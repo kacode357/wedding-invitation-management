@@ -1,0 +1,147 @@
+{
+    "title": "Health Interventions - Protection and Prevention",
+    "source_images": ["image_e4a7d8.jpg", "image_e4a7f9.jpg", "image_e4a813.png"],
+    "dialogue": [
+      {
+        "line_id": 1,
+        "speaker": "Speaker",
+        "content": [
+          { "type": "text", "value": "Good afternoon, and thank you for " },
+          { "type": "blank", "id": "audio4_q1" },
+          { "type": "text", "value": ". This will be the first talk in a series of five on Health interventions - " },
+          { "type": "blank", "id": "audio4_q2" },
+          { "type": "text", "value": ". Could I start by asking for " },
+          { "type": "blank", "id": "audio4_q3" },
+          { "type": "text", "value": " - how many of you " },
+          { "type": "blank", "id": "audio4_q4" },
+          { "type": "text", "value": " at the beginning of winter? Mmm ... I thought so. You young ones always think you're indestructible." }
+        ]
+      },
+      {
+        "line_id": 2,
+        "speaker": "Speaker",
+        "content": [
+          { "type": "text", "value": "Well, " },
+          { "type": "blank", "id": "audio4_q5" },
+          { "type": "text", "value": " disease-spreading germs or pathogens are everywhere. " },
+          { "type": "blank", "id": "audio4_q6" },
+          { "type": "text", "value": " the human body has to ward off " },
+          { "type": "blank", "id": "audio4_q7" },
+          { "type": "text", "value": " and viruses. A healthy body has a good defence system against many of these germs but " },
+          { "type": "blank", "id": "audio4_q8" },
+          { "type": "text", "value": " only operates well against micro-organisms that it has already encountered, " },
+          { "type": "blank", "id": "audio4_q9" },
+          { "type": "text", "value": " it is said to be immune. " },
+          { "type": "blank", "id": "audio4_q10" },
+          { "type": "text", "value": " in which humans acquire natural immunity: actively, when a person " },
+          { "type": "blank", "id": "audio4_q11" },
+          { "type": "text", "value": " and then recovered from an illness, and passively, when " },
+          { "type": "blank", "id": "audio4_q12" },
+          { "type": "text", "value": " is transferred into the body, for example, from the maternal blood via the umbilical cord " },
+          { "type": "blank", "id": "audio4_q13" },
+          { "type": "text", "value": ", or through breast milk." }
+        ]
+      },
+      {
+        "line_id": 3,
+        "speaker": "Speaker",
+        "content": [
+          { "type": "text", "value": "Now, artificially acquired immunity can " },
+          { "type": "blank", "id": "audio4_q14" },
+          { "type": "text", "value": " so we can use active immunisation as a preventative measure. This is " },
+          { "type": "blank", "id": "audio4_q15" },
+          { "type": "text", "value": " an illness by injection or oral ingestion of a tiny amount of weakened or inactive germs - " },
+          { "type": "blank", "id": "audio4_q16" },
+          { "type": "text", "value": " actually cause him or her to contract the illness but sufficient for the body's " },
+          { "type": "blank", "id": "audio4_q17" },
+          { "type": "text", "value": " to recognise and respond to the threat by forming antibodies." }
+        ]
+      },
+      {
+        "line_id": 4,
+        "speaker": "Speaker",
+        "content": [
+          { "type": "text", "value": "Intervention using passive immunisation, on the other hand, " },
+          { "type": "blank", "id": "audio4_q18" },
+          { "type": "text", "value": " curing an illness after it is too late for prevention. " },
+          { "type": "blank", "id": "audio4_q19" },
+          { "type": "text", "value": " than active immunisation and " },
+          { "type": "blank", "id": "audio4_q20" },
+          { "type": "text", "value": ". It is used when the body has already been invaded by bacteria and " },
+          { "type": "blank", "id": "audio4_q21" },
+          { "type": "text", "value": ". In this case there is no time for the body to make antibodies of its own so proteins - usually taken from " },
+          { "type": "blank", "id": "audio4_q22" },
+          { "type": "text", "value": " - are injected to equip the patient with the essential antibodies to combat the particular illness." }
+        ]
+      },
+      {
+        "line_id": 5,
+        "speaker": "Speaker",
+        "content": [
+          { "type": "text", "value": "Let's have a quick look at a bit of history: " },
+          { "type": "blank", "id": "audio4_q23" },
+          { "type": "text", "value": " to boost the body's immune system by making it sensitive to particular disease-causing bacteria was made by " },
+          { "type": "blank", "id": "audio4_q24" },
+          { "type": "text", "value": " Edward Jenner. He noticed that " },
+          { "type": "blank", "id": "audio4_q25" },
+          { "type": "text", "value": " smallpox, a common but extremely dangerous disease, never contracted the disease " },
+          { "type": "blank", "id": "audio4_q26" },
+          { "type": "text", "value": ". In other words, they were " },
+          { "type": "blank", "id": "audio4_q27" },
+          { "type": "text", "value": ". He studied a similar disease in cows called cowpox and realised that " },
+          { "type": "blank", "id": "audio4_q28" },
+          { "type": "text", "value": " with the infected cows became ill with symptoms resembling smallpox. However, this disease was quite mild " },
+          { "type": "blank", "id": "audio4_q29" },
+          { "type": "text", "value": " and those who contracted cowpox were then immune to smallpox. " },
+          { "type": "blank", "id": "audio4_q30" },
+          { "type": "text", "value": " by injecting a child with a small amount of pus taken from a cowpox pustule. The child subsequently became ill " },
+          { "type": "blank", "id": "audio4_q31" },
+          { "type": "text", "value": ". Later, he injected the child with pus from a smallpox pustule and the child did not get sick. " },
+          { "type": "blank", "id": "audio4_q32" },
+          { "type": "text", "value": " the more dangerous disease. The antibodies produced to fight the cowpox bacteria had been able to " },
+          { "type": "blank", "id": "audio4_q33" },
+          { "type": "text", "value": "." }
+        ]
+      },
+      {
+        "line_id": 6,
+        "speaker": "Speaker",
+        "content": [
+          { "type": "text", "value": "What are antibodies? Well, " },
+          { "type": "blank", "id": "audio4_q34" },
+          { "type": "text", "value": " white blood cells called B-lymphocytes. And this is done in response to " },
+          { "type": "blank", "id": "audio4_q35" },
+          { "type": "text", "value": " antigens, or other bacterial toxins, which have been released by the micro-organisms (what we commonly refer to as 'germs') " },
+          { "type": "blank", "id": "audio4_q36" },
+          { "type": "text", "value": ". These Y-shaped antibodies (or you can think of them as 'anti-toxins') may stop the toxins or " },
+          { "type": "blank", "id": "audio4_q37" },
+          { "type": "text", "value": " they have done by what is known as the antigen-antibody reaction " },
+          { "type": "blank", "id": "audio4_q38" },
+          { "type": "text", "value": " within the plasma of the blood. A correct antibody (for that disease) clings to a particular antigen in order to render it harmless. " },
+          { "type": "blank", "id": "audio4_q39" },
+          { "type": "text", "value": " clump together " },
+          { "type": "blank", "id": "audio4_q40" },
+          { "type": "text", "value": ". This is called agglutination and is able to " },
+          { "type": "blank", "id": "audio4_q41" },
+          { "type": "text", "value": " which is very helpful for doctors and other specialists to determine which illnesses a patient is immune to." }
+        ]
+      },
+      {
+        "line_id": 7,
+        "speaker": "Speaker",
+        "content": [
+          { "type": "text", "value": "Inoculation, or active vaccination, " },
+          { "type": "blank", "id": "audio4_q42" },
+          { "type": "text", "value": ". The vaccine may make a person " },
+          { "type": "blank", "id": "audio4_q43" },
+          { "type": "text", "value": " for a few days when the immune system starts to produce antibodies to match the introduced antigen. This is called " },
+          { "type": "blank", "id": "audio4_q44" },
+          { "type": "text", "value": ". If that particular antigen should ever enter the body again later, " },
+          { "type": "blank", "id": "audio4_q45" },
+          { "type": "text", "value": ". The body is then able to produce large numbers of corresponding antibodies " },
+          { "type": "blank", "id": "audio4_q46" },
+          { "type": "text", "value": " so the invading antigens are quickly wiped out without the person suffering any harm from the disease." }
+        ]
+      }
+    ]
+  }

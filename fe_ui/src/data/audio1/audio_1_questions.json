@@ -1,0 +1,433 @@
+{
+    "title": "Accommodation Enquiry",
+    "type": "gap_fill_exercise",
+    "dialogue": [
+      {
+        "id": 1,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Good morning. Ace Accommodation; how can I help you?" }
+        ]
+      },
+      {
+        "id": 2,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "Good morning. " },
+          { "type": "blank", "id": "audio1_q1" },
+          { "type": "text", "value": " on the Gold Coast, please." }
+        ]
+      },
+      {
+        "id": 3,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Certainly. Who am I speaking to?" }
+        ]
+      },
+      {
+        "id": 4,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "Miss Mackinlay. Sylvia Mackinlay." }
+        ]
+      },
+      {
+        "id": 5,
+        "speaker": "Agent",
+        "text": [
+          { "type": "blank", "id": "audio1_q2" },
+          { "type": "text", "value": " for me please?" }
+        ]
+      },
+      {
+        "id": 6,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "It's M-A-C-K-I-N-L-A-Y." }
+        ]
+      },
+      {
+        "id": 7,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Thank you. And your first name is Sylvia?" }
+        ]
+      },
+      {
+        "id": 8,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "Yes." }
+        ]
+      },
+      {
+        "id": 9,
+        "speaker": "Agent",
+        "text": [
+          { "type": "blank", "id": "audio1_q3" },
+          { "type": "text", "value": "?" }
+        ]
+      },
+      {
+        "id": 10,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "A 'y' — the old fashioned way. That's S-Y-L-V-I-A." }
+        ]
+      },
+      {
+        "id": 11,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Thank you, Miss Mackinlay. Now, just for our records, " },
+          { "type": "blank", "id": "audio1_q4" },
+          { "type": "text", "value": "?" }
+        ]
+      },
+      {
+        "id": 12,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "Of course-it's England actually." }
+        ]
+      },
+      {
+        "id": 13,
+        "speaker": "Agent",
+        "text": [
+          { "type": "blank", "id": "audio1_q5" },
+          { "type": "text", "value": " Now, when are you coming?" }
+        ]
+      },
+      {
+        "id": 14,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "Well, at the moment we're planning on " },
+          { "type": "blank", "id": "audio1_q6" }
+        ]
+      },
+      {
+        "id": 15,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Ooh, the 25th, that's the last day of the public holiday and " },
+          { "type": "blank", "id": "audio1_q7" },
+          { "type": "text", "value": " find something available on that date." }
+        ]
+      },
+      {
+        "id": 16,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "No, we're coming " },
+          { "type": "blank", "id": "audio1_q8" }
+        ]
+      },
+      {
+        "id": 17,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Oh, well that's fine then. " },
+          { "type": "blank", "id": "audio1_q9" },
+          { "type": "text", "value": " vacant by then although you wouldn't be able to move in until late afternoon because our cleaning crew " },
+          { "type": "blank", "id": "audio1_q10" }
+        ]
+      },
+      {
+        "id": 18,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "That suits us - our flight " },
+          { "type": "blank", "id": "audio1_q11" },
+          { "type": "text", "value": " early evening anyway." }
+        ]
+      },
+      {
+        "id": 19,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "How many of you will there be?" }
+        ]
+      },
+      {
+        "id": 20,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "Just my sister and myself." }
+        ]
+      },
+      {
+        "id": 21,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "And how long do you intend to stay for?" }
+        ]
+      },
+      {
+        "id": 22,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "Oh, " },
+          { "type": "blank", "id": "audio1_q12" },
+          { "type": "text", "value": ", we'd like to stay longer but we'll have to get back to work." }
+        ]
+      },
+      {
+        "id": 23,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "So, you're not coming on business then?" }
+        ]
+      },
+      {
+        "id": 24,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "blank", "id": "audio1_q13" },
+          { "type": "text", "value": " Why? What difference does that make?" }
+        ]
+      },
+      {
+        "id": 25,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Oh, you'd be surprised. Business people " },
+          { "type": "blank", "id": "audio1_q14" },
+          { "type": "text", "value": "-you know, wireless internet, even fax machines and photocopiers." }
+        ]
+      },
+      {
+        "id": 26,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "No, we won't need any of that stuff-" },
+          { "type": "blank", "id": "audio1_q15" },
+          { "type": "text", "value": ", and get away from all that kind of thing." }
+        ]
+      },
+      {
+        "id": 27,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Good. Now, " },
+          { "type": "blank", "id": "audio1_q16" },
+          { "type": "text", "value": "? A house, a duplex or an apartment?" }
+        ]
+      },
+      {
+        "id": 28,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "What's a duplex?" }
+        ]
+      },
+      {
+        "id": 29,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Oh, that's what you might call a townhouse or a unit-you know, two houses semi-detached " },
+          { "type": "blank", "id": "audio1_q17" }
+        ]
+      },
+      {
+        "id": 30,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "Oh, I see. I think an apartment " },
+          { "type": "blank", "id": "audio1_q18" }
+        ]
+      },
+      {
+        "id": 31,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "And how many bedrooms? Two?" }
+        ]
+      },
+      {
+        "id": 32,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "One or two- " },
+          { "type": "blank", "id": "audio1_q19" },
+          { "type": "text", "value": " My sister and I don't mind sharing if it's a decent size bedroom with two beds." }
+        ]
+      },
+      {
+        "id": 33,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Well, " },
+          { "type": "blank", "id": "q20" }
+        ]
+      },
+      {
+        "id": 34,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "And car parking? Will you require a lock-up " },
+          { "type": "blank", "id": "audio1_q21" },
+          { "type": "text", "value": "?" }
+        ]
+      },
+      {
+        "id": 35,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "They're a little harder to find with an apartment. " },
+          { "type": "blank", "id": "audio1_q22" },
+          { "type": "text", "value": " and as far as I know there are no regulations concerning car parking. I think " },
+          { "type": "blank", "id": "audio1_q23" },
+          { "type": "text", "value": " and it's secure there shouldn't be any problems." }
+        ]
+      },
+      {
+        "id": 36,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Okay. Now, I'm assuming you " },
+          { "type": "blank", "id": "audio1_q24" },
+          { "type": "text", "value": "?" }
+        ]
+      },
+      {
+        "id": 37,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "Yes, that's the idea. We want to enjoy the surf, sand and sunshine." }
+        ]
+      },
+      {
+        "id": 38,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Okay, but before we settle on an area and " },
+          { "type": "blank", "id": "audio1_q25" },
+          { "type": "text", "value": ", I'll need to know about " },
+          { "type": "blank", "id": "audio1_q26" }
+        ]
+      },
+      {
+        "id": 39,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "What do you mean?" }
+        ]
+      },
+      {
+        "id": 40,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Well, for example, do you want to be " },
+          { "type": "blank", "id": "audio1_q27" },
+          { "type": "text", "value": " or the casino or the fun parks? Or do you want to be in a complex with or " },
+          { "type": "blank", "id": "audio1_q28" },
+          { "type": "text", "value": "?" }
+        ]
+      },
+      {
+        "id": 41,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "No, none of that really matters to us but we'd like to " },
+          { "type": "blank", "id": "audio1_q29" },
+          { "type": "text", "value": " so that we can drive up to Brisbane to visit friends there." }
+        ]
+      },
+      {
+        "id": 42,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Well, there are quite a few lovely small towns " },
+          { "type": "blank", "id": "audio1_q30" },
+          { "type": "text", "value": ". There's Main Beach which is north of Surfers' Paradise or Mermaid Waters " },
+          { "type": "blank", "id": "audio1_q31" },
+          { "type": "text", "value": " or Palm Beach which is quite a bit further south?" }
+        ]
+      },
+      {
+        "id": 43,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "Mermaid Waters sounds " },
+          { "type": "blank", "id": "audio1_q32" },
+          { "type": "text", "value": ". Is it close to the motorway?" }
+        ]
+      },
+      {
+        "id": 44,
+        "speaker": "Agent",
+        "text": [
+          { "type": "blank", "id": "audio1_q33" },
+          { "type": "text", "value": ", the M 1 is actually closest to Palm Beach and prices are likely to be more reasonable there too." }
+        ]
+      },
+      {
+        "id": 45,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "blank", "id": "audio1_q34" },
+          { "type": "text", "value": " Palm Beach " },
+          { "type": "blank", "id": "audio1_q35" }
+        ]
+      },
+      {
+        "id": 46,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Now, if you'll just give me " },
+          { "type": "blank", "id": "audio1_q36" },
+          { "type": "text", "value": ", I can send you information about the town and lots of photos." }
+        ]
+      },
+      {
+        "id": 47,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "Well, my email is " },
+          { "type": "blank", "id": "audio1_q37" }
+        ]
+      },
+      {
+        "id": 48,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "And, one final thing, how much are you looking to spend per week " },
+          { "type": "blank", "id": "audio1_q38" },
+          { "type": "text", "value": "? Do you want something " },
+          { "type": "blank", "id": "audio1_q39" },
+          { "type": "text", "value": "-you know, newly redecorated, great views, all the mod cons ... " },
+          { "type": "blank", "id": "audio1_q40" },
+          { "type": "text", "value": " Could we get something clean, comfortable and reasonable for $1200 a week?" }
+        ]
+      },
+      {
+        "id": 49,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Could you " },
+          { "type": "blank", "id": "audio1_q41" },
+          { "type": "text", "value": "? I've got a property in mind that you'll absolutely love but you'd have to go to 1500, " },
+          { "type": "blank", "id": "audio1_q42" }
+        ]
+      },
+      {
+        "id": 50,
+        "speaker": "Sylvia",
+        "text": [
+          { "type": "text", "value": "Alright, then. But that's our top limit." }
+        ]
+      },
+      {
+        "id": 51,
+        "speaker": "Agent",
+        "text": [
+          { "type": "text", "value": "Good. I'll get on to this " },
+          { "type": "blank", "id": "audio1_q43" },
+          { "type": "text", "value": " and there should be something in your inbox shortly." }
+        ]
+      }
+    ]
+  }
