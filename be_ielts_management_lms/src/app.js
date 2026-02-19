@@ -7,6 +7,9 @@ const swaggerSpec = require("./docs/swagger");
 const { isAppError } = require("./utils/appError");
 const { sendError } = require("./utils/response");
 const MESSAGES = require("./constants/messages");
+const dashboardService = require("./services/dashboard.service");
+const auth = require("./middleware/auth");
+const authorizeRoles = require("./middleware/authorizeRoles");
 
 const app = express();
 
@@ -42,7 +45,7 @@ app.get("/health", (req, res) => {
   res.json({ 
     status: "ok", 
     timestamp: new Date().toISOString(),
-    service: "IELTS Management LMS API"
+    service: "Wedding Invitation Management API"
   });
 });
 
@@ -54,26 +57,108 @@ app.get("/health", (req, res) => {
  *     summary: API Root - Welcome message
  *     responses:
  *       200:
- *         description: Welcome to IELTS Management LMS API
+ *         description: Welcome to Wedding Invitation Management API
  */
 app.get("/", (req, res) => {
   res.json({
     success: true,
-    message: "Welcome to IELTS Management LMS API",
+    message: "Welcome to Wedding Invitation Management API",
     version: "1.0.0",
     documentation: "/api-docs",
     health: "/health",
+    dashboard: "/api/dashboard",
     endpoints: {
-      auth: "/api/auth"
+      auth: "/api/auth",
+      guests: "/api/guests",
+      tables: "/api/tables",
+      categories: "/api/categories"
     }
   });
+});
+
+/**
+ * @swagger
+ * /api/dashboard:
+ *   get:
+ *     tags: [Dashboard]
+ *     summary: API Dashboard - Returns comprehensive API information and statistics
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: API dashboard with statistics
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Welcome to Wedding Invitation Management API"
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                 statistics:
+ *                   type: object
+ *                   properties:
+ *                     guests:
+ *                       type: object
+ *                       properties:
+ *                         total:
+ *                           type: number
+ *                     tables:
+ *                       type: object
+ *                       properties:
+ *                         total:
+ *                           type: number
+ *                         occupied:
+ *                           type: number
+ *                         available:
+ *                           type: number
+ *                     guestsByCategory:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           category:
+ *                             type: string
+ *                           count:
+ *                             type: number
+ *                     unassignedGuests:
+ *                       type: number
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
+ *       403:
+ *         description: Forbidden - User does not have required role
+ */
+app.get("/api/dashboard", auth, authorizeRoles("admin", "teacher"), async (req, res) => {
+  try {
+    const statistics = await dashboardService.getDashboardData();
+    
+    res.json({
+      success: true,
+      message: "Welcome to Wedding Invitation Management API",
+      timestamp: new Date().toISOString(),
+      statistics: statistics
+    });
+  } catch (error) {
+    console.error("Error fetching dashboard data:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch dashboard statistics",
+      errors: []
+    });
+  }
 });
 
 // Swagger API Documentation
 if (isSwaggerEnabled) {
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
     customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: "IELTS LMS API Documentation",
+    customSiteTitle: "Wedding Invitation Management API Documentation",
     customJs: '/swagger-clear-auth.js',
     swaggerOptions: {
       persistAuthorization: false,
@@ -109,6 +194,15 @@ if (isSwaggerEnabled) {
 
 // API Routes - User Authentication only
 app.use("/api/auth", require("./routes/auth.routes"));
+
+// Guest Management Routes
+app.use("/api/guests", require("./routes/guest.routes"));
+
+// Table Management Routes
+app.use("/api/tables", require("./routes/table.routes"));
+
+// Category Management Routes
+app.use("/api/categories", require("./routes/category.routes"));
 
 // 404 Handler
 app.use((req, res, next) => {

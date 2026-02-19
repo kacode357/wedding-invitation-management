@@ -38,7 +38,7 @@ async function connectDB() {
 }
 
 // Helper để lấy database
-async function getDB(dbName = "ielts_lms") {
+async function getDB(dbName = "wedding_invitation_management") {
   const c = await connectDB();
   return c.db(dbName);
 }

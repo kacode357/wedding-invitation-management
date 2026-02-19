@@ -3,7 +3,7 @@ require("dotenv").config();
 const mysql = require("mysql2/promise");
 
 async function createDatabase() {
-  const dbName = process.env.DB_NAME || "ielts_lms_db";
+  const dbName = process.env.DB_NAME || "wedding_invitation_management_db";
   
   // Connect to MySQL without specifying database
   const connection = await mysql.createConnection({

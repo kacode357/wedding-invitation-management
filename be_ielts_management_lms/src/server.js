@@ -4,6 +4,7 @@ require("dotenv").config();
 const app = require("./app");
 const { initDatabase } = require("./db/init");
 const { seedAdminUser } = require("./seeds/admin.seed");
+const { seedCategories } = require("./seeds/category.seed");
 const { exec } = require("child_process");
 
 /**
@@ -137,13 +138,16 @@ async function start() {
   // Seed admin user if not exists
   await seedAdminUser();
 
+  // Seed initial categories if not exist
+  await seedCategories();
+
   // Start HTTP server - get API URL from environment
   const serverUrl = process.env.NODE_ENV === "production"
     ? getNormalizedApiUrl()
     : `http://localhost:${PORT}`;
 
   app.listen(PORT, () => {
-    console.log(`\n🚀 IELTS Management LMS API`);
+    console.log(`\n🚀 Wedding Invitation Management API`);
     console.log(`   Port: ${PORT}`);
     console.log(`   Environment: ${process.env.NODE_ENV}`);
     console.log(`   API: ${serverUrl}`);

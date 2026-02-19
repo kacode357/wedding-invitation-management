@@ -27,7 +27,7 @@ async function sendEmail(to, subject, html, text = "") {
     }
 
     const info = await transporter.sendMail({
-      from: `"IELTS Management LMS" <${process.env.EMAIL_USER}>`,
+      from: `"Wedding Invitation Management" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       text,
@@ -46,13 +46,13 @@ async function sendEmail(to, subject, html, text = "") {
  * Send welcome email to new user
  */
 async function sendWelcomeEmail(email, name, role) {
-  const subject = "Welcome to IELTS Management LMS";
+  const subject = "Welcome to Wedding Invitation Management";
   const html = `
     <h2>Welcome ${name}!</h2>
     <p>Your ${role} account has been created successfully.</p>
-    <p>You can now log in to the system and start using IELTS Management LMS.</p>
+    <p>You can now log in to the system and start using Wedding Invitation Management.</p>
     <br>
-    <p>Best regards,<br>IELTS Management LMS Team</p>
+    <p>Best regards,<br>Wedding Invitation Management Team</p>
   `;
   
   return sendEmail(email, subject, html);
@@ -72,7 +72,7 @@ async function sendPasswordResetEmail(email, resetToken) {
     <p>This link will expire in 1 hour.</p>
     <p>If you didn't request this, please ignore this email.</p>
     <br>
-    <p>Best regards,<br>IELTS Management LMS Team</p>
+    <p>Best regards,<br>Wedding Invitation Management Team</p>
   `;
   
   return sendEmail(email, subject, html);

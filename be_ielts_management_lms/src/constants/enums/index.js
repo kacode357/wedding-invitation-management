@@ -15,6 +15,7 @@ const { LESSON_TYPE, LESSON_TYPE_LIST } = require("./lesson.enum");
 const { MATERIAL_TYPE, MATERIAL_TYPE_LIST } = require("./material.enum");
 const { QUIZ_TYPE, QUIZ_TYPE_LIST } = require("./quiz.enum");
 const { QUESTION_TYPE, QUESTION_TYPE_LIST } = require("./question.enum");
+const { GUEST_CATEGORIES, GUEST_CATEGORY_LIST, DEFAULT_TABLE_CAPACITY } = require("./guest.enum");
 
 module.exports = {
   // User & Role
@@ -65,5 +66,10 @@ module.exports = {
 
   // Question
   QUESTION_TYPE,
-  QUESTION_TYPE_LIST
+  QUESTION_TYPE_LIST,
+
+  // Guest
+  GUEST_CATEGORIES,
+  GUEST_CATEGORY_LIST,
+  DEFAULT_TABLE_CAPACITY
 };

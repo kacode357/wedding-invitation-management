@@ -1,24 +1,24 @@
 {
   "app": {
-    "name": "IELTS Management LMS",
+    "name": "Wedding Invitation Management",
     "version": "1.0.0",
-    "description": "Learning Management System for IELTS Teachers and Students"
+    "description": "Wedding Invitation Management System for Event Planning and Guest Management"
   },
   "pagination": {
     "defaultLimit": 20,
     "maxLimit": 100
   },
-  "student": {
-    "maxCoursesPerStudent": 15,
-    "defaultTargetBand": 6.5
+  "guest": {
+    "maxEventsPerGuest": 10,
+    "defaultRsvpStatus": "pending"
   },
-  "course": {
-    "maxStudentsPerClass": 30,
-    "defaultDurationWeeks": 12
+  "event": {
+    "maxGuestsPerEvent": 500,
+    "defaultEventDurationHours": 4
   },
-  "assessment": {
-    "bandScoreMin": 0,
-    "bandScoreMax": 9,
-    "bandScoreStep": 0.5
+  "invitation": {
+    "invitationStatusPending": "pending",
+    "invitationStatusAccepted": "accepted",
+    "invitationStatusDeclined": "declined"
   }
 }
