@@ -21,9 +21,9 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: process.env.API_TITLE || "IELTS Management LMS API",
+      title: process.env.API_TITLE || "Wedding Invitation Management API",
       version: process.env.API_VERSION || "1.0.0",
-      description: process.env.API_DESCRIPTION || "User Authentication API for IELTS Learning Management System",
+      description: process.env.API_DESCRIPTION || "User Authentication API for Wedding Invitation Management System",
       contact: {
         name: "API Support",
         email: getContactEmail(),
@@ -144,6 +144,47 @@ const options = {
             newPassword: { type: "string", minLength: 8 },
           },
         },
+        Guest: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "64f8a2c9e123456789abcdef" },
+            guestName: { type: "string", example: "John Doe" },
+            categoryId: { type: "string", nullable: true, example: "64f8a2c9e123456789abcdef" },
+            category: { type: "string", nullable: true, example: "Family" },
+            phone: { type: "string", example: "+1234567890" },
+            numberOfGuests: { type: "number", example: 2 },
+            invitationSent: { type: "boolean", example: true },
+            tableId: { type: "string", nullable: true, example: "64f8a2c9e123456789abcdef" },
+            tableName: { type: "string", nullable: true, example: "Table 1" },
+            notes: { type: "string", nullable: true },
+            isArrived: { type: "boolean", example: false },
+            arrivedAt: { type: "string", format: "date-time", nullable: true },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
+          },
+        },
+        Table: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "64f8a2c9e123456789abcdef" },
+            tableNumber: { type: "string", example: "Table 1" },
+            capacity: { type: "number", example: 10 },
+            status: { type: "string", enum: ["available", "occupied"], example: "available" },
+            currentGuests: { type: "number", example: 0 },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
+          },
+        },
+        Category: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "64f8a2c9e123456789abcdef" },
+            name: { type: "string", example: "Family" },
+            description: { type: "string", nullable: true },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
+          },
+        },
       },
     },
     security: [
@@ -159,10 +200,31 @@ const options = {
       {
         name: "Health",
         description: "Health check endpoints"
+      },
+      {
+        name: "Root",
+        description: "API root endpoint"
+      },
+      {
+        name: "Dashboard",
+        description: "API dashboard endpoints (requires authentication)"
+      },
+      {
+        name: "Guests",
+        description: "Guest management endpoints (requires authentication)"
+      },
+      {
+        name: "Tables",
+        description: "Table management endpoints (requires authentication)"
+      },
+      {
+        name: "Categories",
+        description: "Category management endpoints (requires authentication)"
       }
     ],
   },
   apis: [
+    "./src/app.js",
     "./src/routes/**/*.js",
     "./src/controllers/**/*.js",
   ],
