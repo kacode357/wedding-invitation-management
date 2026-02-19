@@ -59,7 +59,6 @@ export default function AddGuestPage() {
   const { categories, isLoading: isLoadingCategories, error: categoriesError, fetchCategories } = useCategories();
   
   const [guests, setGuests] = useState<GuestFormData[]>(() => loadSavedData());
-  const [lastSelectedCategory, setLastSelectedCategory] = useState<number>(0);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -84,18 +83,11 @@ export default function AddGuestPage() {
         ? { ...guest, [name]: numValue }
         : guest
     ));
-    
-    // Track last selected category for smart auto-fill
-    if (name === 'categoryId') {
-      setLastSelectedCategory(Number(value));
-    }
   };
 
   const addMoreGuests = () => {
-    // Smart auto-fill: inherit category from last guest
-    const lastGuest = guests[guests.length - 1];
-    const defaultCategoryId = lastGuest?.categoryId || lastSelectedCategory;
-    setGuests(prev => [...prev, { id: crypto.randomUUID(), ...createEmptyGuest(typeof defaultCategoryId === 'number' ? defaultCategoryId : 0) }]);
+    // Each new guest starts with empty category (no auto-fill)
+    setGuests(prev => [...prev, { id: crypto.randomUUID(), ...createEmptyGuest(0) }]);
   };
 
   const removeGuest = (id: string) => {
@@ -131,8 +123,8 @@ export default function AddGuestPage() {
         toast.success(`Successfully added ${validGuests.length} guest${validGuests.length > 1 ? 's' : ''}!`);
         // Clear saved form data after successful submission
         clearSavedData();
-        // Reset to single empty form
-        setGuests([{ id: crypto.randomUUID(), ...createEmptyGuest(lastSelectedCategory || 0) }]);
+        // Reset to single empty form with no category selected
+        setGuests([{ id: crypto.randomUUID(), ...createEmptyGuest(0) }]);
       } else {
         toast.error(response.message || 'Failed to add guests');
       }
