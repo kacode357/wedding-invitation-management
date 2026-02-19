@@ -21,43 +21,29 @@ function getNormalizedApiUrl() {
   return url;
 }
 
-// Save .env PORT before it gets overridden by deployment platform
-const ENV_FILE_PORT = process.env.PORT;
-
 /**
  * Get port for the server
- * 
- * Priority:
- * 1. In production: PORT from API_URL - auto-detect from your deployed URL
- * 2. PORT from .env file - if explicitly set (for local dev)
- * 3. PORT from deployment platform (Render, Railway, etc.) - fallback
- * 4. Default to 5000
- * 
+ * In production (Railway, Render, etc.), always use the platform-assigned PORT
+ * In development, use .env PORT or default 5000
  * @returns {number} - The port number to use
  */
 function getPort() {
-  // Priority 1: In production, auto-detect from API_URL first
-  const apiUrl = getNormalizedApiUrl();
-  if (process.env.NODE_ENV === "production" && apiUrl) {
-    try {
-      const url = new URL(apiUrl);
-      if (url.port) {
-        return parseInt(url.port, 10);
-      }
-      return url.protocol === "https:" ? 443 : 80;
-    } catch (e) {}
+  // In production, always use platform PORT (Railway, Render, etc.)
+  // These platforms set PORT environment variable automatically
+  if (process.env.NODE_ENV === "production") {
+    // Platform PORT takes priority in production
+    if (process.env.PORT) {
+      return parseInt(process.env.PORT, 10);
+    }
+    // Fallback for production without PORT (shouldn't happen on major platforms)
+    return 8080;
   }
 
-  // Priority 2: .env PORT (local dev)
-  if (ENV_FILE_PORT) {
-    return parseInt(ENV_FILE_PORT, 10);
-  }
-
-  // Priority 3: Platform PORT (fallback)
+  // Development: use .env PORT if set, otherwise default 5000
   if (process.env.PORT) {
     return parseInt(process.env.PORT, 10);
   }
-
+  
   return 5000;
 }
 
