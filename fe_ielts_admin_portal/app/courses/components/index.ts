@@ -1,6 +1,0 @@
-export { CoursesFilters } from './CoursesFilters'
-export { CourseCard } from './CourseCard'
-export { CourseModal } from './CourseModal'
-export { CoursesHeader } from './CoursesHeader'
-export { CoursesGrid } from './CoursesGrid'
-export { CoursesPagination } from './CoursesPagination'

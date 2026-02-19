@@ -5,9 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon ./src/server.js",
-    "start": "node ./src/server.js",
-    "db:clear": "node ./scripts/reset-and-seed.js --force",
-    "db:seed": "node ./scripts/seed-data.js"
+    "start": "node ./src/server.js"
   },
   "keywords": [
     "ielts",
@@ -31,6 +29,7 @@
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.30.1",
     "mongodb": "^7.1.0",
+    "mongoose": "^9.2.1",
     "nodemailer": "^7.0.12",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"

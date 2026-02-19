@@ -46,6 +46,29 @@ app.get("/health", (req, res) => {
   });
 });
 
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     tags: [Root]
+ *     summary: API Root - Welcome message
+ *     responses:
+ *       200:
+ *         description: Welcome to IELTS Management LMS API
+ */
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "Welcome to IELTS Management LMS API",
+    version: "1.0.0",
+    documentation: "/api-docs",
+    health: "/health",
+    endpoints: {
+      auth: "/api/auth"
+    }
+  });
+});
+
 // Swagger API Documentation
 if (isSwaggerEnabled) {
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
@@ -84,13 +107,8 @@ if (isSwaggerEnabled) {
   console.log("✗ Swagger UI disabled (NODE_ENV=" + process.env.NODE_ENV + ")");
 }
 
-// API Routes
+// API Routes - User Authentication only
 app.use("/api/auth", require("./routes/auth.routes"));
-app.use("/api/teachers", require("./routes/teacher.routes"));
-app.use("/api/courses", require("./routes/course.routes"));
-app.use("/api/course-levels", require("./routes/courseLevel.routes"));
-app.use("/api/schedules", require("./routes/schedule.routes"));
-app.use("/api/attendance", require("./routes/attendance.routes"));
 
 // 404 Handler
 app.use((req, res, next) => {

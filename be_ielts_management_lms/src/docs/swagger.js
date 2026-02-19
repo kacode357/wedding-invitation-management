@@ -1,4 +1,4 @@
-// Swagger/OpenAPI documentation configuration
+// Swagger/OpenAPI documentation configuration for User API
 const swaggerJsdoc = require("swagger-jsdoc");
 
 // Dynamic server URL based on environment
@@ -18,7 +18,7 @@ const options = {
     info: {
       title: process.env.API_TITLE || "IELTS Management LMS API",
       version: process.env.API_VERSION || "1.0.0",
-      description: process.env.API_DESCRIPTION || "API documentation for IELTS Learning Management System",
+      description: process.env.API_DESCRIPTION || "User Authentication API for IELTS Learning Management System",
       contact: {
         name: "API Support",
         email: getContactEmail(),
@@ -50,9 +50,16 @@ const options = {
               type: "string",
               example: "Error message",
             },
-            details: {
-              type: "object",
+            errors: {
+              type: "array",
               nullable: true,
+              items: {
+                type: "object",
+                properties: {
+                  message: { type: "string" },
+                  field: { type: "string" }
+                }
+              }
             },
           },
         },
@@ -73,6 +80,65 @@ const options = {
             },
           },
         },
+        User: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "64f8a2c9e123456789abcdef" },
+            email: { type: "string", format: "email", example: "user@example.com" },
+            firstName: { type: "string", example: "John" },
+            lastName: { type: "string", example: "Doe" },
+            phone: { type: "string", example: "+1234567890" },
+            avatar: { type: "string", nullable: true },
+            role: { type: "string", enum: ["student", "teacher", "admin"] },
+            isActive: { type: "boolean", example: true },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
+          },
+        },
+        LoginRequest: {
+          type: "object",
+          required: ["email", "password"],
+          properties: {
+            email: { type: "string", format: "email" },
+            password: { type: "string", format: "password" },
+          },
+        },
+        RegisterRequest: {
+          type: "object",
+          required: ["email", "password", "firstName", "lastName", "role"],
+          properties: {
+            email: { type: "string", format: "email" },
+            password: { type: "string", minLength: 8 },
+            firstName: { type: "string" },
+            lastName: { type: "string" },
+            phone: { type: "string" },
+            role: { type: "string", enum: ["student", "teacher", "admin"] },
+          },
+        },
+        TokenResponse: {
+          type: "object",
+          properties: {
+            token: { type: "string" },
+            user: { $ref: "#/components/schemas/User" },
+          },
+        },
+        UpdateProfileRequest: {
+          type: "object",
+          properties: {
+            firstName: { type: "string" },
+            lastName: { type: "string" },
+            phone: { type: "string" },
+            avatar: { type: "string" },
+          },
+        },
+        ChangePasswordRequest: {
+          type: "object",
+          required: ["currentPassword", "newPassword"],
+          properties: {
+            currentPassword: { type: "string" },
+            newPassword: { type: "string", minLength: 8 },
+          },
+        },
       },
     },
     security: [
@@ -80,12 +146,20 @@ const options = {
         bearerAuth: [],
       },
     ],
+    tags: [
+      {
+        name: "Authentication",
+        description: "User authentication and profile management endpoints"
+      },
+      {
+        name: "Health",
+        description: "Health check endpoints"
+      }
+    ],
   },
   apis: [
-    "./src/app.js",
-    "./src/controllers/**/*.js",
     "./src/routes/**/*.js",
-    "./src/models/**/*.js",
+    "./src/controllers/**/*.js",
   ],
 };
 

@@ -1,8 +1,6 @@
 // Response Messages Manager - Multi-language support
 const common = require('./common');
 const auth = require('./auth');
-const course = require('./course');
-const schedule = require('./schedule');
 
 /**
  * Get messages for a specific language
@@ -15,14 +13,12 @@ const getMessages = (lang = "en") => {
   return {
     COMMON: common[validLang],
     AUTH: auth[validLang],
-    COURSE: course[validLang],
-    SCHEDULE: schedule[validLang],
   };
 };
 
 /**
  * Get a specific message
- * @param {string} key - Message key (e.g., 'COURSE.CREATED')
+ * @param {string} key - Message key (e.g., 'AUTH.LOGIN_SUCCESS')
  * @param {string} lang - Language code
  * @returns {string} Message
  */
