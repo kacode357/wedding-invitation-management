@@ -59,6 +59,7 @@ export default function AddGuestPage() {
   const { categories, isLoading: isLoadingCategories, error: categoriesError, fetchCategories } = useCategories();
   
   const [guests, setGuests] = useState<GuestFormData[]>(() => loadSavedData());
+  const [lastCategoryId, setLastCategoryId] = useState<string>('0');
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -83,11 +84,22 @@ export default function AddGuestPage() {
         ? { ...guest, [name]: numValue }
         : guest
     ));
+    
+    // Track last selected category for auto-fill
+    if (name === 'categoryId' && value !== '0') {
+      setLastCategoryId(String(value));
+    }
   };
 
   const addMoreGuests = () => {
-    // Each new guest starts with empty category (no auto-fill)
-    setGuests(prev => [...prev, { id: crypto.randomUUID(), ...createEmptyGuest(0) }]);
+    // Auto-fill: inherit category from last guest or last selected category
+    const lastGuest = guests[guests.length - 1];
+    const defaultCategoryId = lastGuest?.categoryId && lastGuest.categoryId !== 0 
+      ? lastGuest.categoryId 
+      : lastCategoryId !== '0' 
+        ? lastCategoryId 
+        : 0;
+    setGuests(prev => [...prev, { id: crypto.randomUUID(), ...createEmptyGuest(Number(defaultCategoryId)) }]);
   };
 
   const removeGuest = (id: string) => {
@@ -123,8 +135,8 @@ export default function AddGuestPage() {
         toast.success(`Successfully added ${validGuests.length} guest${validGuests.length > 1 ? 's' : ''}!`);
         // Clear saved form data after successful submission
         clearSavedData();
-        // Reset to single empty form with no category selected
-        setGuests([{ id: crypto.randomUUID(), ...createEmptyGuest(0) }]);
+        // Reset to single empty form, keeping last selected category for convenience
+        setGuests([{ id: crypto.randomUUID(), ...createEmptyGuest(Number(lastCategoryId)) }]);
       } else {
         toast.error(response.message || 'Failed to add guests');
       }
