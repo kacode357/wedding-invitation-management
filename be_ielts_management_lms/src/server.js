@@ -6,7 +6,35 @@ const { initDatabase } = require("./db/init");
 const { seedAdminUser } = require("./seeds/admin.seed");
 const { exec } = require("child_process");
 
-const PORT = process.env.PORT || 5000;
+/**
+ * Get port from environment or auto-detect from deployed URL
+ * @returns {number} - The port number to use
+ */
+function getPort() {
+  // If PORT is explicitly set in .env, use it
+  if (process.env.PORT) {
+    return parseInt(process.env.PORT, 10);
+  }
+
+  // In production, try to extract port from API_URL
+  if (process.env.NODE_ENV === "production" && process.env.API_URL) {
+    try {
+      const url = new URL(process.env.API_URL);
+      if (url.port) {
+        return parseInt(url.port, 10);
+      }
+      // For HTTPS, default to 443; for HTTP, default to 80
+      return url.protocol === "https:" ? 443 : 80;
+    } catch (e) {
+      // If URL parsing fails, use default
+    }
+  }
+
+  // Default to 5000
+  return 5000;
+}
+
+const PORT = getPort();
 
 /**
  * Kill process running on specified port
