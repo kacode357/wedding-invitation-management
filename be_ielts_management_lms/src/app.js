@@ -71,7 +71,8 @@ app.get("/", (req, res) => {
       auth: "/api/auth",
       guests: "/api/guests",
       tables: "/api/tables",
-      categories: "/api/categories"
+      categories: "/api/categories",
+      notes: "/api/notes"
     }
   });
 });
@@ -203,6 +204,9 @@ app.use("/api/tables", require("./routes/table.routes"));
 
 // Category Management Routes
 app.use("/api/categories", require("./routes/category.routes"));
+
+// Note Management Routes
+app.use("/api/notes", require("./routes/note.routes"));
 
 // 404 Handler
 app.use((req, res, next) => {

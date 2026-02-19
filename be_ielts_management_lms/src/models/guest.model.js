@@ -2,6 +2,7 @@
 const { getCollection, ObjectId } = require("../db/mongoose");
 const Category = require("../models/category.model");
 const Table = require("../models/table.model");
+const Note = require("../models/note.model");
 const { getGuestCategoryList } = require("../constants/enums/guest.enum");
 
 const COLLECTION_NAME = "guests";
@@ -20,7 +21,7 @@ const COLLECTION_NAME = "guests";
  *         numberOfGuests: { type: number, minimum: 1, maximum: 10 }
  *         invitationSent: { type: boolean }
  *         tableId: { type: string }
- *         notes: { type: string }
+ *         noteId: { type: string, description: "Note ID reference (e.g., NOTE-001)" }
  *         isArrived: { type: boolean, description: "Check-in status - whether guest has arrived" }
  *         arrivedAt: { type: string, format: date-time, description: "Timestamp when guest arrived" }
  *         createdAt: { type: string, format: date-time }
@@ -50,6 +51,23 @@ async function create(data) {
   }
   if (!data.arrivedAt) {
     data.arrivedAt = null;
+  }
+  // Handle noteId - convert to ObjectId if provided
+  if (data.noteId) {
+    // Check if noteId is a valid MongoDB ObjectId or a string like "NOTE-001"
+    try {
+      const note = await Note.findByNoteId(data.noteId);
+      if (note) {
+        data.noteId = note._id;
+      }
+    } catch (e) {
+      // If noteId is already an ObjectId string, use it directly
+      if (data.noteId && data.noteId.match(/^[0-9a-fA-F]{24}$/)) {
+        data.noteId = new ObjectId(data.noteId);
+      } else {
+        data.noteId = null;
+      }
+    }
   }
 
   // Convert categoryId to ObjectId if provided
@@ -81,6 +99,22 @@ async function findById(id) {
       // Get category name
       const category = await Category.findById(categoryIdStr);
       guest.category = category ? category.name : "";
+    }
+    // Get note details if noteId exists
+    if (guest.noteId) {
+      const noteIdStr = guest.noteId.toString();
+      guest.noteId = noteIdStr;
+      // Get note details
+      const note = await Note.findById(noteIdStr);
+      if (note) {
+        guest.note = {
+          noteId: note.noteId,
+          attendanceStatus: note.attendanceStatus,
+          customPrediction: note.customPrediction,
+          invitedCount: note.invitedCount,
+          predictedCount: note.predictedCount
+        };
+      }
     }
   }
 
@@ -135,6 +169,19 @@ async function find(query = {}, options = {}) {
     tableMap[table._id.toString()] = table.tableNumber;
   });
 
+  // Get all notes to map noteId to note details
+  const notes = await Note.find();
+  const noteMap = {};
+  notes.forEach(note => {
+    noteMap[note._id.toString()] = {
+      noteId: note.noteId,
+      attendanceStatus: note.attendanceStatus,
+      customPrediction: note.customPrediction,
+      invitedCount: note.invitedCount,
+      predictedCount: note.predictedCount
+    };
+  });
+
   // Convert tableId and categoryId to string and add category/table names for each guest
   return guests.map(guest => {
     if (guest.tableId) {
@@ -146,6 +193,11 @@ async function find(query = {}, options = {}) {
       const categoryIdStr = guest.categoryId.toString();
       guest.categoryId = categoryIdStr;
       guest.category = categoryMap[categoryIdStr] || "";
+    }
+    // Add note details if noteId exists
+    if (guest.noteId) {
+      const noteIdStr = guest.noteId.toString();
+      guest.note = noteMap[noteIdStr] || null;
     }
     return guest;
   });
@@ -329,6 +381,27 @@ async function updateById(id, data) {
   } else if (data.tableId === null) {
     // Allow setting tableId to null (unassign)
     data.tableId = null;
+  }
+
+  // Handle noteId - convert to ObjectId if provided
+  if (data.noteId) {
+    // Check if noteId is a valid MongoDB ObjectId or a string like "NOTE-001"
+    try {
+      const note = await Note.findByNoteId(data.noteId);
+      if (note) {
+        data.noteId = note._id;
+      }
+    } catch (e) {
+      // If noteId is already an ObjectId string, use it directly
+      if (data.noteId && data.noteId.match(/^[0-9a-fA-F]{24}$/)) {
+        data.noteId = new ObjectId(data.noteId);
+      } else {
+        data.noteId = null;
+      }
+    }
+  } else if (data.noteId === null) {
+    // Allow setting noteId to null (remove note reference)
+    data.noteId = null;
   }
 
   await collection.updateOne(
