@@ -6,6 +6,21 @@ const { initDatabase } = require("./db/init");
 const { seedAdminUser } = require("./seeds/admin.seed");
 const { exec } = require("child_process");
 
+/**
+ * Normalize API_URL - add https:// if protocol is missing
+ * @returns {string|null} - Normalized URL or null
+ */
+function getNormalizedApiUrl() {
+  if (!process.env.API_URL) return null;
+  
+  let url = process.env.API_URL;
+  // Add https:// if no protocol specified
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = 'https://' + url;
+  }
+  return url;
+}
+
 // Save .env PORT before it gets overridden by deployment platform
 const ENV_FILE_PORT = process.env.PORT;
 
@@ -22,9 +37,10 @@ const ENV_FILE_PORT = process.env.PORT;
  */
 function getPort() {
   // Priority 1: In production, auto-detect from API_URL first
-  if (process.env.NODE_ENV === "production" && process.env.API_URL) {
+  const apiUrl = getNormalizedApiUrl();
+  if (process.env.NODE_ENV === "production" && apiUrl) {
     try {
-      const url = new URL(process.env.API_URL);
+      const url = new URL(apiUrl);
       if (url.port) {
         return parseInt(url.port, 10);
       }
@@ -137,7 +153,7 @@ async function start() {
 
   // Start HTTP server - get API URL from environment
   const serverUrl = process.env.NODE_ENV === "production"
-    ? process.env.API_URL
+    ? getNormalizedApiUrl()
     : `http://localhost:${PORT}`;
 
   app.listen(PORT, () => {

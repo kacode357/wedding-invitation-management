@@ -4,7 +4,12 @@ const swaggerJsdoc = require("swagger-jsdoc");
 // Dynamic server URL based on environment
 const getServerUrl = () => {
   if (process.env.NODE_ENV === "production") {
-    return process.env.API_URL || "http://localhost:5000";
+    let url = process.env.API_URL || "http://localhost:5000";
+    // Add https:// if no protocol specified
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+    return url;
   }
   return `http://localhost:${process.env.PORT || 5000}`;
 };
