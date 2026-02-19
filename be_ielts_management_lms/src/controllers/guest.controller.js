@@ -23,6 +23,7 @@ const { getMessages } = require("../responses");
  *               numberOfGuests: { type: number, minimum: 1, maximum: 10 }
  *               tableId: { type: string }
  *               notes: { type: string }
+ *               noteId: { type: string, description: "Note ID (e.g., NOTE-001)" }
  *     responses:
  *       201:
  *         description: Guest created successfully
@@ -111,6 +112,45 @@ exports.bulkCreate = async (req, res, next) => {
  *     responses:
  *       200:
  *         description: Guests retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     guests:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           _id: { type: string }
+ *                           guestName: { type: string }
+ *                           categoryId: { type: string }
+ *                           category: { type: string }
+ *                           phone: { type: string }
+ *                           numberOfGuests: { type: number }
+ *                           invitationSent: { type: boolean }
+ *                           tableId: { type: string }
+ *                           tableName: { type: string }
+ *                           noteId: { type: string, description: "Note ID (e.g., NOTE-001)" }
+ *                           note: 
+ *                             type: object
+ *                             properties:
+ *                               noteId: { type: string }
+ *                               attendanceStatus: { type: string }
+ *                               customPrediction: { type: string }
+ *                               invitedCount: { type: number }
+ *                               predictedCount: { type: number }
+ *                           isArrived: { type: boolean }
+ *                           arrivedAt: { type: string, format: date-time }
+ *                           createdAt: { type: string, format: date-time }
+ *                           updatedAt: { type: string, format: date-time }
  */
 exports.findAll = async (req, res, next) => {
   try {
@@ -154,6 +194,43 @@ exports.findAll = async (req, res, next) => {
  *     responses:
  *       200:
  *         description: Guest retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     guest:
+ *                       type: object
+ *                       properties:
+ *                         _id: { type: string }
+ *                         guestName: { type: string }
+ *                         categoryId: { type: string }
+ *                         category: { type: string }
+ *                         phone: { type: string }
+ *                         numberOfGuests: { type: number }
+ *                         invitationSent: { type: boolean }
+ *                         tableId: { type: string }
+ *                         tableName: { type: string }
+ *                         noteId: { type: string, description: "Note ID (e.g., NOTE-001)" }
+ *                         note: 
+ *                           type: object
+ *                           properties:
+ *                             noteId: { type: string }
+ *                             attendanceStatus: { type: string }
+ *                             customPrediction: { type: string }
+ *                             invitedCount: { type: number }
+ *                             predictedCount: { type: number }
+ *                         isArrived: { type: boolean }
+ *                         arrivedAt: { type: string, format: date-time }
+ *                         createdAt: { type: string, format: date-time }
+ *                         updatedAt: { type: string, format: date-time }
  */
 exports.findById = async (req, res, next) => {
   try {
@@ -307,6 +384,7 @@ exports.findByInvitationStatus = async (req, res, next) => {
  *               tableId: { type: string }
  *               invitationSent: { type: boolean }
  *               notes: { type: string }
+ *               noteId: { type: string, description: "Note ID (e.g., NOTE-001)" }
  *     responses:
  *       200:
  *         description: Guest updated successfully
