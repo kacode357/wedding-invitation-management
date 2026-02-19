@@ -9,7 +9,7 @@ import type { GuestData } from '../types/guest/guest.payload';
 const STORAGE_KEY = 'addGuestFormData';
 
 // Initial empty guest data
-const createEmptyGuest = (defaultCategoryId?: number): GuestData => ({
+const createEmptyGuest = (defaultCategoryId?: number | string): GuestData => ({
   guestName: '',
   numberOfGuests: 1,
   notes: '',
@@ -94,12 +94,13 @@ export default function AddGuestPage() {
   const addMoreGuests = () => {
     // Auto-fill: inherit category from last guest or last selected category
     const lastGuest = guests[guests.length - 1];
-    const defaultCategoryId = lastGuest?.categoryId && lastGuest.categoryId !== 0 
+    const lastCategoryIdNum = Number(lastGuest?.categoryId);
+    const defaultCategoryId = (lastCategoryIdNum > 0) 
       ? lastGuest.categoryId 
-      : lastCategoryId !== '0' 
+      : (lastCategoryId !== '0') 
         ? lastCategoryId 
         : 0;
-    setGuests(prev => [...prev, { id: crypto.randomUUID(), ...createEmptyGuest(Number(defaultCategoryId)) }]);
+    setGuests(prev => [...prev, { id: crypto.randomUUID(), ...createEmptyGuest(defaultCategoryId) }]);
   };
 
   const removeGuest = (id: string) => {
