@@ -6,31 +6,42 @@ const { initDatabase } = require("./db/init");
 const { seedAdminUser } = require("./seeds/admin.seed");
 const { exec } = require("child_process");
 
+// Save .env PORT before it gets overridden by deployment platform
+const ENV_FILE_PORT = process.env.PORT;
+
 /**
- * Get port from environment or auto-detect from deployed URL
+ * Get port for the server
+ * 
+ * Priority:
+ * 1. In production: PORT from API_URL - auto-detect from your deployed URL
+ * 2. PORT from .env file - if explicitly set (for local dev)
+ * 3. PORT from deployment platform (Render, Railway, etc.) - fallback
+ * 4. Default to 5000
+ * 
  * @returns {number} - The port number to use
  */
 function getPort() {
-  // If PORT is explicitly set in .env, use it
-  if (process.env.PORT) {
-    return parseInt(process.env.PORT, 10);
-  }
-
-  // In production, try to extract port from API_URL
+  // Priority 1: In production, auto-detect from API_URL first
   if (process.env.NODE_ENV === "production" && process.env.API_URL) {
     try {
       const url = new URL(process.env.API_URL);
       if (url.port) {
         return parseInt(url.port, 10);
       }
-      // For HTTPS, default to 443; for HTTP, default to 80
       return url.protocol === "https:" ? 443 : 80;
-    } catch (e) {
-      // If URL parsing fails, use default
-    }
+    } catch (e) {}
   }
 
-  // Default to 5000
+  // Priority 2: .env PORT (local dev)
+  if (ENV_FILE_PORT) {
+    return parseInt(ENV_FILE_PORT, 10);
+  }
+
+  // Priority 3: Platform PORT (fallback)
+  if (process.env.PORT) {
+    return parseInt(process.env.PORT, 10);
+  }
+
   return 5000;
 }
 
@@ -100,7 +111,7 @@ function killPort(port) {
  * Initialize database and start the server
  */
 async function start() {
-  // Kill any process running on port 5000
+  // Kill any process running on the determined port
   console.log(`⏳ Checking port ${PORT}...`);
   const killed = await killPort(PORT);
   if (killed) {
