@@ -19,7 +19,7 @@ async function getDashboardData() {
   // Invitations statistics
   // Families invited = count of guest records
   const familiesInvited = allGuests.length;
-  
+
   // People who received invitations = sum of numberOfGuests where invitationSent is true
   const invitationsSent = allGuests
     .filter(guest => guest.invitationSent === true)
@@ -27,7 +27,7 @@ async function getDashboardData() {
 
   // Get guests by category
   const categoryCounts = await guestModel.countByCategory();
-  
+
   // Transform category counts into array format
   const categoryList = await getGuestCategoryList();
   const guestsByCategory = categoryList.map(category => ({

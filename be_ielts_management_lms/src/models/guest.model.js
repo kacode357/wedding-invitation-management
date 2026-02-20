@@ -621,8 +621,14 @@ async function countByCategory() {
 
   const result = await collection.aggregate([
     {
+      // Normalize categoryId to string to merge ObjectId and string variants
+      $addFields: {
+        categoryIdStr: { $toString: "$categoryId" }
+      }
+    },
+    {
       $group: {
-        _id: "$categoryId",
+        _id: "$categoryIdStr",
         invited: { $sum: "$numberOfGuests" },
         confirmed: { $sum: "$confirmedGuests" }
       }
@@ -648,10 +654,9 @@ async function countByCategory() {
       const categoryIdStr = item._id.toString();
       const categoryName = categoryMap[categoryIdStr];
       if (categoryName) {
-        counts[categoryName] = {
-          invited: item.invited || 0,
-          confirmed: item.confirmed || 0
-        };
+        // Accumulate (+=) to safely handle any remaining duplicates
+        counts[categoryName].invited += item.invited || 0;
+        counts[categoryName].confirmed += item.confirmed || 0;
       }
     }
   });
