@@ -5,6 +5,77 @@ const { getMessages } = require("../responses");
 
 /**
  * @swagger
+ * /api/guests:
+ *   post:
+ *     tags: [Guests]
+ *     summary: Create a new guest
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [guestName]
+ *             properties:
+ *               guestName: { type: string, description: "Guest name (required)" }
+ *               categoryId: { type: string, description: "Category ID reference (optional)" }
+ *               numberOfGuests: { type: number, minimum: 1, maximum: 10, description: "Total guests invited (default: 1)" }
+ *               confirmedGuests: { type: number, minimum: 0, description: "Guests confirmed to attend (defaults to numberOfGuests)" }
+ *               invitationSent: { type: boolean, description: "Whether invitation has been sent (default: false)" }
+ *               tableId: { type: string, description: "Table ID to assign guest to (optional)" }
+ *               noteId: { type: string, description: "Note _id reference (optional)" }
+ *               groupId: { type: string, description: "Group _id reference (optional)" }
+ *     responses:
+ *       201:
+ *         description: Guest created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 message: { type: string }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     guest:
+ *                       type: object
+ *                       properties:
+ *                         _id: { type: string }
+ *                         guestName: { type: string }
+ *                         categoryId: { type: string }
+ *                         categoryName: { type: string }
+ *                         numberOfGuests: { type: number }
+ *                         confirmedGuests: { type: number }
+ *                         invitationSent: { type: boolean }
+ *                         tableId: { type: string }
+ *                         tableName: { type: string }
+ *                         noteId: { type: string }
+ *                         noteName: { type: string }
+ *                         groupId: { type: string }
+ *                         groupName: { type: string }
+ *                         groupPriorityLevel: { type: number }
+ *                         isArrived: { type: boolean }
+ *                         arrivedAt: { type: string, format: date-time }
+ *                         createdAt: { type: string, format: date-time }
+ *                         updatedAt: { type: string, format: date-time }
+ */
+exports.create = async (req, res, next) => {
+  try {
+    const lang = req.headers["accept-language"] || "en";
+    const messages = getMessages(lang);
+    const guest = await guestService.create(req.body, lang);
+
+    sendSuccess(res, { guest }, 201, messages.COMMON.CREATE_SUCCESS);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+/**
+ * @swagger
  * /api/guests/bulk:
  *   post:
  *     tags: [Guests]
@@ -29,7 +100,8 @@ const { getMessages } = require("../responses");
  *                     confirmedGuests: { type: number, minimum: 0, description: "Guests confirmed to attend" }
  *                     tableId: { type: string }
 *                     noteId: { type: string, description: "Note _id reference" }
-*     responses:
+ *                     groupId: { type: string, description: "Group _id reference" }
+ *     responses:
  *       201:
  *         description: Guests created successfully
  */
@@ -104,6 +176,9 @@ exports.bulkCreate = async (req, res, next) => {
  *                           tableName: { type: string }
  *                           noteId: { type: string }
  *                           noteName: { type: string }
+ *                           groupId: { type: string }
+ *                           groupName: { type: string }
+ *                           groupPriorityLevel: { type: number }
  *                           isArrived: { type: boolean }
  *                           arrivedAt: { type: string, format: date-time }
  *                           createdAt: { type: string, format: date-time }
@@ -177,6 +252,9 @@ exports.findAll = async (req, res, next) => {
  *                         tableName: { type: string }
  *                         noteId: { type: string }
  *                         noteName: { type: string }
+ *                         groupId: { type: string }
+ *                         groupName: { type: string }
+ *                         groupPriorityLevel: { type: number }
  *                         isArrived: { type: boolean }
  *                         arrivedAt: { type: string, format: date-time }
  *                         createdAt: { type: string, format: date-time }
@@ -302,6 +380,7 @@ exports.findByInvitationStatus = async (req, res, next) => {
  *               tableId: { type: string }
  *               invitationSent: { type: boolean }
  *               noteId: { type: string, description: "Note _id reference" }
+ *               groupId: { type: string, description: "Group _id reference (set to null to remove)" }
  *     responses:
  *       200:
  *         description: Guest updated successfully

@@ -3,6 +3,7 @@ const { getCollection, ObjectId } = require("../db/mongoose");
 const Category = require("../models/category.model");
 const Table = require("../models/table.model");
 const Note = require("../models/note.model");
+const Group = require("../models/group.model");
 const { getGuestCategoryList } = require("../constants/enums/guest.enum");
 
 const COLLECTION_NAME = "guests";
@@ -22,6 +23,7 @@ const COLLECTION_NAME = "guests";
  *         invitationSent: { type: boolean }
  *         tableId: { type: string }
  *         noteId: { type: string, description: "Note _id reference" }
+ *         groupId: { type: string, description: "Group _id reference (optional)" }
  *         isArrived: { type: boolean, description: "Check-in status - whether guest has arrived" }
  *         arrivedAt: { type: string, format: date-time, description: "Timestamp when guest arrived" }
  *         createdAt: { type: string, format: date-time }
@@ -55,6 +57,20 @@ async function create(data) {
   }
   if (!data.arrivedAt) {
     data.arrivedAt = null;
+  }
+  // Handle groupId - convert to ObjectId if provided
+  if (data.groupId) {
+    try {
+      if (data.groupId.match(/^[0-9a-fA-F]{24}$/)) {
+        data.groupId = new ObjectId(data.groupId);
+      } else {
+        data.groupId = null;
+      }
+    } catch (e) {
+      data.groupId = null;
+    }
+  } else {
+    data.groupId = null;
   }
   // Handle noteId - convert to ObjectId if provided
   if (data.noteId) {
@@ -116,6 +132,18 @@ async function findById(id) {
       guest.noteId = null;
       guest.noteName = null;
     }
+    // Resolve groupId to groupName
+    if (guest.groupId) {
+      const groupIdStr = guest.groupId.toString();
+      guest.groupId = groupIdStr;
+      const group = await Group.findById(groupIdStr);
+      guest.groupName = group ? group.name : null;
+      guest.groupPriorityLevel = group ? group.priorityLevel : null;
+    } else {
+      guest.groupId = null;
+      guest.groupName = null;
+      guest.groupPriorityLevel = null;
+    }
   }
 
   return guest;
@@ -154,6 +182,18 @@ async function findOne(query) {
     } else {
       guest.noteId = null;
       guest.noteName = null;
+    }
+    // Resolve groupId to groupName
+    if (guest.groupId) {
+      const groupIdStr = guest.groupId.toString();
+      guest.groupId = groupIdStr;
+      const group = await Group.findById(groupIdStr);
+      guest.groupName = group ? group.name : null;
+      guest.groupPriorityLevel = group ? group.priorityLevel : null;
+    } else {
+      guest.groupId = null;
+      guest.groupName = null;
+      guest.groupPriorityLevel = null;
     }
   }
 
@@ -199,6 +239,13 @@ async function find(query = {}, options = {}) {
     noteMap[note._id.toString()] = note.name;
   });
 
+  // Get all groups to map groupId to group info
+  const groups = await Group.getAllGroups();
+  const groupMap = {};
+  groups.forEach(group => {
+    groupMap[group._id.toString()] = { name: group.name, priorityLevel: group.priorityLevel };
+  });
+
   // Convert tableId and categoryId to string and add category/table names for each guest
   return guests.map(guest => {
     if (guest.tableId) {
@@ -225,6 +272,18 @@ async function find(query = {}, options = {}) {
     } else {
       guest.noteId = null;
       guest.noteName = null;
+    }
+    // Resolve groupId to groupName
+    if (guest.groupId) {
+      const groupIdStr = guest.groupId.toString();
+      guest.groupId = groupIdStr;
+      const groupData = groupMap[groupIdStr];
+      guest.groupName = groupData ? groupData.name : null;
+      guest.groupPriorityLevel = groupData ? groupData.priorityLevel : null;
+    } else {
+      guest.groupId = null;
+      guest.groupName = null;
+      guest.groupPriorityLevel = null;
     }
     return guest;
   });
@@ -256,6 +315,13 @@ async function findByCategory(categoryId) {
     noteMap[note._id.toString()] = note.name;
   });
 
+  // Get all groups to map groupId to group info
+  const groups = await Group.getAllGroups();
+  const groupMap = {};
+  groups.forEach(group => {
+    groupMap[group._id.toString()] = { name: group.name, priorityLevel: group.priorityLevel };
+  });
+
   return guests.map(guest => {
     if (guest.tableId) {
       const tableIdStr = guest.tableId.toString();
@@ -280,6 +346,18 @@ async function findByCategory(categoryId) {
     } else {
       guest.noteId = null;
       guest.noteName = null;
+    }
+    // Resolve groupId to groupName
+    if (guest.groupId) {
+      const groupIdStr = guest.groupId.toString();
+      guest.groupId = groupIdStr;
+      const groupData = groupMap[groupIdStr];
+      guest.groupName = groupData ? groupData.name : null;
+      guest.groupPriorityLevel = groupData ? groupData.priorityLevel : null;
+    } else {
+      guest.groupId = null;
+      guest.groupName = null;
+      guest.groupPriorityLevel = null;
     }
     return guest;
   });
@@ -307,6 +385,13 @@ async function findUnassigned() {
     noteMap[note._id.toString()] = note.name;
   });
 
+  // Get all groups to map groupId to group info
+  const groups = await Group.getAllGroups();
+  const groupMap = {};
+  groups.forEach(group => {
+    groupMap[group._id.toString()] = { name: group.name, priorityLevel: group.priorityLevel };
+  });
+
   return guests.map(guest => {
     // Unassigned guests don't have a table
     guest.tableId = null;
@@ -326,6 +411,18 @@ async function findUnassigned() {
     } else {
       guest.noteId = null;
       guest.noteName = null;
+    }
+    // Resolve groupId to groupName
+    if (guest.groupId) {
+      const groupIdStr = guest.groupId.toString();
+      guest.groupId = groupIdStr;
+      const groupData = groupMap[groupIdStr];
+      guest.groupName = groupData ? groupData.name : null;
+      guest.groupPriorityLevel = groupData ? groupData.priorityLevel : null;
+    } else {
+      guest.groupId = null;
+      guest.groupName = null;
+      guest.groupPriorityLevel = null;
     }
     return guest;
   });
@@ -360,6 +457,13 @@ async function findAssigned() {
     noteMap[note._id.toString()] = note.name;
   });
 
+  // Get all groups to map groupId to group info
+  const groups = await Group.getAllGroups();
+  const groupMap = {};
+  groups.forEach(group => {
+    groupMap[group._id.toString()] = { name: group.name, priorityLevel: group.priorityLevel };
+  });
+
   return guests.map(guest => {
     if (guest.tableId) {
       const tableIdStr = guest.tableId.toString();
@@ -384,6 +488,18 @@ async function findAssigned() {
     } else {
       guest.noteId = null;
       guest.noteName = null;
+    }
+    // Resolve groupId to groupName
+    if (guest.groupId) {
+      const groupIdStr = guest.groupId.toString();
+      guest.groupId = groupIdStr;
+      const groupData = groupMap[groupIdStr];
+      guest.groupName = groupData ? groupData.name : null;
+      guest.groupPriorityLevel = groupData ? groupData.priorityLevel : null;
+    } else {
+      guest.groupId = null;
+      guest.groupName = null;
+      guest.groupPriorityLevel = null;
     }
     return guest;
   });
@@ -418,6 +534,13 @@ async function findArrived() {
     noteMap[note._id.toString()] = note.name;
   });
 
+  // Get all groups to map groupId to group info
+  const groups = await Group.getAllGroups();
+  const groupMap = {};
+  groups.forEach(group => {
+    groupMap[group._id.toString()] = { name: group.name, priorityLevel: group.priorityLevel };
+  });
+
   return guests.map(guest => {
     if (guest.tableId) {
       const tableIdStr = guest.tableId.toString();
@@ -442,6 +565,18 @@ async function findArrived() {
     } else {
       guest.noteId = null;
       guest.noteName = null;
+    }
+    // Resolve groupId to groupName
+    if (guest.groupId) {
+      const groupIdStr = guest.groupId.toString();
+      guest.groupId = groupIdStr;
+      const groupData = groupMap[groupIdStr];
+      guest.groupName = groupData ? groupData.name : null;
+      guest.groupPriorityLevel = groupData ? groupData.priorityLevel : null;
+    } else {
+      guest.groupId = null;
+      guest.groupName = null;
+      guest.groupPriorityLevel = null;
     }
     return guest;
   });
@@ -477,6 +612,13 @@ async function findUnarrived() {
     noteMap[note._id.toString()] = note.name;
   });
 
+  // Get all groups to map groupId to group info
+  const groups = await Group.getAllGroups();
+  const groupMap = {};
+  groups.forEach(group => {
+    groupMap[group._id.toString()] = { name: group.name, priorityLevel: group.priorityLevel };
+  });
+
   return guests.map(guest => {
     if (guest.tableId) {
       const tableIdStr = guest.tableId.toString();
@@ -501,6 +643,18 @@ async function findUnarrived() {
     } else {
       guest.noteId = null;
       guest.noteName = null;
+    }
+    // Resolve groupId to groupName
+    if (guest.groupId) {
+      const groupIdStr = guest.groupId.toString();
+      guest.groupId = groupIdStr;
+      const groupData = groupMap[groupIdStr];
+      guest.groupName = groupData ? groupData.name : null;
+      guest.groupPriorityLevel = groupData ? groupData.priorityLevel : null;
+    } else {
+      guest.groupId = null;
+      guest.groupName = null;
+      guest.groupPriorityLevel = null;
     }
     return guest;
   });
@@ -528,6 +682,13 @@ async function findByTableId(tableId) {
     noteMap[note._id.toString()] = note.name;
   });
 
+  // Get all groups to map groupId to group info
+  const groups = await Group.getAllGroups();
+  const groupMap = {};
+  groups.forEach(group => {
+    groupMap[group._id.toString()] = { name: group.name, priorityLevel: group.priorityLevel };
+  });
+
   return guests.map(guest => {
     if (guest.tableId) {
       guest.tableId = guest.tableId.toString();
@@ -551,6 +712,18 @@ async function findByTableId(tableId) {
     } else {
       guest.noteId = null;
       guest.noteName = null;
+    }
+    // Resolve groupId to groupName
+    if (guest.groupId) {
+      const groupIdStr = guest.groupId.toString();
+      guest.groupId = groupIdStr;
+      const groupData = groupMap[groupIdStr];
+      guest.groupName = groupData ? groupData.name : null;
+      guest.groupPriorityLevel = groupData ? groupData.priorityLevel : null;
+    } else {
+      guest.groupId = null;
+      guest.groupName = null;
+      guest.groupPriorityLevel = null;
     }
     return guest;
   });
@@ -595,6 +768,22 @@ async function updateById(id, data) {
   } else if (data.noteId === null) {
     // Allow setting noteId to null (remove note reference)
     data.noteId = null;
+  }
+
+  // Handle groupId - convert to ObjectId if provided
+  if (data.groupId) {
+    try {
+      if (data.groupId.match(/^[0-9a-fA-F]{24}$/)) {
+        data.groupId = new ObjectId(data.groupId);
+      } else {
+        data.groupId = null;
+      }
+    } catch (e) {
+      data.groupId = null;
+    }
+  } else if (data.groupId === null) {
+    // Allow setting groupId to null (remove group reference)
+    data.groupId = null;
   }
 
   await collection.updateOne(

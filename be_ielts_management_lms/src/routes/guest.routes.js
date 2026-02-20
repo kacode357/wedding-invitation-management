@@ -11,6 +11,7 @@ router.use(auth);
 router.use(authorizeRoles(USER_ROLES.ADMIN));
 
 // CRUD Operations
+router.post("/", guestController.create);
 router.post("/bulk", guestController.bulkCreate);
 router.get("/", guestController.findAll);
 router.get("/search/table", guestController.findByIdAndGetTable);

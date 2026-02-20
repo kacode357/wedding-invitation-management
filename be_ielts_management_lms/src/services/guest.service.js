@@ -75,6 +75,13 @@ class GuestService {
       data.noteId = null;
     }
 
+    // If groupId is provided and is a valid ObjectId, save it
+    if (guestData.groupId && /^[0-9a-fA-F]{24}$/.test(guestData.groupId)) {
+      data.groupId = guestData.groupId;
+    } else {
+      data.groupId = null;
+    }
+
     const guest = await Guest.create(data);
     return guest;
   }
@@ -134,7 +141,7 @@ class GuestService {
    */
   async findAssigned(lang = "en") {
     const guests = await Guest.findAssigned();
-    
+
     // Get table details for each guest
     const tableCollection = await require("../models/table.model");
     const guestsWithTable = await Promise.all(
@@ -153,7 +160,7 @@ class GuestService {
         return guest;
       })
     );
-    
+
     return guestsWithTable;
   }
 
@@ -248,6 +255,17 @@ class GuestService {
       if (newTableId && newTableId !== existingGuest.tableId) {
         // Check new table has capacity
         await this.assignTableToGuest(null, newTableId, confirmedGuests, lang);
+      }
+    }
+
+    // Handle groupId update: allow setting to valid ObjectId or null to remove
+    if (updateData.groupId !== undefined) {
+      if (updateData.groupId && /^[0-9a-fA-F]{24}$/.test(updateData.groupId)) {
+        // valid — keep as-is; guest.model.updateById will convert to ObjectId
+      } else if (updateData.groupId === null || updateData.groupId === "") {
+        updateData.groupId = null;
+      } else {
+        delete updateData.groupId; // invalid string — ignore
       }
     }
 

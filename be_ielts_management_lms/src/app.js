@@ -42,8 +42,8 @@ app.use(express.urlencoded({ extended: true }));
  *         description: Service is healthy
  */
 app.get("/health", (req, res) => {
-  res.json({ 
-    status: "ok", 
+  res.json({
+    status: "ok",
     timestamp: new Date().toISOString(),
     service: "Wedding Invitation Management API"
   });
@@ -72,7 +72,8 @@ app.get("/", (req, res) => {
       guests: "/api/guests",
       tables: "/api/tables",
       categories: "/api/categories",
-      notes: "/api/notes"
+      notes: "/api/notes",
+      groups: "/api/groups"
     }
   });
 });
@@ -138,7 +139,7 @@ app.get("/", (req, res) => {
 app.get("/api/dashboard", auth, authorizeRoles("admin", "teacher"), async (req, res) => {
   try {
     const data = await dashboardService.getDashboardData();
-    
+
     res.json({
       success: true,
       message: "Dashboard data fetched successfully",
@@ -171,7 +172,7 @@ if (isSwaggerEnabled) {
       }
     }
   }));
-  
+
   // Serve custom JS to clear authorization on page load
   app.get('/swagger-clear-auth.js', (req, res) => {
     res.type('application/javascript');
@@ -187,7 +188,7 @@ if (isSwaggerEnabled) {
       })();
     `);
   });
-  
+
   console.log("✓ Swagger UI enabled at /api-docs");
 } else {
   console.log("✗ Swagger UI disabled (NODE_ENV=" + process.env.NODE_ENV + ")");
@@ -207,6 +208,9 @@ app.use("/api/categories", require("./routes/category.routes"));
 
 // Note Management Routes
 app.use("/api/notes", require("./routes/note.routes"));
+
+// Group Management Routes
+app.use("/api/groups", require("./routes/group.routes"));
 
 // 404 Handler
 app.use((req, res, next) => {
