@@ -17,11 +17,11 @@ const COLLECTION_NAME = "guests";
  *         _id: { type: string }
  *         guestName: { type: string, description: "Guest name (required)" }
  *         categoryId: { type: string, description: "Category ID reference (optional)" }
- *         phone: { type: string }
- *         numberOfGuests: { type: number, minimum: 1, maximum: 10 }
+ *         numberOfGuests: { type: number, minimum: 1, maximum: 10, description: "Total number of guests invited" }
+ *         confirmedGuests: { type: number, minimum: 0, description: "Number of guests confirmed to attend (can be less than numberOfGuests)" }
  *         invitationSent: { type: boolean }
  *         tableId: { type: string }
- *         noteId: { type: string, description: "Note ID reference (e.g., NOTE-001)" }
+ *         noteId: { type: string, description: "Note _id reference" }
  *         isArrived: { type: boolean, description: "Check-in status - whether guest has arrived" }
  *         arrivedAt: { type: string, format: date-time, description: "Timestamp when guest arrived" }
  *         createdAt: { type: string, format: date-time }
@@ -39,6 +39,10 @@ async function create(data) {
   if (data.numberOfGuests === undefined || data.numberOfGuests === null) {
     data.numberOfGuests = 1;
   }
+  // confirmedGuests defaults to numberOfGuests (all invited will attend)
+  if (data.confirmedGuests === undefined || data.confirmedGuests === null) {
+    data.confirmedGuests = data.numberOfGuests;
+  }
   if (data.invitationSent === undefined || data.invitationSent === null) {
     data.invitationSent = false;
   }
@@ -54,19 +58,15 @@ async function create(data) {
   }
   // Handle noteId - convert to ObjectId if provided
   if (data.noteId) {
-    // Check if noteId is a valid MongoDB ObjectId or a string like "NOTE-001"
     try {
-      const note = await Note.findByNoteId(data.noteId);
-      if (note) {
-        data.noteId = note._id;
-      }
-    } catch (e) {
-      // If noteId is already an ObjectId string, use it directly
-      if (data.noteId && data.noteId.match(/^[0-9a-fA-F]{24}$/)) {
+      // Check if noteId is a valid MongoDB ObjectId
+      if (data.noteId.match(/^[0-9a-fA-F]{24}$/)) {
         data.noteId = new ObjectId(data.noteId);
       } else {
         data.noteId = null;
       }
+    } catch (e) {
+      data.noteId = null;
     }
   }
 
@@ -92,29 +92,29 @@ async function findById(id) {
       // Get table name
       const table = await Table.findById(tableIdStr);
       guest.tableName = table ? table.tableNumber : null;
+    } else {
+      guest.tableId = null;
+      guest.tableName = null;
     }
     if (guest.categoryId) {
       const categoryIdStr = guest.categoryId.toString();
       guest.categoryId = categoryIdStr;
       // Get category name
       const category = await Category.findById(categoryIdStr);
-      guest.category = category ? category.name : "";
+      guest.categoryName = category ? category.name : null;
+    } else {
+      guest.categoryId = null;
+      guest.categoryName = null;
     }
-    // Get note details if noteId exists
+    // Always include noteId and noteName
     if (guest.noteId) {
       const noteIdStr = guest.noteId.toString();
       guest.noteId = noteIdStr;
-      // Get note details
       const note = await Note.findById(noteIdStr);
-      if (note) {
-        guest.note = {
-          noteId: note.noteId,
-          attendanceStatus: note.attendanceStatus,
-          customPrediction: note.customPrediction,
-          invitedCount: note.invitedCount,
-          predictedCount: note.predictedCount
-        };
-      }
+      guest.noteName = note ? note.name : null;
+    } else {
+      guest.noteId = null;
+      guest.noteName = null;
     }
   }
 
@@ -126,12 +126,35 @@ async function findOne(query) {
 
   let guest = await collection.findOne(query);
 
-  // Convert tableId and categoryId to string if they exist
-  if (guest && guest.tableId) {
-    guest.tableId = guest.tableId.toString();
-  }
-  if (guest && guest.categoryId) {
-    guest.categoryId = guest.categoryId.toString();
+  // Convert tableId and categoryId to string if they exist and add names
+  if (guest) {
+    if (guest.tableId) {
+      const tableIdStr = guest.tableId.toString();
+      guest.tableId = tableIdStr;
+      const table = await Table.findById(tableIdStr);
+      guest.tableName = table ? table.tableNumber : null;
+    } else {
+      guest.tableId = null;
+      guest.tableName = null;
+    }
+    if (guest.categoryId) {
+      const categoryIdStr = guest.categoryId.toString();
+      guest.categoryId = categoryIdStr;
+      const category = await Category.findById(categoryIdStr);
+      guest.categoryName = category ? category.name : null;
+    } else {
+      guest.categoryId = null;
+      guest.categoryName = null;
+    }
+    if (guest.noteId) {
+      const noteIdStr = guest.noteId.toString();
+      guest.noteId = noteIdStr;
+      const note = await Note.findById(noteIdStr);
+      guest.noteName = note ? note.name : null;
+    } else {
+      guest.noteId = null;
+      guest.noteName = null;
+    }
   }
 
   return guest;
@@ -173,13 +196,7 @@ async function find(query = {}, options = {}) {
   const notes = await Note.find();
   const noteMap = {};
   notes.forEach(note => {
-    noteMap[note._id.toString()] = {
-      noteId: note.noteId,
-      attendanceStatus: note.attendanceStatus,
-      customPrediction: note.customPrediction,
-      invitedCount: note.invitedCount,
-      predictedCount: note.predictedCount
-    };
+    noteMap[note._id.toString()] = note.name;
   });
 
   // Convert tableId and categoryId to string and add category/table names for each guest
@@ -188,16 +205,26 @@ async function find(query = {}, options = {}) {
       const tableIdStr = guest.tableId.toString();
       guest.tableId = tableIdStr;
       guest.tableName = tableMap[tableIdStr] || null;
+    } else {
+      guest.tableId = null;
+      guest.tableName = null;
     }
     if (guest.categoryId) {
       const categoryIdStr = guest.categoryId.toString();
       guest.categoryId = categoryIdStr;
-      guest.category = categoryMap[categoryIdStr] || "";
+      guest.categoryName = categoryMap[categoryIdStr] || null;
+    } else {
+      guest.categoryId = null;
+      guest.categoryName = null;
     }
-    // Add note details if noteId exists
+    // Always include noteId and noteName
     if (guest.noteId) {
       const noteIdStr = guest.noteId.toString();
-      guest.note = noteMap[noteIdStr] || null;
+      guest.noteId = noteIdStr;
+      guest.noteName = noteMap[noteIdStr] || null;
+    } else {
+      guest.noteId = null;
+      guest.noteName = null;
     }
     return guest;
   });
@@ -213,7 +240,7 @@ async function findByCategory(categoryId) {
 
   // Get category name
   const category = await Category.findById(categoryId);
-  const categoryName = category ? category.name : "";
+  const categoryName = category ? category.name : null;
 
   // Get all tables to map tableId to tableName
   const tables = await Table.find();
@@ -222,16 +249,37 @@ async function findByCategory(categoryId) {
     tableMap[table._id.toString()] = table.tableNumber;
   });
 
+  // Get all notes to map noteId to noteName
+  const notes = await Note.find();
+  const noteMap = {};
+  notes.forEach(note => {
+    noteMap[note._id.toString()] = note.name;
+  });
+
   return guests.map(guest => {
     if (guest.tableId) {
       const tableIdStr = guest.tableId.toString();
       guest.tableId = tableIdStr;
       guest.tableName = tableMap[tableIdStr] || null;
+    } else {
+      guest.tableId = null;
+      guest.tableName = null;
     }
     if (guest.categoryId) {
       const categoryIdStr = guest.categoryId.toString();
       guest.categoryId = categoryIdStr;
-      guest.category = categoryName;
+      guest.categoryName = categoryName;
+    } else {
+      guest.categoryId = null;
+      guest.categoryName = null;
+    }
+    if (guest.noteId) {
+      const noteIdStr = guest.noteId.toString();
+      guest.noteId = noteIdStr;
+      guest.noteName = noteMap[noteIdStr] || null;
+    } else {
+      guest.noteId = null;
+      guest.noteName = null;
     }
     return guest;
   });
@@ -245,12 +293,39 @@ async function findUnassigned() {
     .sort({ category: 1, createdAt: -1 })
     .toArray();
 
+  // Get all categories to map categoryId to category name
+  const categories = await Category.getAllCategories();
+  const categoryMap = {};
+  categories.forEach(cat => {
+    categoryMap[cat._id.toString()] = cat.name;
+  });
+
+  // Get all notes to map noteId to noteName
+  const notes = await Note.find();
+  const noteMap = {};
+  notes.forEach(note => {
+    noteMap[note._id.toString()] = note.name;
+  });
+
   return guests.map(guest => {
-    if (guest.tableId) {
-      guest.tableId = guest.tableId.toString();
-    }
+    // Unassigned guests don't have a table
+    guest.tableId = null;
+    guest.tableName = null;
     if (guest.categoryId) {
-      guest.categoryId = guest.categoryId.toString();
+      const categoryIdStr = guest.categoryId.toString();
+      guest.categoryId = categoryIdStr;
+      guest.categoryName = categoryMap[categoryIdStr] || null;
+    } else {
+      guest.categoryId = null;
+      guest.categoryName = null;
+    }
+    if (guest.noteId) {
+      const noteIdStr = guest.noteId.toString();
+      guest.noteId = noteIdStr;
+      guest.noteName = noteMap[noteIdStr] || null;
+    } else {
+      guest.noteId = null;
+      guest.noteName = null;
     }
     return guest;
   });
@@ -264,12 +339,51 @@ async function findAssigned() {
     .sort({ category: 1, createdAt: -1 })
     .toArray();
 
+  // Get all categories to map categoryId to category name
+  const categories = await Category.getAllCategories();
+  const categoryMap = {};
+  categories.forEach(cat => {
+    categoryMap[cat._id.toString()] = cat.name;
+  });
+
+  // Get all tables to map tableId to tableName
+  const tables = await Table.find();
+  const tableMap = {};
+  tables.forEach(table => {
+    tableMap[table._id.toString()] = table.tableNumber;
+  });
+
+  // Get all notes to map noteId to noteName
+  const notes = await Note.find();
+  const noteMap = {};
+  notes.forEach(note => {
+    noteMap[note._id.toString()] = note.name;
+  });
+
   return guests.map(guest => {
     if (guest.tableId) {
-      guest.tableId = guest.tableId.toString();
+      const tableIdStr = guest.tableId.toString();
+      guest.tableId = tableIdStr;
+      guest.tableName = tableMap[tableIdStr] || null;
+    } else {
+      guest.tableId = null;
+      guest.tableName = null;
     }
     if (guest.categoryId) {
-      guest.categoryId = guest.categoryId.toString();
+      const categoryIdStr = guest.categoryId.toString();
+      guest.categoryId = categoryIdStr;
+      guest.categoryName = categoryMap[categoryIdStr] || null;
+    } else {
+      guest.categoryId = null;
+      guest.categoryName = null;
+    }
+    if (guest.noteId) {
+      const noteIdStr = guest.noteId.toString();
+      guest.noteId = noteIdStr;
+      guest.noteName = noteMap[noteIdStr] || null;
+    } else {
+      guest.noteId = null;
+      guest.noteName = null;
     }
     return guest;
   });
@@ -297,16 +411,37 @@ async function findArrived() {
     tableMap[table._id.toString()] = table.tableNumber;
   });
 
+  // Get all notes to map noteId to noteName
+  const notes = await Note.find();
+  const noteMap = {};
+  notes.forEach(note => {
+    noteMap[note._id.toString()] = note.name;
+  });
+
   return guests.map(guest => {
     if (guest.tableId) {
       const tableIdStr = guest.tableId.toString();
       guest.tableId = tableIdStr;
       guest.tableName = tableMap[tableIdStr] || null;
+    } else {
+      guest.tableId = null;
+      guest.tableName = null;
     }
     if (guest.categoryId) {
       const categoryIdStr = guest.categoryId.toString();
       guest.categoryId = categoryIdStr;
-      guest.category = categoryMap[categoryIdStr] || "";
+      guest.categoryName = categoryMap[categoryIdStr] || null;
+    } else {
+      guest.categoryId = null;
+      guest.categoryName = null;
+    }
+    if (guest.noteId) {
+      const noteIdStr = guest.noteId.toString();
+      guest.noteId = noteIdStr;
+      guest.noteName = noteMap[noteIdStr] || null;
+    } else {
+      guest.noteId = null;
+      guest.noteName = null;
     }
     return guest;
   });
@@ -335,16 +470,37 @@ async function findUnarrived() {
     tableMap[table._id.toString()] = table.tableNumber;
   });
 
+  // Get all notes to map noteId to noteName
+  const notes = await Note.find();
+  const noteMap = {};
+  notes.forEach(note => {
+    noteMap[note._id.toString()] = note.name;
+  });
+
   return guests.map(guest => {
     if (guest.tableId) {
       const tableIdStr = guest.tableId.toString();
       guest.tableId = tableIdStr;
       guest.tableName = tableMap[tableIdStr] || null;
+    } else {
+      guest.tableId = null;
+      guest.tableName = null;
     }
     if (guest.categoryId) {
       const categoryIdStr = guest.categoryId.toString();
       guest.categoryId = categoryIdStr;
-      guest.category = categoryMap[categoryIdStr] || "";
+      guest.categoryName = categoryMap[categoryIdStr] || null;
+    } else {
+      guest.categoryId = null;
+      guest.categoryName = null;
+    }
+    if (guest.noteId) {
+      const noteIdStr = guest.noteId.toString();
+      guest.noteId = noteIdStr;
+      guest.noteName = noteMap[noteIdStr] || null;
+    } else {
+      guest.noteId = null;
+      guest.noteName = null;
     }
     return guest;
   });
@@ -358,12 +514,43 @@ async function findByTableId(tableId) {
     .sort({ createdAt: -1 })
     .toArray();
 
+  // Get all categories to map categoryId to category name
+  const categories = await Category.getAllCategories();
+  const categoryMap = {};
+  categories.forEach(cat => {
+    categoryMap[cat._id.toString()] = cat.name;
+  });
+
+  // Get all notes to map noteId to noteName
+  const notes = await Note.find();
+  const noteMap = {};
+  notes.forEach(note => {
+    noteMap[note._id.toString()] = note.name;
+  });
+
   return guests.map(guest => {
     if (guest.tableId) {
       guest.tableId = guest.tableId.toString();
+      guest.tableName = null; // Already filtering by table, so we know the table
+    } else {
+      guest.tableId = null;
+      guest.tableName = null;
     }
     if (guest.categoryId) {
-      guest.categoryId = guest.categoryId.toString();
+      const categoryIdStr = guest.categoryId.toString();
+      guest.categoryId = categoryIdStr;
+      guest.categoryName = categoryMap[categoryIdStr] || null;
+    } else {
+      guest.categoryId = null;
+      guest.categoryName = null;
+    }
+    if (guest.noteId) {
+      const noteIdStr = guest.noteId.toString();
+      guest.noteId = noteIdStr;
+      guest.noteName = noteMap[noteIdStr] || null;
+    } else {
+      guest.noteId = null;
+      guest.noteName = null;
     }
     return guest;
   });
@@ -375,6 +562,16 @@ async function updateById(id, data) {
   data.updatedAt = new Date();
   delete data._id; // Can't update _id
 
+  // If numberOfGuests is being updated, also update confirmedGuests if not provided
+  if (data.numberOfGuests !== undefined && data.confirmedGuests === undefined) {
+    // Get existing guest to check current confirmedGuests
+    const existingGuest = await findById(id);
+    if (existingGuest) {
+      // If confirmedGuests was not provided, reset it to match new numberOfGuests
+      data.confirmedGuests = data.numberOfGuests;
+    }
+  }
+
   // Convert tableId to ObjectId if provided
   if (data.tableId) {
     data.tableId = new ObjectId(data.tableId);
@@ -385,19 +582,15 @@ async function updateById(id, data) {
 
   // Handle noteId - convert to ObjectId if provided
   if (data.noteId) {
-    // Check if noteId is a valid MongoDB ObjectId or a string like "NOTE-001"
     try {
-      const note = await Note.findByNoteId(data.noteId);
-      if (note) {
-        data.noteId = note._id;
-      }
-    } catch (e) {
-      // If noteId is already an ObjectId string, use it directly
-      if (data.noteId && data.noteId.match(/^[0-9a-fA-F]{24}$/)) {
+      // Check if noteId is a valid MongoDB ObjectId
+      if (data.noteId.match(/^[0-9a-fA-F]{24}$/)) {
         data.noteId = new ObjectId(data.noteId);
       } else {
         data.noteId = null;
       }
+    } catch (e) {
+      data.noteId = null;
     }
   } else if (data.noteId === null) {
     // Allow setting noteId to null (remove note reference)
@@ -430,7 +623,8 @@ async function countByCategory() {
     {
       $group: {
         _id: "$categoryId",
-        count: { $sum: "$numberOfGuests" }
+        invited: { $sum: "$numberOfGuests" },
+        confirmed: { $sum: "$confirmedGuests" }
       }
     }
   ]).toArray();
@@ -446,7 +640,7 @@ async function countByCategory() {
 
   const counts = {};
   categories.forEach(cat => {
-    counts[cat.name] = 0;
+    counts[cat.name] = { invited: 0, confirmed: 0 };
   });
 
   result.forEach(item => {
@@ -454,7 +648,10 @@ async function countByCategory() {
       const categoryIdStr = item._id.toString();
       const categoryName = categoryMap[categoryIdStr];
       if (categoryName) {
-        counts[categoryName] = item.count;
+        counts[categoryName] = {
+          invited: item.invited || 0,
+          confirmed: item.confirmed || 0
+        };
       }
     }
   });

@@ -5,6 +5,7 @@ const app = require("./app");
 const { initDatabase } = require("./db/init");
 const { seedAdminUser } = require("./seeds/admin.seed");
 const { seedCategories } = require("./seeds/category.seed");
+const { seedNotes } = require("./seeds/note.seed");
 const { exec } = require("child_process");
 
 /**
@@ -140,6 +141,9 @@ async function start() {
 
   // Seed initial categories if not exist
   await seedCategories();
+
+  // Seed initial notes if not exist
+  await seedNotes();
 
   // Start HTTP server - get API URL from environment
   const serverUrl = process.env.NODE_ENV === "production"

@@ -84,14 +84,20 @@ async function count(query = {}) {
 /**
  * Get table with guest count (occupancy)
  * @param {string} id - Table ID
- * @returns {Object} Table with guest count
+ * @returns {Object} Table with guest count based on confirmed guests
  */
 async function getTableWithOccupancy(id) {
   const table = await findById(id);
   if (!table) return null;
 
   const guestCollection = await getCollection("guests");
-  const guestCount = await guestCollection.countDocuments({ tableId: new ObjectId(id) });
+  // Sum confirmedGuests - handle both string and ObjectId formats
+  const guestsAggregation = await guestCollection.aggregate([
+    { $match: { $expr: { $eq: [{ $toString: "$tableId" }, id] } } },
+    { $group: { _id: null, totalConfirmed: { $sum: "$confirmedGuests" } } }
+  ]);
+  const guestCountResult = await guestsAggregation.toArray();
+  const guestCount = guestCountResult.length > 0 ? guestCountResult[0].totalConfirmed : 0;
 
   return {
     ...table,
@@ -104,7 +110,7 @@ async function getTableWithOccupancy(id) {
  * Get all tables with their occupancy
  * @param {Object} query - Query filter
  * @param {Object} options - Query options
- * @returns {Array} Tables with guest counts
+ * @returns {Array} Tables with guest counts based on confirmed guests
  */
 async function findWithOccupancy(query = {}, options = {}) {
   const tables = await find(query, options);
@@ -113,9 +119,14 @@ async function findWithOccupancy(query = {}, options = {}) {
   
   const tablesWithOccupancy = await Promise.all(
     tables.map(async (table) => {
-      const guestCount = await guestCollection.countDocuments({ 
-        tableId: table._id 
-      });
+      // Sum confirmedGuests - handle both string and ObjectId formats
+      const tableIdStr = table._id.toString();
+      const guestsAggregation = await guestCollection.aggregate([
+        { $match: { $expr: { $eq: [{ $toString: "$tableId" }, tableIdStr] } } },
+        { $group: { _id: null, totalConfirmed: { $sum: "$confirmedGuests" } } }
+      ]);
+      const guestCountResult = await guestsAggregation.toArray();
+      const guestCount = guestCountResult.length > 0 ? guestCountResult[0].totalConfirmed : 0;
       
       return {
         ...table,

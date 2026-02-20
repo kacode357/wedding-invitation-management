@@ -18,8 +18,6 @@ const { getMessages } = require("../responses");
  *             required: [name]
  *             properties:
  *               name: { type: string, description: "Category name (unique)" }
- *               description: { type: string }
- *               sortOrder: { type: number, description: "Sort order for display" }
  *     responses:
  *       201:
  *         description: Category created successfully
@@ -43,12 +41,6 @@ exports.create = async (req, res, next) => {
  *     tags: [Categories]
  *     summary: Get all categories
  *     security: [{ bearerAuth: [] }]
- *     parameters:
- *       - in: query
- *         name: sort
- *         schema:
- *           type: string
- *         description: Sort field (e.g., "sortOrder", "name", "createdAt")
  *     responses:
  *       200:
  *         description: Categories retrieved successfully
@@ -58,15 +50,7 @@ exports.findAll = async (req, res, next) => {
     const lang = req.headers["accept-language"] || "en";
     const messages = getMessages(lang);
 
-    const { sort, order } = req.query;
-
-    let options = {};
-    if (sort) {
-      const sortOrder = order === "desc" ? -1 : 1;
-      options.sort = { [sort]: sortOrder };
-    }
-
-    const categories = await categoryService.findAll({}, options, lang);
+    const categories = await categoryService.findAll({}, {}, lang);
 
     sendSuccess(res, { categories, count: categories.length }, 200, messages.COMMON.SUCCESS);
   } catch (error) {
@@ -125,8 +109,6 @@ exports.findById = async (req, res, next) => {
  *             type: object
  *             properties:
  *               name: { type: string, description: "Category name (unique)" }
- *               description: { type: string }
- *               sortOrder: { type: number }
  *     responses:
  *       200:
  *         description: Category updated successfully

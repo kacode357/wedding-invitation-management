@@ -46,28 +46,12 @@ async function createNote(data) {
 }
 
 /**
- * Get all notes with pagination
- * @param {Object} options - Pagination options
- * @returns {Object} - Notes with pagination info
+ * Get all notes
+ * @returns {Array} - Array of notes
  */
-async function getAllNotes(options = {}) {
-  const { page = 1, limit = 20 } = options;
-  const skip = (page - 1) * limit;
-
-  const [notes, total] = await Promise.all([
-    Note.find({}, { sort: { createdAt: -1 }, limit, skip }),
-    Note.count()
-  ]);
-
-  return {
-    notes,
-    pagination: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit)
-    }
-  };
+async function getAllNotes() {
+  const notes = await Note.find({}, { sort: { createdAt: -1 } });
+  return notes;
 }
 
 /**
@@ -77,19 +61,6 @@ async function getAllNotes(options = {}) {
  */
 async function getNoteById(id) {
   const note = await Note.findById(id);
-  if (!note) {
-    throw new AppError("Note not found", 404);
-  }
-  return note;
-}
-
-/**
- * Get note by noteId
- * @param {string} noteId - Note ID (e.g., NOTE-001)
- * @returns {Object} - Note
- */
-async function getNoteByNoteId(noteId) {
-  const note = await Note.findByNoteId(noteId);
   if (!note) {
     throw new AppError("Note not found", 404);
   }
@@ -154,7 +125,6 @@ module.exports = {
   createNote,
   getAllNotes,
   getNoteById,
-  getNoteByNoteId,
   updateNote,
   deleteNote,
   getAttendanceStatusOptions,

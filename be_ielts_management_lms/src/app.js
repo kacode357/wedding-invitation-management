@@ -137,13 +137,13 @@ app.get("/", (req, res) => {
  */
 app.get("/api/dashboard", auth, authorizeRoles("admin", "teacher"), async (req, res) => {
   try {
-    const statistics = await dashboardService.getDashboardData();
+    const data = await dashboardService.getDashboardData();
     
     res.json({
       success: true,
-      message: "Welcome to Wedding Invitation Management API",
+      message: "Dashboard data fetched successfully",
       timestamp: new Date().toISOString(),
-      statistics: statistics
+      ...data
     });
   } catch (error) {
     console.error("Error fetching dashboard data:", error);

@@ -99,14 +99,14 @@ class TableService {
         })
       );
 
-      // Calculate total guests to assign
-      const totalGuestsToAssign = guests.reduce((sum, guest) => sum + (guest.numberOfGuests || 1), 0);
+      // Calculate total guests to assign (use confirmedGuests only)
+      const totalGuestsToAssign = guests.reduce((sum, guest) => sum + (guest.confirmedGuests ?? 0), 0);
 
       // Check capacity
-      const availableSeats = data.capacity;
-      if (totalGuestsToAssign > availableSeats) {
+      const tableCapacity = table.capacity;
+      if (totalGuestsToAssign > tableCapacity) {
         throw new AppError(
-          `Table does not have enough capacity. Available seats: ${availableSeats}, requested: ${totalGuestsToAssign}`,
+          `Table does not have enough capacity. Table capacity: ${tableCapacity}, confirmed guests: ${totalGuestsToAssign}`,
           400
         );
       }

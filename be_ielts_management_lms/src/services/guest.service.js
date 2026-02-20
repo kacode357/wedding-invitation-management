@@ -55,18 +55,24 @@ class GuestService {
     const data = {
       guestName: guestData.guestName.trim(),
       categoryId: guestData.categoryId || null,
-      phone: guestData.phone || "",
       numberOfGuests: guestData.numberOfGuests || 1,
-      invitationSent: guestData.invitationSent || false,
-      notes: guestData.notes || ""
+      confirmedGuests: guestData.confirmedGuests ?? guestData.numberOfGuests ?? 1,
+      invitationSent: guestData.invitationSent || false
     };
 
-    // If tableId is provided, validate table and capacity
-    if (guestData.tableId) {
-      await this.assignTableToGuest(null, guestData.tableId, data.numberOfGuests, lang);
+    // If tableId is provided and is a valid ObjectId, validate table and capacity
+    if (guestData.tableId && /^[0-9a-fA-F]{24}$/.test(guestData.tableId)) {
+      await this.assignTableToGuest(null, guestData.tableId, data.confirmedGuests, lang);
       data.tableId = guestData.tableId;
     } else {
       data.tableId = null;
+    }
+
+    // If noteId is provided and is a valid ObjectId, save it
+    if (guestData.noteId && /^[0-9a-fA-F]{24}$/.test(guestData.noteId)) {
+      data.noteId = guestData.noteId;
+    } else {
+      data.noteId = null;
     }
 
     const guest = await Guest.create(data);
@@ -223,15 +229,25 @@ class GuestService {
       }
     }
 
-    // If updating table assignment, handle capacity
+    // Validate confirmedGuests if provided
+    if (updateData.confirmedGuests !== undefined) {
+      if (updateData.confirmedGuests < 0) {
+        throw new AppError("Confirmed guests cannot be negative", 400);
+      }
+      if (updateData.numberOfGuests !== undefined && updateData.confirmedGuests > updateData.numberOfGuests) {
+        throw new AppError("Confirmed guests cannot exceed number of guests invited", 400);
+      }
+    }
+
+    // If updating table assignment, handle capacity (use confirmedGuests)
     if (updateData.tableId !== undefined) {
       const newTableId = updateData.tableId;
-      const numberOfGuests = updateData.numberOfGuests || existingGuest.numberOfGuests;
+      const confirmedGuests = updateData.confirmedGuests ?? existingGuest.confirmedGuests;
 
       // If assigning to a new table
       if (newTableId && newTableId !== existingGuest.tableId) {
         // Check new table has capacity
-        await this.assignTableToGuest(null, newTableId, numberOfGuests, lang);
+        await this.assignTableToGuest(null, newTableId, confirmedGuests, lang);
       }
     }
 
@@ -290,8 +306,8 @@ class GuestService {
       })
     );
 
-    // Calculate total guests to assign
-    const totalGuestsToAssign = guests.reduce((sum, guest) => sum + (guest.numberOfGuests || 1), 0);
+    // Calculate total guests to assign (use confirmedGuests)
+    const totalGuestsToAssign = guests.reduce((sum, guest) => sum + (guest.confirmedGuests || guest.numberOfGuests || 1), 0);
 
     // Get current occupancy of the table
     const tableWithOccupancy = await Table.getTableWithOccupancy(tableId);
@@ -335,8 +351,8 @@ class GuestService {
       return updatedGuest;
     }
 
-    // Validate and assign table
-    await this.assignTableToGuest(null, tableId, guest.numberOfGuests, lang);
+    // Validate and assign table (use confirmedGuests)
+    await this.assignTableToGuest(null, tableId, guest.confirmedGuests ?? guest.numberOfGuests, lang);
 
     const updatedGuest = await Guest.updateById(guestId, { tableId });
     return updatedGuest;
@@ -358,12 +374,12 @@ class GuestService {
     const tableWithOccupancy = await Table.getTableWithOccupancy(tableId);
     const currentGuests = tableWithOccupancy.currentGuests || 0;
 
-    // If updating existing guest, subtract their current count
+    // If updating existing guest, subtract their current count (use confirmedGuests)
     let existingGuestCount = 0;
     if (guestId) {
       const existingGuest = await Guest.findById(guestId);
       if (existingGuest && existingGuest.tableId === tableId) {
-        existingGuestCount = existingGuest.numberOfGuests;
+        existingGuestCount = existingGuest.confirmedGuests || existingGuest.numberOfGuests;
       }
     }
 
@@ -500,6 +516,55 @@ class GuestService {
       errors,
       count: createdGuests.length,
       errorCount: errors.length
+    };
+  }
+
+  /**
+   * Find guest by ID and get table information with all guests at that table
+   */
+  async findByIdAndGetTable(guestId, lang = "en") {
+    const messages = getMessages(lang);
+
+    if (!guestId) {
+      throw new AppError("Guest ID is required", 400);
+    }
+
+    // Find guest by ID
+    const guest = await Guest.findById(guestId);
+
+    if (!guest) {
+      throw new AppError("Guest not found", 404);
+    }
+
+    // If guest has no table assigned, return guest info without table
+    if (!guest.tableId) {
+      return {
+        guest: guest,
+        table: null,
+        tableGuests: []
+      };
+    }
+
+    // Get table information
+    const table = await Table.findById(guest.tableId.toString());
+
+    if (!table) {
+      return {
+        guest: guest,
+        table: null,
+        tableGuests: []
+      };
+    }
+
+    // Get all guests at this table
+    const tableGuests = await Guest.find({
+      $expr: { $eq: [{ $toString: "$tableId" }, guest.tableId.toString()] }
+    });
+
+    return {
+      guest: guest,
+      table: table,
+      tableGuests: tableGuests
     };
   }
 }

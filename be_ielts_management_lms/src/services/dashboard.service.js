@@ -1,6 +1,5 @@
 // Dashboard Service - Fetches statistics for the API dashboard
 const guestModel = require("../models/guest.model");
-const tableModel = require("../models/table.model");
 const { getGuestCategoryList } = require("../constants/enums/guest.enum");
 
 /**
@@ -11,43 +10,39 @@ async function getDashboardData() {
   // Get all guests to calculate actual counts
   const allGuests = await guestModel.find();
 
-  // Calculate total actual guests by summing numberOfGuests field
-  const totalGuests = allGuests.reduce((sum, guest) => sum + (guest.numberOfGuests || 0), 0);
+  // Calculate total invited guests (sum of numberOfGuests)
+  const totalInvited = allGuests.reduce((sum, guest) => sum + (guest.numberOfGuests || 0), 0);
 
-  const totalTables = await tableModel.count();
+  // Calculate total confirmed guests (sum of confirmedGuests)
+  const totalConfirmed = allGuests.reduce((sum, guest) => sum + (guest.confirmedGuests || 0), 0);
 
-  // Get guests by category (already sums numberOfGuests)
+  // Invitations statistics
+  // Families invited = count of guest records
+  const familiesInvited = allGuests.length;
+  
+  // People who received invitations = sum of numberOfGuests where invitationSent is true
+  const invitationsSent = allGuests
+    .filter(guest => guest.invitationSent === true)
+    .reduce((sum, guest) => sum + (guest.numberOfGuests || 0), 0);
+
+  // Get guests by category
   const categoryCounts = await guestModel.countByCategory();
   
   // Transform category counts into array format
   const categoryList = await getGuestCategoryList();
   const guestsByCategory = categoryList.map(category => ({
     category: category,
-    count: categoryCounts[category] || 0
+    count: (categoryCounts[category]?.invited || 0)
   }));
-
-  // Get table occupancy
-  const tables = await tableModel.find();
-  let occupiedTables = 0;
-  let availableTables = 0;
-
-  for (const table of tables) {
-    const tableGuests = await guestModel.findByTableId(table._id.toString());
-    if (tableGuests && tableGuests.length > 0) {
-      occupiedTables++;
-    } else {
-      availableTables++;
-    }
-  }
 
   return {
     guests: {
-      total: totalGuests
+      confirmedGuests: totalConfirmed,
+      numberOfGuests: totalInvited
     },
-    tables: {
-      total: totalTables,
-      occupied: occupiedTables,
-      available: availableTables
+    invitations: {
+      familiesInvited: familiesInvited,
+      invitationsSent: invitationsSent
     },
     guestsByCategory: guestsByCategory
   };

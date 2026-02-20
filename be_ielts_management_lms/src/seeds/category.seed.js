@@ -6,10 +6,10 @@
 const categoryModel = require("../models/category.model");
 
 const INITIAL_CATEGORIES = [
-  { name: "Dad's Guest", description: "Guests of Dad", sortOrder: 1 },
-  { name: "Mom's Guest", description: "Guests of Mom", sortOrder: 2 },
-  { name: "Ms. Ngoc's Guest", description: "Guests of Ms. Ngoc", sortOrder: 3 },
-  { name: "Ka's Guest", description: "Guests of Ka", sortOrder: 4 }
+  { name: "Dad's Guest" },
+  { name: "Mom's Guest" },
+  { name: "Ms. Ngoc's Guest" },
+  { name: "Ka's Guest" }
 ];
 
 async function seedCategories() {
@@ -31,7 +31,7 @@ async function seedCategories() {
 
     console.log("✓ Initial categories created successfully:");
     createdCategories.forEach(cat => {
-      console.log(`   - ${cat.name} (sortOrder: ${cat.sortOrder})`);
+      console.log(`   - ${cat.name}`);
     });
   } catch (error) {
     console.error("✗ Failed to seed categories:", error.message);

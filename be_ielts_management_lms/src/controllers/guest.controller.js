@@ -5,43 +5,6 @@ const { getMessages } = require("../responses");
 
 /**
  * @swagger
- * /api/guests:
- *   post:
- *     tags: [Guests]
- *     summary: Create new guest
- *     security: [{ bearerAuth: [] }]
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [guestName]
- *             properties:
- *               guestName: { type: string }
- *               categoryId: { type: string, description: "Category ID (optional)" }
- *               phone: { type: string }
- *               numberOfGuests: { type: number, minimum: 1, maximum: 10 }
- *               tableId: { type: string }
- *               notes: { type: string }
- *               noteId: { type: string, description: "Note ID (e.g., NOTE-001)" }
- *     responses:
- *       201:
- *         description: Guest created successfully
- */
-exports.create = async (req, res, next) => {
-  try {
-    const lang = req.headers["accept-language"] || "en";
-    const messages = getMessages(lang);
-    const guest = await guestService.create(req.body, lang);
-
-    sendSuccess(res, { guest }, 201, messages.COMMON.CREATE_SUCCESS);
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * @swagger
  * /api/guests/bulk:
  *   post:
  *     tags: [Guests]
@@ -52,7 +15,8 @@ exports.create = async (req, res, next) => {
  *         application/json:
  *           schema:
  *             type: object
- *             required: [guests]
+ *             required:
+ *               - guests
  *             properties:
  *               guests:
  *                 type: array
@@ -61,11 +25,11 @@ exports.create = async (req, res, next) => {
  *                   properties:
  *                     guestName: { type: string }
  *                     categoryId: { type: string, description: "Category ID" }
- *                     phone: { type: string }
- *                     numberOfGuests: { type: number, minimum: 1, maximum: 10 }
+ *                     numberOfGuests: { type: number, minimum: 1, maximum: 10, description: "Total guests invited" }
+ *                     confirmedGuests: { type: number, minimum: 0, description: "Guests confirmed to attend" }
  *                     tableId: { type: string }
- *                     notes: { type: string }
- *     responses:
+*                     noteId: { type: string, description: "Note _id reference" }
+*     responses:
  *       201:
  *         description: Guests created successfully
  */
@@ -132,21 +96,14 @@ exports.bulkCreate = async (req, res, next) => {
  *                           _id: { type: string }
  *                           guestName: { type: string }
  *                           categoryId: { type: string }
- *                           category: { type: string }
- *                           phone: { type: string }
- *                           numberOfGuests: { type: number }
+ *                           categoryName: { type: string }
+ *                           numberOfGuests: { type: number, description: "Total guests invited" }
+ *                           confirmedGuests: { type: number, description: "Guests confirmed to attend" }
  *                           invitationSent: { type: boolean }
  *                           tableId: { type: string }
  *                           tableName: { type: string }
- *                           noteId: { type: string, description: "Note ID (e.g., NOTE-001)" }
- *                           note: 
- *                             type: object
- *                             properties:
- *                               noteId: { type: string }
- *                               attendanceStatus: { type: string }
- *                               customPrediction: { type: string }
- *                               invitedCount: { type: number }
- *                               predictedCount: { type: number }
+ *                           noteId: { type: string }
+ *                           noteName: { type: string }
  *                           isArrived: { type: boolean }
  *                           arrivedAt: { type: string, format: date-time }
  *                           createdAt: { type: string, format: date-time }
@@ -213,20 +170,13 @@ exports.findAll = async (req, res, next) => {
  *                         guestName: { type: string }
  *                         categoryId: { type: string }
  *                         category: { type: string }
- *                         phone: { type: string }
- *                         numberOfGuests: { type: number }
- *                         invitationSent: { type: boolean }
+*                         numberOfGuests: { type: number, description: "Total guests invited" }
+*                         confirmedGuests: { type: number, description: "Guests confirmed to attend" }
+*                         invitationSent: { type: boolean }
  *                         tableId: { type: string }
  *                         tableName: { type: string }
- *                         noteId: { type: string, description: "Note ID (e.g., NOTE-001)" }
- *                         note: 
- *                           type: object
- *                           properties:
- *                             noteId: { type: string }
- *                             attendanceStatus: { type: string }
- *                             customPrediction: { type: string }
- *                             invitedCount: { type: number }
- *                             predictedCount: { type: number }
+ *                         noteId: { type: string }
+ *                         noteName: { type: string }
  *                         isArrived: { type: boolean }
  *                         arrivedAt: { type: string, format: date-time }
  *                         createdAt: { type: string, format: date-time }
@@ -241,38 +191,6 @@ exports.findById = async (req, res, next) => {
     const guest = await guestService.findById(id, lang);
 
     sendSuccess(res, { guest }, 200, messages.COMMON.SUCCESS);
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * @swagger
- * /api/guests/category/{categoryId}:
- *   get:
- *     tags: [Guests]
- *     summary: Get guests by category
- *     security: [{ bearerAuth: [] }]
- *     parameters:
- *       - in: path
- *         name: categoryId
- *         required: true
- *         schema:
- *           type: string
- *         description: Category ID
- *     responses:
- *       200:
- *         description: Guests retrieved successfully
- */
-exports.findByCategory = async (req, res, next) => {
-  try {
-    const lang = req.headers["accept-language"] || "en";
-    const messages = getMessages(lang);
-
-    const { categoryId } = req.params;
-    const guests = await guestService.findByCategory(categoryId, lang);
-
-    sendSuccess(res, { guests, count: guests.length }, 200, messages.COMMON.SUCCESS);
   } catch (error) {
     next(error);
   }
@@ -379,12 +297,11 @@ exports.findByInvitationStatus = async (req, res, next) => {
  *             properties:
  *               guestName: { type: string }
  *               categoryId: { type: string, description: "Category ID" }
- *               phone: { type: string }
- *               numberOfGuests: { type: number, minimum: 1, maximum: 10 }
+ *               numberOfGuests: { type: number, minimum: 1, maximum: 10, description: "Total guests invited" }
+ *               confirmedGuests: { type: number, minimum: 0, description: "Guests confirmed to attend (can be less than numberOfGuests)" }
  *               tableId: { type: string }
  *               invitationSent: { type: boolean }
- *               notes: { type: string }
- *               noteId: { type: string, description: "Note ID (e.g., NOTE-001)" }
+ *               noteId: { type: string, description: "Note _id reference" }
  *     responses:
  *       200:
  *         description: Guest updated successfully
@@ -436,84 +353,6 @@ exports.delete = async (req, res, next) => {
 
 /**
  * @swagger
- * /api/guests/table/{tableId}/assign:
- *   put:
- *     tags: [Guests]
- *     summary: Assign multiple guests to a table
- *     security: [{ bearerAuth: [] }]
- *     parameters:
- *       - in: path
- *         name: tableId
- *         required: true
- *         schema:
- *           type: string
- *         description: Table ID to assign guests to
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [guestIds]
- *             properties:
- *               guestIds:
- *                 type: array
- *                 items:
- *                   type: string
- *                 description: Array of guest IDs to assign to the table
- *     responses:
- *       200:
- *         description: Guests assigned successfully
- */
-exports.assignTable = async (req, res, next) => {
-  try {
-    const lang = req.headers["accept-language"] || "en";
-    const messages = getMessages(lang);
-
-    const { tableId } = req.params;
-    const { guestIds } = req.body;
-
-    // Validate guestIds array
-    if (!Array.isArray(guestIds) || guestIds.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "guestIds must be a non-empty array"
-      });
-    }
-
-    const guests = await guestService.assignTableToMultipleGuests(guestIds, tableId, lang);
-
-    sendSuccess(res, { guests, count: guests.length }, 200, messages.COMMON.UPDATE_SUCCESS);
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * @swagger
- * /api/guests/stats:
- *   get:
- *     tags: [Guests]
- *     summary: Get guest statistics
- *     security: [{ bearerAuth: [] }]
- *     responses:
- *       200:
- *         description: Statistics retrieved successfully
- */
-exports.getStatistics = async (req, res, next) => {
-  try {
-    const lang = req.headers["accept-language"] || "en";
-    const messages = getMessages(lang);
-
-    const stats = await guestService.getStatistics(lang);
-
-    sendSuccess(res, { stats }, 200, messages.COMMON.SUCCESS);
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * @swagger
  * /api/guests/{id}/invitation/sent:
  *   put:
  *     tags: [Guests]
@@ -536,37 +375,6 @@ exports.markInvitationSent = async (req, res, next) => {
 
     const { id } = req.params;
     const guest = await guestService.markInvitationSent(id, lang);
-
-    sendSuccess(res, { guest }, 200, messages.COMMON.UPDATE_SUCCESS);
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * @swagger
- * /api/guests/{id}/invitation/not-sent:
- *   put:
- *     tags: [Guests]
- *     summary: Mark invitation as not sent
- *     security: [{ bearerAuth: [] }]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Invitation marked as not sent
- */
-exports.markInvitationNotSent = async (req, res, next) => {
-  try {
-    const lang = req.headers["accept-language"] || "en";
-    const messages = getMessages(lang);
-
-    const { id } = req.params;
-    const guest = await guestService.markInvitationNotSent(id, lang);
 
     sendSuccess(res, { guest }, 200, messages.COMMON.UPDATE_SUCCESS);
   } catch (error) {
@@ -648,6 +456,46 @@ exports.checkIn = async (req, res, next) => {
     const guest = await guestService.checkInGuest(id, lang);
 
     sendSuccess(res, { guest }, 200, messages.COMMON.UPDATE_SUCCESS);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @swagger
+ * /api/guests/search/table:
+ *   get:
+ *     tags: [Guests]
+ *     summary: Search for guest by ID and get table information
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: query
+ *         name: guestId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Guest ID to search for
+ *     responses:
+ *       200:
+ *         description: Guest and table information retrieved successfully
+ */
+exports.findByIdAndGetTable = async (req, res, next) => {
+  try {
+    const lang = req.headers["accept-language"] || "en";
+    const messages = getMessages(lang);
+
+    const { guestId } = req.query;
+
+    if (!guestId) {
+      return res.status(400).json({
+        success: false,
+        message: "Guest ID is required"
+      });
+    }
+
+    const result = await guestService.findByIdAndGetTable(guestId, lang);
+
+    sendSuccess(res, result, 200, messages.COMMON.SUCCESS);
   } catch (error) {
     next(error);
   }

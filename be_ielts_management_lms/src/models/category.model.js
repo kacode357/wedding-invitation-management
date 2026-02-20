@@ -12,8 +12,6 @@ const COLLECTION_NAME = "categories";
  *       properties:
  *         _id: { type: string }
  *         name: { type: string, description: "Category name (unique)" }
- *         description: { type: string }
- *         sortOrder: { type: number }
  *         createdAt: { type: string, format: date-time }
  *         updatedAt: { type: string, format: date-time }
  */
@@ -23,13 +21,6 @@ async function create(data) {
 
   data.createdAt = new Date();
   data.updatedAt = new Date();
-
-  // Set default sort order if not provided
-  if (data.sortOrder === undefined || data.sortOrder === null) {
-    // Get the maximum sort order and add 1
-    const maxSortCategory = await collection.find().sort({ sortOrder: -1 }).limit(1).toArray();
-    data.sortOrder = maxSortCategory.length > 0 ? maxSortCategory[0].sortOrder + 1 : 1;
-  }
 
   const result = await collection.insertOne(data);
   return { ...data, _id: result.insertedId };
@@ -47,7 +38,7 @@ async function findOne(query) {
 
 async function find(query = {}, options = {}) {
   const collection = await getCollection(COLLECTION_NAME);
-  const { sort = { sortOrder: 1, createdAt: -1 }, limit, skip } = options;
+  const { sort = { createdAt: -1 }, limit, skip } = options;
 
   let cursor = collection.find(query).sort(sort);
 
@@ -84,13 +75,13 @@ async function count(query = {}) {
 
 async function getAllCategoryNames() {
   const collection = await getCollection(COLLECTION_NAME);
-  const categories = await collection.find().sort({ sortOrder: 1 }).project({ name: 1 }).toArray();
+  const categories = await collection.find().project({ name: 1 }).toArray();
   return categories.map(cat => cat.name);
 }
 
 async function getAllCategories() {
   const collection = await getCollection(COLLECTION_NAME);
-  return await collection.find().sort({ sortOrder: 1 }).toArray();
+  return await collection.find().toArray();
 }
 
 module.exports = {

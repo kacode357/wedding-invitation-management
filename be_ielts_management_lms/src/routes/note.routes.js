@@ -15,12 +15,6 @@ router.post("/", noteController.createNote);
 // Get all notes with pagination
 router.get("/", noteController.getAllNotes);
 
-// Get attendance status options (for frontend dropdown)
-router.get("/options/attendance-status", noteController.getAttendanceStatusOptions);
-
-// Get note by noteId (e.g., NOTE-001)
-router.get("/noteId/:noteId", noteController.getNoteByNoteId);
-
 // Get note by ID
 router.get("/:id", noteController.getNoteById);
 

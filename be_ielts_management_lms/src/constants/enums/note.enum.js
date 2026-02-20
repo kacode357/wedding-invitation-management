@@ -18,7 +18,6 @@
  *     Note:
  *       type: object
  *       properties:
- *         noteId: { type: string, description: "Unique note identifier" }
  *         attendanceStatus: { type: string, enum: [definitely, highly_likely, unlikely, custom_prediction] }
  *         customPrediction: { type: string, description: "Custom prediction text (used when attendanceStatus is custom_prediction)" }
  *         invitedCount: { type: number, description: "Number of guests invited" }
