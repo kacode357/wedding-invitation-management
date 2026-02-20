@@ -10,7 +10,11 @@ class GroupService {
     async validateUniqueName(name, excludeId = null) {
         const query = { name: name.trim() };
         if (excludeId) {
-            query._id = { $ne: excludeId };
+            try {
+                query._id = { $ne: new Group.ObjectId(excludeId) };
+            } catch (e) {
+                query._id = { $ne: excludeId };
+            }
         }
         const existing = await Group.findOne(query);
         return !existing;
@@ -22,7 +26,11 @@ class GroupService {
     async validateUniquePriorityLevel(priorityLevel, excludeId = null) {
         const query = { priorityLevel: Number(priorityLevel) };
         if (excludeId) {
-            query._id = { $ne: excludeId };
+            try {
+                query._id = { $ne: new Group.ObjectId(excludeId) };
+            } catch (e) {
+                query._id = { $ne: excludeId };
+            }
         }
         const existing = await Group.findOne(query);
         return !existing;
