@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { noteService } from '../../services/note.service';
 import { useCreateNote } from './useCreateNote';
 import { useGetNote } from './useGetNote';

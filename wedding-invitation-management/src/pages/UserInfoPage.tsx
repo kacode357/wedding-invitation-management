@@ -3,13 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useSearchGuestByTable } from '../hooks/guest/useSearchGuestByTable';
 import { useGetAllGuests } from '../hooks/guest/useGetAllGuests';
-import type { Guest, TableInfo } from '../types/guest/guest.response';
+import type { Guest } from '../types/guest/guest.response';
 
 export default function UserInfoPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
@@ -64,7 +63,6 @@ export default function UserInfoPage() {
       return;
     }
     
-    setSelectedGuest(guestItem);
     setSearchQuery(guestItem.guestName || '');
     setShowDropdown(false);
     
@@ -74,7 +72,6 @@ export default function UserInfoPage() {
 
   const handleClearSearch = () => {
     setSearchQuery('');
-    setSelectedGuest(null);
     reset();
   };
 
@@ -280,7 +277,6 @@ export default function UserInfoPage() {
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
                       setShowDropdown(true);
-                      setSelectedGuest(null);
                     }}
                     onFocus={() => setShowDropdown(true)}
                     placeholder="Nhập tên khách mời..."
