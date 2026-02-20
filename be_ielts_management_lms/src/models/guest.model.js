@@ -107,7 +107,7 @@ async function findById(id) {
       guest.tableId = tableIdStr;
       // Get table name
       const table = await Table.findById(tableIdStr);
-      guest.tableName = table ? table.tableNumber : null;
+      guest.tableName = table ? table.tableName : null;
     } else {
       guest.tableId = null;
       guest.tableName = null;
@@ -160,7 +160,7 @@ async function findOne(query) {
       const tableIdStr = guest.tableId.toString();
       guest.tableId = tableIdStr;
       const table = await Table.findById(tableIdStr);
-      guest.tableName = table ? table.tableNumber : null;
+      guest.tableName = table ? table.tableName : null;
     } else {
       guest.tableId = null;
       guest.tableName = null;
@@ -229,7 +229,7 @@ async function find(query = {}, options = {}) {
   const tables = await Table.find();
   const tableMap = {};
   tables.forEach(table => {
-    tableMap[table._id.toString()] = table.tableNumber;
+    tableMap[table._id.toString()] = table.tableName;
   });
 
   // Get all notes to map noteId to note details
@@ -305,7 +305,7 @@ async function findByCategory(categoryId) {
   const tables = await Table.find();
   const tableMap = {};
   tables.forEach(table => {
-    tableMap[table._id.toString()] = table.tableNumber;
+    tableMap[table._id.toString()] = table.tableName;
   });
 
   // Get all notes to map noteId to noteName
@@ -447,7 +447,7 @@ async function findAssigned() {
   const tables = await Table.find();
   const tableMap = {};
   tables.forEach(table => {
-    tableMap[table._id.toString()] = table.tableNumber;
+    tableMap[table._id.toString()] = table.tableName;
   });
 
   // Get all notes to map noteId to noteName
@@ -524,7 +524,7 @@ async function findArrived() {
   const tables = await Table.find();
   const tableMap = {};
   tables.forEach(table => {
-    tableMap[table._id.toString()] = table.tableNumber;
+    tableMap[table._id.toString()] = table.tableName;
   });
 
   // Get all notes to map noteId to noteName
@@ -602,7 +602,7 @@ async function findUnarrived() {
   const tables = await Table.find();
   const tableMap = {};
   tables.forEach(table => {
-    tableMap[table._id.toString()] = table.tableNumber;
+    tableMap[table._id.toString()] = table.tableName;
   });
 
   // Get all notes to map noteId to noteName
