@@ -22,6 +22,12 @@ export default function AddTablePage() {
   
   const [guestSearchTerm, setGuestSearchTerm] = useState('');
   
+  // Calculate total confirmed guests based on selected guest IDs
+  const selectedConfirmedGuests = formData.guestIds?.reduce((total, guestId) => {
+    const guest = availableGuests.find(g => (g._id || String(g.id)) === guestId);
+    return total + (guest?.confirmedGuests || 0);
+  }, 0) || 0;
+  
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -67,8 +73,16 @@ export default function AddTablePage() {
           guestIds: currentGuestIds.filter(id => id !== guestId)
         };
       } else {
+        // Calculate total confirmed guests after adding this guest
+        const guestToAdd = availableGuests.find(g => (g._id || String(g.id)) === guestId);
+        const additionalGuests = guestToAdd?.confirmedGuests || 0;
+        const currentConfirmedGuests = currentGuestIds.reduce((total, id) => {
+          const guest = availableGuests.find(g => (g._id || String(g.id)) === id);
+          return total + (guest?.confirmedGuests || 0);
+        }, 0);
+        
         // Check if capacity would be exceeded
-        if (currentGuestIds.length >= (prev.capacity || 10)) {
+        if (currentConfirmedGuests + additionalGuests > (prev.capacity || 10)) {
           setSubmitError(`Cannot add more guests. Banquet table capacity is ${prev.capacity}`);
           setTimeout(() => setSubmitError(null), 3000);
           return prev;
@@ -82,7 +96,12 @@ export default function AddTablePage() {
   };
 
   const handleSelectAll = () => {
-    if (availableGuests.length <= (formData.capacity || 10)) {
+    // Calculate total confirmed guests if all available guests are selected
+    const totalConfirmedIfAllSelected = availableGuests.reduce((total, guest) => {
+      return total + (guest.confirmedGuests || 0);
+    }, 0);
+    
+    if (totalConfirmedIfAllSelected <= (formData.capacity || 10)) {
       setFormData(prev => ({
         ...prev,
         guestIds: availableGuests.map(g => g._id || String(g.id)).filter((id): id is string => !!id)
@@ -110,18 +129,26 @@ export default function AddTablePage() {
 
     setSubmitError(null);
 
-    const result = await createTable(formData);
-
-    if (result?.success) {
-      toast.success('Banquet table created successfully!');
-      navigate('/home');
-    } else {
-      toast.error(result?.message || 'Failed to create table');
+    try {
+      const result = await createTable(formData);
+      
+      if (result?.success) {
+        toast.success('Banquet table created successfully!');
+        // Use setTimeout to ensure toast is shown before navigating
+        setTimeout(() => {
+          navigate('/tables');
+        }, 100);
+      } else {
+        toast.error(result?.message || 'Failed to create table');
+      }
+    } catch (err) {
+      toast.error('An error occurred while creating the table');
+      console.error('Create table error:', err);
     }
   };
 
   const handleBack = () => {
-    navigate('/home');
+    navigate('/tables');
   };
 
   // Filter guests by search term
@@ -129,13 +156,13 @@ export default function AddTablePage() {
     const searchLower = guestSearchTerm.toLowerCase();
     return (
       guest.guestName.toLowerCase().includes(searchLower) ||
-      guest.category?.toLowerCase().includes(searchLower)
+      (guest.categoryName || guest.category)?.toLowerCase().includes(searchLower)
     );
   });
 
   // Group filtered guests by category for better display
   const guestsByCategory = filteredGuests.reduce((acc, guest) => {
-    const category = guest.category || 'Uncategorized';
+    const category = guest.categoryName || guest.category || 'Uncategorized';
     if (!acc[category]) {
       acc[category] = [];
     }
@@ -246,7 +273,7 @@ export default function AddTablePage() {
             </div>
 
             <p className="text-sm text-gray-600 mb-4">
-              Selected: {formData.guestIds?.length || 0} / 10 guests
+              Selected: {selectedConfirmedGuests} / {formData.capacity || 10} guests ({formData.guestIds?.length || 0} entries)
             </p>
 
             {/* Search Guests */}
@@ -312,9 +339,12 @@ export default function AddTablePage() {
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-gray-800 truncate">
                                 {guest.guestName}
+                                <span className="ml-2 text-xs font-normal text-gray-500">
+                                  ({guest.categoryName || guest.category || 'Uncategorized'})
+                                </span>
                               </p>
                               <p className="text-xs text-gray-500 truncate">
-                                {guest.numberOfGuests} guest{guest.numberOfGuests !== 1 ? 's' : ''}
+                                Total: {guest.numberOfGuests} guests | Confirmed: {guest.confirmedGuests}
                               </p>
                             </div>
                             {isSelected && (

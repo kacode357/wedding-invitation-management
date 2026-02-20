@@ -4,30 +4,23 @@ export interface GuestCategory {
   count: number;
 }
 
-// Guest statistics
-export interface GuestCount {
-  total: number;
+// Guests object
+export interface GuestsData {
+  confirmedGuests: number;
+  numberOfGuests: number;
 }
 
-// Table statistics
-export interface TableCount {
-  total: number;
-  occupied: number;
-  available: number;
-}
-
-// User statistics
-export interface UserCount {
-  total: number;
+// Invitations object
+export interface InvitationsData {
+  familiesInvited: number;
+  invitationsSent: number;
 }
 
 // Main statistics object from API
 export interface Statistics {
-  guests: GuestCount;
-  tables: TableCount;
-  users: UserCount;
+  guests: GuestsData;
+  invitations: InvitationsData;
   guestsByCategory: GuestCategory[];
-  unassignedGuests: number;
 }
 
 // Dashboard API response wrapper
@@ -35,5 +28,7 @@ export interface DashboardResponse {
   success: boolean;
   message?: string;
   timestamp?: string;
-  statistics?: Statistics;
+  guests?: GuestsData;
+  invitations?: InvitationsData;
+  guestsByCategory?: GuestCategory[];
 }

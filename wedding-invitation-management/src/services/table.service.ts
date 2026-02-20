@@ -38,11 +38,6 @@ export const tableService = {
     return response.data;
   },
 
-  async swapGuests(guestId1: string, guestId2: string): Promise<GuestAssignResponse> {
-    const response = await api.post<GuestAssignResponse>('/tables/swap-guests', { guestId1, guestId2 });
-    return response.data;
-  },
-
   async deleteTable(id: string): Promise<TableResponse> {
     const response = await api.delete<TableResponse>(`/tables/${id}`);
     return response.data;

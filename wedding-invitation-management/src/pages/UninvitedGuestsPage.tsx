@@ -62,7 +62,7 @@ export default function UninvitedGuestsPage() {
                   </svg>
                 </div>
                 <span className="text-sm sm:text-xl font-serif font-bold text-gray-800 hidden xs:block">
-                  Uninvited Guests
+                  Uninvited Invitations
                 </span>
               </div>
             </div>
@@ -126,8 +126,8 @@ export default function UninvitedGuestsPage() {
               </svg>
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Uninvited Guests</h1>
-              <p className="text-sm text-gray-500">{count} guest{count !== 1 ? 's' : ''} without invitations sent</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Uninvited Invitations</h1>
+              <p className="text-sm text-gray-500">{count} invitation{count !== 1 ? 's' : ''} not yet sent</p>
             </div>
           </div>
 
@@ -165,8 +165,8 @@ export default function UninvitedGuestsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <p className="text-gray-600 mb-2">No uninvited guests</p>
-              <p className="text-sm text-gray-500">All guests have been sent invitations</p>
+              <p className="text-gray-600 mb-2">No uninvited invitations</p>
+              <p className="text-sm text-gray-500">All invitations have been sent</p>
             </div>
           ) : filteredGuests.length === 0 ? (
             <div className="text-center py-12">
@@ -175,7 +175,7 @@ export default function UninvitedGuestsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-              <p className="text-gray-600 mb-2">No guests found</p>
+              <p className="text-gray-600 mb-2">No invitations found</p>
               <p className="text-sm text-gray-500">Try a different search term</p>
             </div>
           ) : (
@@ -196,16 +196,17 @@ export default function UninvitedGuestsPage() {
                         </div>
                         <span className="font-semibold text-gray-800">{guest.guestName}</span>
                       </div>
-                      <span className="inline-flex items-center justify-center w-6 h-6 bg-amber-500 text-white text-xs font-bold rounded-full">
-                        {guest.numberOfGuests}
+                    </div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="inline-flex items-center justify-center px-2 py-1 bg-amber-200 text-amber-700 text-xs font-medium rounded-full">
+                        {guest.confirmedGuests}/{guest.numberOfGuests}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">{guest.phone}</p>
-                    {guest.category && (
-                      <p className="text-xs text-gray-500 mb-1">Category: {guest.category}</p>
+                    {guest.categoryName && (
+                      <p className="text-xs text-gray-500 mb-1">Category: {guest.categoryName}</p>
                     )}
-                    {(guest.table?.tableName || guest.table?.tableNumber) && (
-                      <p className="text-xs text-gray-500 mb-2">Banquet Table: {guest.table.tableName || guest.table.tableNumber}</p>
+                    {guest.tableName && (
+                      <p className="text-xs text-gray-500 mb-2">Table: {guest.tableName}</p>
                     )}
                     <button
                       onClick={() => guest._id && handleMarkAsSent(guest._id)}
@@ -226,11 +227,10 @@ export default function UninvitedGuestsPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Guest Name</th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600 hidden md:table-cell">Phone</th>
+                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Name</th>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600 hidden lg:table-cell">Category</th>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600 hidden lg:table-cell">Table</th>
-                      <th className="text-center py-3 px-4 text-sm font-semibold text-gray-600">Guests</th>
+                      <th className="text-center py-3 px-4 text-sm font-semibold text-gray-600">Invitations</th>
                       <th className="text-center py-3 px-4 text-sm font-semibold text-gray-600">Actions</th>
                     </tr>
                   </thead>
@@ -247,14 +247,13 @@ export default function UninvitedGuestsPage() {
                             <span className="font-medium text-gray-800">{guest.guestName}</span>
                           </div>
                         </td>
-                        <td className="py-3 px-4 text-sm text-gray-600 hidden md:table-cell">{guest.phone}</td>
-                        <td className="py-3 px-4 text-sm text-gray-600 hidden lg:table-cell">{guest.category || '-'}</td>
+                        <td className="py-3 px-4 text-sm text-gray-600 hidden lg:table-cell">{guest.categoryName || '-'}</td>
                         <td className="py-3 px-4 text-sm text-gray-600 hidden lg:table-cell">
-                          {guest.table?.tableName || guest.table?.tableNumber || '-'}
+                          {guest.tableName || '-'}
                         </td>
                         <td className="py-3 px-4 text-center">
-                          <span className="inline-flex items-center justify-center w-8 h-8 bg-amber-100 text-amber-700 rounded-full text-sm font-medium">
-                            {guest.numberOfGuests}
+                          <span className="inline-flex items-center justify-center px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-medium">
+                            {guest.confirmedGuests}/{guest.numberOfGuests}
                           </span>
                         </td>
                         <td className="py-3 px-4 text-center">

@@ -21,9 +21,8 @@ export function useGuests(): UseGuestsReturn {
 
     try {
       const response = await guestService.bulkCreateGuests(payload);
-
-      if (response.success && response.guests) {
-        setGuests(response.guests);
+      if (response.success && response.data?.guests) {
+        setGuests(response.data.guests);
         return true;
       } else {
         setError(response.message || 'Failed to create guests');

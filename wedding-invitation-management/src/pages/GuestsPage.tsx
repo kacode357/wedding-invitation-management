@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../hooks/auth/useAuth';
 import { useGetAllGuests } from '../hooks/guest/useGetAllGuests';
-import { useGetUnassignedGuests } from '../hooks/guest/useGetUnassignedGuests';
 import { useUpdateGuest } from '../hooks/guest/useUpdateGuest';
 import { useDeleteGuest } from '../hooks/guest/useDeleteGuest';
 import { useCategories } from '../hooks/category/useCategories';
+import { useNotes } from '../hooks/note/useNotes';
 import type { Guest } from '../types/guest/guest.response';
 import type { UpdateGuestPayload } from '../types/guest/guest.payload';
 
@@ -14,14 +14,16 @@ export default function GuestsPage() {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { guests, count, isLoading, error, fetchGuests } = useGetAllGuests();
-  const { guests: unassignedGuests, count: unassignedCount, fetchGuests: fetchUnassignedGuests } = useGetUnassignedGuests();
   const { updateGuest, isLoading: isUpdating } = useUpdateGuest();
   const { deleteGuest, isLoading: isDeleting } = useDeleteGuest();
   const { categories, fetchCategories } = useCategories();
+  const { notes, fetchNotes } = useNotes();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [showUnassigned, setShowUnassigned] = useState(false);
+
+  // Dropdown state
+  const [openDropdown, setOpenDropdown] = useState<'category' | 'guest' | 'confirmed' | 'note' | null>(null);
 
   // Edit modal state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -35,21 +37,21 @@ export default function GuestsPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Extract unique categories from guests
-  const guestCategories = ['all', ...new Set(guests.map(guest => guest.category).filter(Boolean))];
+  const guestCategories = ['all', ...new Set(guests.map(guest => guest.categoryName).filter(Boolean))];
 
   useEffect(() => {
     fetchGuests();
     fetchCategories();
-    fetchUnassignedGuests();
-  }, [fetchGuests, fetchCategories, fetchUnassignedGuests]);
+    fetchNotes();
+  }, [fetchGuests, fetchCategories, fetchNotes]);
 
-  const filteredGuests = (showUnassigned ? unassignedGuests : guests).filter((guest) => {
-    const category = guest.category || '';
+  const filteredGuests = guests.filter((guest) => {
+    const category = guest.categoryName || '';
     const matchesSearch = 
       guest.guestName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       category.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesCategory = selectedCategory === 'all' || guest.category === selectedCategory;
+    const matchesCategory = selectedCategory === 'all' || guest.categoryName === selectedCategory;
     
     return matchesSearch && matchesCategory;
   });
@@ -68,9 +70,10 @@ export default function GuestsPage() {
     setEditFormData({
       guestName: guest.guestName,
       numberOfGuests: guest.numberOfGuests,
-      notes: guest.notes || '',
-      categoryId: guest.categoryId,
-      tableId: guest.tableId,
+      confirmedGuests: guest.confirmedGuests,
+      categoryId: guest.categoryId || '',
+      tableId: guest.tableId || '',
+      noteId: guest.noteId || '',
     });
     setEditError(null);
     setIsEditModalOpen(true);
@@ -80,7 +83,7 @@ export default function GuestsPage() {
     const { name, value } = e.target;
     setEditFormData(prev => ({
       ...prev,
-      [name]: name === 'numberOfGuests' || name === 'categoryId' || name === 'tableId'
+      [name]: name === 'numberOfGuests' || name === 'categoryId' || name === 'tableId' || name === 'confirmedGuests'
         ? value === '' ? undefined : Number(value)
         : value
     }));
@@ -114,6 +117,7 @@ export default function GuestsPage() {
     setEditingGuest(null);
     setEditFormData({});
     setEditError(null);
+    setOpenDropdown(null);
   };
 
   // Delete functions
@@ -228,9 +232,11 @@ export default function GuestsPage() {
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
         {/* Page Title */}
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-gray-800">Guest List</h1>
-          <p className="text-gray-600 mt-1">Total: {showUnassigned ? unassignedCount : count} guests</p>
-        </div>
+  <h1 className="text-2xl sm:text-3xl font-serif font-bold text-gray-800">Invitations</h1>
+  <p className="text-gray-600 mt-1">
+    Total: {count} {count === 1 ? 'invitation' : 'invitations'}
+  </p>
+</div>
 
         {/* Search Bar */}
         <div className="mb-6">
@@ -258,9 +264,9 @@ export default function GuestsPage() {
           <div className="flex gap-2 pb-2">
             {/* All Button */}
             <button
-              onClick={() => { setSelectedCategory('all'); setShowUnassigned(false); }}
+              onClick={() => setSelectedCategory('all')}
               className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                selectedCategory === 'all' && !showUnassigned
+                selectedCategory === 'all'
                   ? 'bg-rose-500 text-white'
                   : 'bg-white text-gray-600 hover:bg-rose-50'
               }`}
@@ -268,25 +274,13 @@ export default function GuestsPage() {
               All
             </button>
 
-            {/* Unassigned Button */}
-            <button
-              onClick={() => { setSelectedCategory('all'); setShowUnassigned(true); }}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                showUnassigned
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-white text-gray-600 hover:bg-orange-50'
-              }`}
-            >
-              Unassigned ({unassignedCount})
-            </button>
-
             {guestCategories.map((cat) => (
               cat !== 'all' && cat && (
                 <button
                   key={cat}
-                  onClick={() => { setSelectedCategory(cat); setShowUnassigned(false); }}
+                  onClick={() => setSelectedCategory(cat)}
                   className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                    selectedCategory === cat && !showUnassigned
+                    selectedCategory === cat
                       ? 'bg-rose-500 text-white'
                       : 'bg-white text-gray-600 hover:bg-rose-50'
                   }`}
@@ -330,30 +324,31 @@ export default function GuestsPage() {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Category</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Guests</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Table</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Notes</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Note</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredGuests.map((guest) => (
-                  <tr key={guest.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={guest._id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{guest.guestName}</div>
-                      {guest.address && (
-                        <div className="text-xs text-gray-500 truncate max-w-[150px]">{guest.address}</div>
-                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800">
-                        {guest.category || 'Uncategorized'}
+                        {guest.categoryName || 'Uncategorized'}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      {guest.confirmedGuests}/{guest.numberOfGuests}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {guest.tableName || '-'}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
-                      {guest.notes || '-'}
+                      {guest.noteName || '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <div className="flex items-center gap-2">
@@ -389,16 +384,22 @@ export default function GuestsPage() {
           <div className="md:hidden space-y-4">
             {filteredGuests.map((guest) => (
               <div
-                key={guest.id}
+                key={guest._id}
                 className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/50"
               >
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-gray-900">{guest.guestName}</h3>
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-rose-100 text-rose-800">
-                    {guest.category || 'Uncategorized'}
+                    {guest.categoryName || 'Uncategorized'}
                   </span>
                 </div>
                 <div className="space-y-1 text-sm">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <span>{guest.confirmedGuests}/{guest.numberOfGuests} guests</span>
+                  </div>
                   {guest.tableName && (
                     <div className="flex items-center gap-2 text-gray-600">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -407,12 +408,15 @@ export default function GuestsPage() {
                       <span>{guest.tableName}</span>
                     </div>
                   )}
+                  {guest.noteName && (
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <span>{guest.noteName}</span>
+                    </div>
+                  )}
                 </div>
-                {guest.notes && (
-                  <div className="mt-2 pt-2 border-t border-gray-100">
-                    <p className="text-xs text-gray-500 italic">{guest.notes}</p>
-                  </div>
-                )}
                 {/* Mobile Action Buttons */}
                 <div className="mt-3 pt-3 border-t border-gray-100 flex gap-2">
                   <button
@@ -442,9 +446,9 @@ export default function GuestsPage() {
 
       {/* Edit Guest Modal */}
       {isEditModalOpen && editingGuest && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setOpenDropdown(null)}>
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleEditModalClose}></div>
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[95vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
               <h2 className="text-lg font-semibold text-gray-800">Edit Guest</h2>
@@ -469,74 +473,247 @@ export default function GuestsPage() {
             )}
 
             {/* Edit Form */}
-            <form onSubmit={handleEditSubmit} className="p-4 space-y-4">
+            <form onSubmit={handleEditSubmit} className="p-4 space-y-4" onClick={(e) => e.stopPropagation()}>
               {/* Guest Name */}
               <div>
-                <label htmlFor="edit-guestName" className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Guest Name
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Guest Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  id="edit-guestName"
-                  name="guestName"
                   value={editFormData.guestName || ''}
                   onChange={handleEditChange}
+                  name="guestName"
                   className="w-full px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-gray-800"
                   required
                 />
               </div>
 
-              {/* Category */}
+              {/* Category Dropdown */}
               <div>
-                <label htmlFor="edit-categoryId" className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Category
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Category <span className="text-red-500">*</span>
                 </label>
-                <select
-                  id="edit-categoryId"
-                  name="categoryId"
-                  value={editFormData.categoryId || ''}
-                  onChange={handleEditChange}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-gray-800 bg-white"
-                >
-                  <option value="">Select a category</option>
-                  {categories.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setOpenDropdown(openDropdown === 'category' ? null : 'category')}
+                    className={`w-full px-3 py-2.5 text-left border rounded-xl bg-white transition-all duration-200 flex items-center justify-between ${
+                      editFormData.categoryId ? 'border-rose-400' : 'border-gray-300 hover:border-rose-400'
+                    }`}
+                  >
+                    <span className={editFormData.categoryId ? 'text-gray-800' : 'text-gray-400'}>
+                      {categories.find(c => c._id === editFormData.categoryId)?.name || 'Select a category'}
+                    </span>
+                    <svg className={`w-5 h-5 text-gray-400 transition-transform ${openDropdown === 'category' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {openDropdown === 'category' && (
+                    <div className="absolute z-[100] w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                      {categories.length === 0 ? (
+                        <div className="px-4 py-3 text-gray-500 text-sm">No categories</div>
+                      ) : (
+                        categories.map((cat) => (
+                          <button
+                            key={cat._id}
+                            type="button"
+                            onClick={() => {
+                              setEditFormData({ ...editFormData, categoryId: cat._id });
+                              setOpenDropdown(null);
+                            }}
+                            className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${
+                              cat._id === editFormData.categoryId ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
+                            }`}
+                          >
+                            <span>{cat.name}</span>
+                            {cat._id === editFormData.categoryId && (
+                              <svg className="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Number of Guests */}
-              <div>
-                <label htmlFor="edit-numberOfGuests" className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Number of Guests
-                </label>
-                <input
-                  type="number"
-                  id="edit-numberOfGuests"
-                  name="numberOfGuests"
-                  value={editFormData.numberOfGuests || 1}
-                  onChange={handleEditChange}
-                  min="1"
-                  max="10"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-gray-800"
-                />
+              {/* Number of Guests and Confirmed Guests */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Number of Guests
+                  </label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setOpenDropdown(openDropdown === 'guest' ? null : 'guest')}
+                      className="w-full px-3 py-2.5 text-left border border-gray-300 hover:border-rose-400 rounded-xl bg-white transition-all duration-200 flex items-center justify-between"
+                    >
+                      <span className="text-gray-800">{editFormData.numberOfGuests || 1} {editFormData.numberOfGuests === 1 ? 'Guest' : 'Guests'}</span>
+                      <svg className={`w-5 h-5 text-gray-400 transition-transform ${openDropdown === 'guest' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {openDropdown === 'guest' && (
+                      <div className="absolute z-[100] w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                          <button
+                            key={`guest-${num}`}
+                            type="button"
+                            onClick={() => {
+                              const newData = { ...editFormData, numberOfGuests: num };
+                              if ((newData.confirmedGuests || 0) > num) {
+                                newData.confirmedGuests = num;
+                              }
+                              setEditFormData(newData);
+                              setOpenDropdown(null);
+                            }}
+                            className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${
+                              num === editFormData.numberOfGuests ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
+                            }`}
+                          >
+                            <span>{num} {num === 1 ? 'Guest' : 'Guests'}</span>
+                            {num === editFormData.numberOfGuests && (
+                              <svg className="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Confirmed
+                  </label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setOpenDropdown(openDropdown === 'confirmed' ? null : 'confirmed')}
+                      className="w-full px-3 py-2.5 text-left border border-gray-300 hover:border-rose-400 rounded-xl bg-white transition-all duration-200 flex items-center justify-between"
+                    >
+                      <span className="text-gray-800 truncate pr-2">
+                        {(editFormData.confirmedGuests || 0) === (editFormData.numberOfGuests || 1) 
+                          ? 'Attend all' 
+                          : `${editFormData.confirmedGuests || 0} Confirmed`}
+                      </span>
+                      <svg className={`w-5 h-5 text-gray-400 shrink-0 transition-transform ${openDropdown === 'confirmed' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {openDropdown === 'confirmed' && (
+                      <div className="absolute z-[100] w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditFormData({ ...editFormData, confirmedGuests: editFormData.numberOfGuests || 1 });
+                            setOpenDropdown(null);
+                          }}
+                          className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${
+                            (editFormData.confirmedGuests || 0) === (editFormData.numberOfGuests || 1) ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
+                          }`}
+                        >
+                          <span className="truncate pr-2">Attend all</span>
+                          {(editFormData.confirmedGuests || 0) === (editFormData.numberOfGuests || 1) && (
+                            <svg className="w-4 h-4 text-rose-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </button>
+                        {Array.from({ length: (editFormData.numberOfGuests || 1) - 1 }, (_, i) => i + 1).map((opt) => (
+                          <button
+                            key={`confirmed-${opt}`}
+                            type="button"
+                            onClick={() => {
+                              setEditFormData({ ...editFormData, confirmedGuests: opt });
+                              setOpenDropdown(null);
+                            }}
+                            className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${
+                              opt === editFormData.confirmedGuests ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
+                            }`}
+                          >
+                            <span className="truncate pr-2">{opt} Confirmed</span>
+                            {opt === editFormData.confirmedGuests && (
+                              <svg className="w-4 h-4 text-rose-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              {/* Notes */}
+              {/* Note Dropdown */}
               <div>
-                <label htmlFor="edit-notes" className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Notes
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Note
                 </label>
-                <textarea
-                  id="edit-notes"
-                  name="notes"
-                  value={editFormData.notes || ''}
-                  onChange={handleEditChange}
-                  rows={2}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-gray-800 resize-none"
-                />
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setOpenDropdown(openDropdown === 'note' ? null : 'note')}
+                    className={`w-full px-3 py-2.5 text-left border rounded-xl bg-white transition-all duration-200 flex items-center justify-between ${
+                      editFormData.noteId ? 'border-rose-300' : 'border-gray-300 hover:border-rose-400'
+                    }`}
+                  >
+                    <span className={editFormData.noteId ? 'text-gray-800' : 'text-gray-400'}>
+                      {notes.find(n => n._id === editFormData.noteId)?.name || 'Select a note (optional)'}
+                    </span>
+                    <svg className={`w-5 h-5 text-gray-400 transition-transform ${openDropdown === 'note' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {openDropdown === 'note' && (
+                    <div className="absolute z-[100] w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditFormData({ ...editFormData, noteId: '' });
+                          setOpenDropdown(null);
+                        }}
+                        className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${
+                          !editFormData.noteId ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
+                        }`}
+                      >
+                        <span>None</span>
+                        {!editFormData.noteId && (
+                          <svg className="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                      </button>
+                      {notes.map((note) => (
+                        <button
+                          key={note._id}
+                          type="button"
+                          onClick={() => {
+                            setEditFormData({ ...editFormData, noteId: note._id });
+                            setOpenDropdown(null);
+                          }}
+                          className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${
+                            note._id === editFormData.noteId ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
+                          }`}
+                        >
+                          <span>{note.name}</span>
+                          {note._id === editFormData.noteId && (
+                            <svg className="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Submit Button */}

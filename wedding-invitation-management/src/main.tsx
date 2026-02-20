@@ -12,6 +12,11 @@ import TablesPage from './pages/TablesPage.tsx'
 import InvitedGuestsPage from './pages/InvitedGuestsPage.tsx'
 import UninvitedGuestsPage from './pages/UninvitedGuestsPage.tsx'
 import AttendancePage from './pages/AttendancePage.tsx'
+import NotesPage from './pages/NotesPage.tsx'
+import AddNotePage from './pages/AddNotePage.tsx'
+import CategoriesPage from './pages/CategoriesPage.tsx'
+import AddCategoryPage from './pages/AddCategoryPage.tsx'
+import UserInfoPage from './pages/UserInfoPage.tsx'
 import { ProtectedRoute } from './components/ProtectedRoute.tsx'
 
 // ScrollToTop component - scrolls window to top on route changes
@@ -93,6 +98,62 @@ createRoot(document.getElementById('root')!).render(
           element={
             <ProtectedRoute>
               <AttendancePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user-info"
+          element={
+            <ProtectedRoute>
+              <UserInfoPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notes"
+          element={
+            <ProtectedRoute>
+              <NotesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add-note"
+          element={
+            <ProtectedRoute>
+              <AddNotePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/edit-note/:id"
+          element={
+            <ProtectedRoute>
+              <AddNotePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/categories"
+          element={
+            <ProtectedRoute>
+              <CategoriesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add-category"
+          element={
+            <ProtectedRoute>
+              <AddCategoryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/edit-category/:id"
+          element={
+            <ProtectedRoute>
+              <AddCategoryPage />
             </ProtectedRoute>
           }
         />

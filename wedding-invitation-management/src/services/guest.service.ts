@@ -1,6 +1,6 @@
 import api from '../config/axios';
 import type { BulkGuestPayload, UpdateGuestPayload } from '../types/guest/guest.payload';
-import type { BulkGuestResponse, GuestListResponse, GuestResponse } from '../types/guest/guest.response';
+import type { BulkGuestResponse, GuestListResponse, GuestResponse, GuestSearchTableResponse } from '../types/guest/guest.response';
 
 export const guestService = {
   async bulkCreateGuests(payload: BulkGuestPayload): Promise<BulkGuestResponse> {
@@ -55,6 +55,11 @@ export const guestService = {
 
   async deleteGuest(id: string | number): Promise<GuestResponse> {
     const response = await api.delete<GuestResponse>(`/guests/${id}`);
+    return response.data;
+  },
+
+  async searchGuestByTable(guestId: string): Promise<GuestSearchTableResponse> {
+    const response = await api.get<GuestSearchTableResponse>(`/guests/search/table?guestId=${guestId}`);
     return response.data;
   },
 };

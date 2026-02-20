@@ -3,8 +3,10 @@ export interface GuestData {
   guestName: string;
   phone?: string;
   numberOfGuests: number;
-  notes?: string;
+  confirmedGuests?: number;
   categoryId: number | string; // string for MongoDB _id, number for default value 0
+  tableId?: number | string;
+  noteId?: string;
 }
 
 // Bulk guest creation payload
@@ -18,7 +20,8 @@ export interface UpdateGuestPayload {
   categoryId?: number | string;
   phone?: string;
   numberOfGuests?: number;
+  confirmedGuests?: number;
   tableId?: number | string;
   invitationSent?: boolean;
-  notes?: string;
+  noteId?: string;
 }

@@ -33,3 +33,40 @@ export interface CategoriesResponseDirect {
   message?: string;
   timestamp?: string;
 }
+
+// Single category response (GET by ID)
+export interface CategoryDetailResponse {
+  success: boolean;
+  data?: {
+    category: Category;
+  };
+  message?: string;
+  timestamp?: string;
+}
+
+// Category creation response
+export interface CategoryCreateResponse {
+  success: boolean;
+  data?: {
+    category: Category;
+  };
+  message?: string;
+  timestamp?: string;
+}
+
+// Category update response
+export interface CategoryUpdateResponse {
+  success: boolean;
+  data?: {
+    category: Category;
+  };
+  message?: string;
+  timestamp?: string;
+}
+
+// Category delete response
+export interface CategoryDeleteResponse {
+  success: boolean;
+  message?: string;
+  timestamp?: string;
+}

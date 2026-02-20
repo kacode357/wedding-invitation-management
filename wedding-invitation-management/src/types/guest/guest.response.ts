@@ -4,23 +4,27 @@ export interface Guest {
   _id?: string;
   guestName: string;
   relationship?: string;
-  phone: string;
+  phone?: string;
   address?: string;
   numberOfGuests: number;
+  confirmedGuests: number;
   notes?: string;
   categoryId?: number | string;
   categoryName?: string;
   category?: string; // Some APIs return "category" instead of "categoryName"
-  tableId?: number | string;
-  tableName?: string | number;
+  tableId?: number | string | null;
+  tableName?: string | number | null;
   table?: {
     _id: string;
     tableName?: string | number;
     tableNumber?: number;
     capacity?: number;
   };
+  noteId?: string | null;
+  noteName?: string | null;
   invitationSent?: boolean;
-  arrived?: boolean;
+  isArrived?: boolean;
+  arrivedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -61,5 +65,24 @@ export interface GuestListResponse {
   data: {
     guests: Guest[];
     count: number;
+  };
+}
+
+// Search guest by table response
+export interface TableInfo {
+  _id: string;
+  tableName: string | number;
+  tableNumber: number;
+  capacity: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GuestSearchTableResponse {
+  success: boolean;
+  data: {
+    guest: Guest;
+    table: TableInfo;
+    tableGuests: Guest[];
   };
 }
