@@ -172,7 +172,7 @@ class TableService {
       // Check for duplicate name (excluding current table)
       const existingWithName = await Table.findOne({
         tableName: updateData.tableName.trim(),
-        _id: { $ne: Table.ObjectId(id) }
+        _id: { $ne: new Table.ObjectId(id) }
       });
       if (existingWithName) {
         throw new AppError("Table name already exists", 400);
@@ -183,7 +183,7 @@ class TableService {
     if (updateData.tableNumber !== undefined && updateData.tableNumber !== null) {
       const existingWithNumber = await Table.findOne({
         tableNumber: updateData.tableNumber,
-        _id: { $ne: Table.ObjectId(id) }
+        _id: { $ne: new Table.ObjectId(id) }
       });
       if (existingWithNumber) {
         throw new AppError("Table number already exists", 400);
@@ -301,7 +301,7 @@ class TableService {
     // Check for duplicate name
     const existingWithName = await Table.findOne({
       tableName: newName.trim(),
-      _id: { $ne: Table.ObjectId(id) }
+      _id: { $ne: new Table.ObjectId(id) }
     });
     if (existingWithName) {
       throw new AppError("Table name already exists", 400);
