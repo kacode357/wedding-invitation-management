@@ -8,6 +8,8 @@ import { useGetUnassignedGuests } from '../hooks/guest/useGetUnassignedGuests';
 import { useAssignGuestsToTable } from '../hooks/table/useAssignGuestsToTable';
 import { useRemoveGuestsFromTable } from '../hooks/table/useRemoveGuestsFromTable';
 import { useDeleteTable } from '../hooks/table/useDeleteTable';
+import { useUpdateTable } from '../hooks/table/useUpdateTable';
+import type { Table } from '../types/table/table.response';
 
 export default function TablesPage() {
   const navigate = useNavigate();
@@ -18,17 +20,20 @@ export default function TablesPage() {
   const { assignGuests, isLoading: assigningGuests } = useAssignGuestsToTable();
   const { removeGuests, isLoading: removingGuests } = useRemoveGuestsFromTable();
   const { isLoading: deletingTable, deleteTable } = useDeleteTable();
-  
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   // Table detail modal state
   const [showTableModal, setShowTableModal] = useState(false);
-  
+
   // Assign guest modal state
   const [showAssignGuestModal, setShowAssignGuestModal] = useState(false);
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
   const [selectedGuestIds, setSelectedGuestIds] = useState<string[]>([]);
+  const [unassignedGroupFilter, setUnassignedGroupFilter] = useState<string>('all');
+  const [unassignedCategoryFilter, setUnassignedCategoryFilter] = useState<string>('all');
+  const [unassignedSearchTerm, setUnassignedSearchTerm] = useState('');
 
   // Confirmation modal state
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -42,15 +47,75 @@ export default function TablesPage() {
     setShowConfirmModal(true);
   };
 
+  // Edit table modal state
+  const { updateTable, isLoading: updatingTable } = useUpdateTable();
+  const [showEditTableModal, setShowEditTableModal] = useState(false);
+  const [editingTable, setEditingTable] = useState<{ id: string; name: string; number?: number; capacity: number } | null>(null);
+
+  const handleOpenEditModal = (table: Table) => {
+    setEditingTable({
+      id: table._id,
+      name: table.tableName,
+      number: table.tableNumber,
+      capacity: table.capacity
+    });
+    setShowEditTableModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditTableModal(false);
+    setEditingTable(null);
+  };
+
+  const handleSaveEditTable = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTable) return;
+
+    const success = await updateTable(editingTable.id, {
+      tableName: editingTable.name,
+      tableNumber: editingTable.number,
+      capacity: editingTable.capacity
+    });
+
+    if (success) {
+      handleCloseEditModal();
+      if (selectedTable?._id === editingTable.id) {
+        fetchTableDetails(editingTable.id);
+      }
+      fetchTables();
+    }
+  };
+
   useEffect(() => {
     fetchTables();
   }, [fetchTables]);
 
   const filteredTables = tables.filter((table) => {
-    const matchesSearch = 
+    const matchesSearch =
       table.tableName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       table.tableNumber?.toString().includes(searchTerm.toLowerCase());
     return matchesSearch;
+  });
+
+  const unassignedGroups = [...new Set(unassignedGuests.map(g => g.groupName).filter(Boolean))] as string[];
+  const unassignedCategories = [...new Set(unassignedGuests.map(g => g.categoryName).filter(Boolean))] as string[];
+
+  const filteredUnassignedGuests = unassignedGuests.filter(guest => {
+    // Group filter
+    if (unassignedGroupFilter !== 'all') {
+      if (unassignedGroupFilter === 'none' && guest.groupName) return false;
+      if (unassignedGroupFilter !== 'none' && guest.groupName !== unassignedGroupFilter) return false;
+    }
+    // Category filter
+    if (unassignedCategoryFilter !== 'all') {
+      if (unassignedCategoryFilter === 'none' && guest.categoryName) return false;
+      if (unassignedCategoryFilter !== 'none' && guest.categoryName !== unassignedCategoryFilter) return false;
+    }
+    // Search filter
+    if (unassignedSearchTerm) {
+      if (!guest.guestName.toLowerCase().includes(unassignedSearchTerm.toLowerCase())) return false;
+    }
+    return true;
   });
 
   const handleLogout = () => {
@@ -81,11 +146,14 @@ export default function TablesPage() {
     setShowAssignGuestModal(false);
     setSelectedTableId(null);
     setSelectedGuestIds([]);
+    setUnassignedGroupFilter('all');
+    setUnassignedCategoryFilter('all');
+    setUnassignedSearchTerm('');
   };
 
   const handleToggleGuestSelection = (guestId: string) => {
-    setSelectedGuestIds(prev => 
-      prev.includes(guestId) 
+    setSelectedGuestIds(prev =>
+      prev.includes(guestId)
         ? prev.filter(id => id !== guestId)
         : [...prev, guestId]
     );
@@ -93,7 +161,7 @@ export default function TablesPage() {
 
   const handleAssignGuests = async () => {
     if (!selectedTableId || selectedGuestIds.length === 0) return;
-    
+
     const success = await assignGuests(selectedTableId, selectedGuestIds);
     if (success) {
       toast.success(`Successfully assigned ${selectedGuestIds.length} guest(s) to table`);
@@ -144,7 +212,7 @@ export default function TablesPage() {
               <div className="flex-shrink-0 flex items-center gap-2 sm:gap-3">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 bg-rose-500 rounded-full flex items-center justify-center">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C13.1 2 14 2.9 14 4C14 4.74 13.6 5.39 13 5.73V7H14C17.87 7 21 10.13 21 14V20C21 21.1 20.1 22 19 22H5C3.9 22 3 21.1 3 20V14C3 10.13 6.13 7 10 7H11V5.73C10.4 5.39 10 4.74 10 4C10 2.9 10.9 2 12 2ZM12 4C11.45 4 11 4.45 11 5C11 5.55 11.45 6 12 6C12.55 6 13 5.55 13 5C13 4.45 12.55 4 12 4ZM5 14V19H19V14C19 11.24 16.76 9 14 9H10C7.24 9 5 11.24 5 14Z"/>
+                    <path d="M12 2C13.1 2 14 2.9 14 4C14 4.74 13.6 5.39 13 5.73V7H14C17.87 7 21 10.13 21 14V20C21 21.1 20.1 22 19 22H5C3.9 22 3 21.1 3 20V14C3 10.13 6.13 7 10 7H11V5.73C10.4 5.39 10 4.74 10 4C10 2.9 10.9 2 12 2ZM12 4C11.45 4 11 4.45 11 5C11 5.55 11.45 6 12 6C12.55 6 13 5.55 13 5C13 4.45 12.55 4 12 4ZM5 14V19H19V14C19 11.24 16.76 9 14 9H10C7.24 9 5 11.24 5 14Z" />
                   </svg>
                 </div>
                 <span className="text-sm sm:text-xl font-serif font-bold text-gray-800 hidden xs:block">
@@ -320,12 +388,21 @@ export default function TablesPage() {
                 key={table._id}
                 className="bg-white/80 backdrop-blur-sm rounded-xl p-4 sm:p-6 shadow-lg border border-purple-100 hover:shadow-xl transition-shadow"
               >
-                <div className="flex items-start mb-4">
+                <div className="flex items-start justify-between mb-4">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-800">Table number {table.tableNumber} - {table.tableName}</h3>
                   </div>
+                  <button
+                    onClick={() => handleOpenEditModal(table)}
+                    className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors ml-2"
+                    title="Edit Table"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </button>
                 </div>
-                
+
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -359,14 +436,13 @@ export default function TablesPage() {
                 {/* Progress bar */}
                 <div className="mb-4">
                   <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full rounded-full transition-all duration-300 ${
-                        ((table.currentGuests || 0) / table.capacity) >= 1 
-                          ? 'bg-red-500' 
-                          : ((table.currentGuests || 0) / table.capacity) >= 0.8
-                            ? 'bg-amber-500'
-                            : 'bg-purple-500'
-                      }`}
+                    <div
+                      className={`h-full rounded-full transition-all duration-300 ${((table.currentGuests || 0) / table.capacity) >= 1
+                        ? 'bg-red-500'
+                        : ((table.currentGuests || 0) / table.capacity) >= 0.8
+                          ? 'bg-amber-500'
+                          : 'bg-purple-500'
+                        }`}
                       style={{ width: `${Math.min(((table.currentGuests || 0) / table.capacity) * 100, 100)}%` }}
                     ></div>
                   </div>
@@ -446,19 +522,27 @@ export default function TablesPage() {
                               </div>
                               <div>
                                 <p className="font-medium text-gray-800">{guest.guestName}</p>
-                                <div className="flex flex-wrap gap-1 mt-0.5">
+                                <div className="flex flex-wrap gap-1.5 mt-1">
                                   {guest.categoryName && (
-                                    <span className="text-xs bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded">
+                                    <span className="text-[11px] text-gray-600 border border-gray-200 bg-gray-50 px-1.5 py-0.5 rounded">
                                       {guest.categoryName}
                                     </span>
                                   )}
+                                  <span className="text-[11px] text-gray-600 border border-gray-200 bg-gray-50 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                    {guest.groupName || 'No Group'}
+                                    {guest.groupName && guest.groupPriorityLevel && (
+                                      <span className="text-gray-400 font-medium">
+                                        (P{guest.groupPriorityLevel})
+                                      </span>
+                                    )}
+                                  </span>
                                   {guest.noteName && (
-                                    <span className="text-xs bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded">
+                                    <span className="text-[11px] text-gray-600 border border-gray-200 bg-gray-50 px-1.5 py-0.5 rounded">
                                       {guest.noteName}
                                     </span>
                                   )}
-                                  <span className="text-xs text-gray-500">
-                                    {guest.confirmedGuests}/{guest.numberOfGuests} confirmed
+                                  <span className="text-[11px] text-gray-500 flex items-center ml-1">
+                                    • {guest.confirmedGuests}/{guest.numberOfGuests} confirmed
                                   </span>
                                 </div>
                               </div>
@@ -562,7 +646,7 @@ export default function TablesPage() {
                 </svg>
               </button>
             </div>
-            
+
             <div className="p-4 sm:p-6 overflow-y-auto max-h-[60vh]">
               {unassignedLoading ? (
                 <div className="flex items-center justify-center py-8">
@@ -579,36 +663,100 @@ export default function TablesPage() {
                   <p className="text-sm text-gray-500">All guests are already assigned to tables</p>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {unassignedGuests.map((guest) => {
-                    const guestId = guest._id || '';
-                    return (
-                    <label
-                      key={guestId}
-                      className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                        selectedGuestIds.includes(guestId)
-                          ? 'bg-purple-50 border-purple-200'
-                          : 'bg-white border-gray-200 hover:bg-gray-50'
-                      }`}
-                    >
+                <div className="space-y-4">
+                  {/* Filters */}
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="relative flex-1">
                       <input
-                        type="checkbox"
-                        checked={selectedGuestIds.includes(guestId)}
-                        onChange={() => guestId && handleToggleGuestSelection(guestId)}
-                        className="w-4 h-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                        type="text"
+                        placeholder="Search by name..."
+                        value={unassignedSearchTerm}
+                        onChange={(e) => setUnassignedSearchTerm(e.target.value)}
+                        className="w-full px-4 py-2 pl-10 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-800 truncate">{guest.guestName}</p>
-                      </div>
-                      <span className="text-xs text-gray-500">
-                        {guest.numberOfGuests} guest{guest.numberOfGuests > 1 ? 's' : ''}
-                      </span>
-                    </label>
-                  );})}
+                      <svg
+                        className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={unassignedCategoryFilter}
+                        onChange={(e) => setUnassignedCategoryFilter(e.target.value)}
+                        className="w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer"
+                      >
+                        <option value="all">All Categories</option>
+                        <option value="none">No Category</option>
+                        {unassignedCategories.map(cat => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                      </select>
+                      <select
+                        value={unassignedGroupFilter}
+                        onChange={(e) => setUnassignedGroupFilter(e.target.value)}
+                        className="w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer"
+                      >
+                        <option value="all">All Groups</option>
+                        <option value="none">No Group</option>
+                        {unassignedGroups.map(group => (
+                          <option key={group} value={group}>{group}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {filteredUnassignedGuests.length === 0 ? (
+                    <p className="text-sm text-gray-500 text-center py-4">No guests match the selected group.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {filteredUnassignedGuests.map((guest) => {
+                        const guestId = guest._id || '';
+                        return (
+                          <label
+                            key={guestId}
+                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${selectedGuestIds.includes(guestId)
+                              ? 'bg-purple-50 border-purple-200'
+                              : 'bg-white border-gray-200 hover:bg-gray-50'
+                              }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedGuestIds.includes(guestId)}
+                              onChange={() => guestId && handleToggleGuestSelection(guestId)}
+                              className="w-4 h-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-gray-800 truncate">{guest.guestName}</p>
+                              <p className="text-[11px] text-gray-500 truncate mt-0.5 flex items-center gap-1">
+                                {guest.groupName ? (
+                                  <>
+                                    <span>{guest.groupName}</span>
+                                    {guest.groupPriorityLevel && (
+                                      <span className="px-1 bg-gray-100 rounded text-gray-400 font-medium">(P{guest.groupPriorityLevel})</span>
+                                    )}
+                                  </>
+                                ) : (
+                                  <span className="italic">No Group</span>
+                                )}
+                              </p>
+                            </div>
+                            <span className="text-xs text-gray-500">
+                              {guest.numberOfGuests} guest{guest.numberOfGuests > 1 ? 's' : ''}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-            
+
             <div className="p-4 sm:p-6 border-t border-gray-100 flex gap-3">
               <button
                 onClick={handleCloseAssignGuestModal}
@@ -672,6 +820,97 @@ export default function TablesPage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Table Modal */}
+      {showEditTableModal && editingTable && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+                Edit Banquet Table
+              </h3>
+              <button
+                onClick={handleCloseEditModal}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditTable} className="p-4 sm:p-6 space-y-4">
+              <div>
+                <label htmlFor="editTableName" className="block text-sm font-medium text-gray-700 mb-1">
+                  Table Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="editTableName"
+                  value={editingTable.name}
+                  onChange={(e) => setEditingTable({ ...editingTable, name: e.target.value })}
+                  required
+                  placeholder="e.g., VIP Table"
+                  className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label htmlFor="editTableNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                    Table Number
+                  </label>
+                  <input
+                    type="number"
+                    id="editTableNumber"
+                    value={editingTable.number || ''}
+                    onChange={(e) => setEditingTable({ ...editingTable, number: e.target.value ? parseInt(e.target.value) : undefined })}
+                    min={1}
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label htmlFor="editTableCapacity" className="block text-sm font-medium text-gray-700 mb-1">
+                    Capacity <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    id="editTableCapacity"
+                    value={editingTable.capacity}
+                    onChange={(e) => setEditingTable({ ...editingTable, capacity: parseInt(e.target.value) || 1 })}
+                    required
+                    min={1}
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={handleCloseEditModal}
+                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium border border-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={updatingTable}
+                  className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {updatingTable ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Changes'
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

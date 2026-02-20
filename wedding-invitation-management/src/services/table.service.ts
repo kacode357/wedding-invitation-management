@@ -38,6 +38,16 @@ export const tableService = {
     return response.data;
   },
 
+  async renameTable(id: string, payload: { tableName: string }): Promise<TableResponse> {
+    const response = await api.put<TableResponse>(`/tables/${id}/rename`, payload);
+    return response.data;
+  },
+
+  async updateTable(id: string, payload: { tableName: string; tableNumber?: number; capacity: number; }): Promise<TableResponse> {
+    const response = await api.put<TableResponse>(`/tables/${id}`, payload);
+    return response.data;
+  },
+
   async deleteTable(id: string): Promise<TableResponse> {
     const response = await api.delete<TableResponse>(`/tables/${id}`);
     return response.data;

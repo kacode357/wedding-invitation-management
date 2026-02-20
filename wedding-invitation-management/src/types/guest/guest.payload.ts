@@ -5,6 +5,7 @@ export interface GuestData {
   numberOfGuests: number;
   confirmedGuests?: number;
   categoryId: number | string; // string for MongoDB _id, number for default value 0
+  groupId?: string;
   tableId?: number | string;
   noteId?: string;
 }
@@ -18,6 +19,7 @@ export interface BulkGuestPayload {
 export interface UpdateGuestPayload {
   guestName?: string;
   categoryId?: number | string;
+  groupId?: string;
   phone?: string;
   numberOfGuests?: number;
   confirmedGuests?: number;

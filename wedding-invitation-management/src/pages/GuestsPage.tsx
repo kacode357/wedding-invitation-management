@@ -7,6 +7,7 @@ import { useUpdateGuest } from '../hooks/guest/useUpdateGuest';
 import { useDeleteGuest } from '../hooks/guest/useDeleteGuest';
 import { useCategories } from '../hooks/category/useCategories';
 import { useNotes } from '../hooks/note/useNotes';
+import { useGroups } from '../hooks/group/useGroups';
 import type { Guest } from '../types/guest/guest.response';
 import type { UpdateGuestPayload } from '../types/guest/guest.payload';
 
@@ -18,12 +19,16 @@ export default function GuestsPage() {
   const { deleteGuest, isLoading: isDeleting } = useDeleteGuest();
   const { categories, fetchCategories } = useCategories();
   const { notes, fetchNotes } = useNotes();
+  const { groups, fetchGroups } = useGroups();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedGroup, setSelectedGroup] = useState<string>('all');
+  const [selectedNote, setSelectedNote] = useState<string>('all');
+  const [selectedTable, setSelectedTable] = useState<string>('all');
 
   // Dropdown state
-  const [openDropdown, setOpenDropdown] = useState<'category' | 'guest' | 'confirmed' | 'note' | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<'category' | 'group' | 'guest' | 'confirmed' | 'note' | null>(null);
 
   // Edit modal state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -36,24 +41,35 @@ export default function GuestsPage() {
   const [deletingGuestId, setDeletingGuestId] = useState<string | number | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  // Extract unique categories from guests
+  // Extract unique options from guests
   const guestCategories = ['all', ...new Set(guests.map(guest => guest.categoryName).filter(Boolean))];
+  const guestGroups = ['all', ...new Set(guests.map(guest => guest.groupName).filter(Boolean))];
+  const guestNotes = ['all', ...new Set(guests.map(guest => guest.noteName).filter(Boolean))];
+  const guestTables = ['all', ...new Set(guests.map(guest => guest.tableName).filter(Boolean))];
 
   useEffect(() => {
     fetchGuests();
     fetchCategories();
     fetchNotes();
-  }, [fetchGuests, fetchCategories, fetchNotes]);
+    fetchGroups();
+  }, [fetchGuests, fetchCategories, fetchNotes, fetchGroups]);
 
   const filteredGuests = guests.filter((guest) => {
-    const category = guest.categoryName || '';
-    const matchesSearch = 
+    const categoryName = guest.categoryName || '';
+    const groupName = guest.groupName || '';
+    const noteName = guest.noteName || '';
+    const tableName = guest.tableName || '';
+
+    const matchesSearch =
       guest.guestName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      category.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesCategory = selectedCategory === 'all' || guest.categoryName === selectedCategory;
-    
-    return matchesSearch && matchesCategory;
+      categoryName.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesCategory = selectedCategory === 'all' || categoryName === selectedCategory;
+    const matchesGroup = selectedGroup === 'all' || groupName === selectedGroup;
+    const matchesNote = selectedNote === 'all' || noteName === selectedNote;
+    const matchesTable = selectedTable === 'all' || tableName === selectedTable;
+
+    return matchesSearch && matchesCategory && matchesGroup && matchesNote && matchesTable;
   });
 
   const handleLogout = () => {
@@ -72,6 +88,7 @@ export default function GuestsPage() {
       numberOfGuests: guest.numberOfGuests,
       confirmedGuests: guest.confirmedGuests,
       categoryId: guest.categoryId || '',
+      groupId: guest.groupId || '',
       tableId: guest.tableId || '',
       noteId: guest.noteId || '',
     });
@@ -171,7 +188,7 @@ export default function GuestsPage() {
               <div className="flex-shrink-0 flex items-center gap-2 sm:gap-3">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 bg-rose-500 rounded-full flex items-center justify-center">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C13.1 2 14 2.9 14 4C14 4.74 13.6 5.39 13 5.73V7H14C17.87 7 21 10.13 21 14V20C21 21.1 20.1 22 19 22H5C3.9 22 3 21.1 3 20V14C3 10.13 6.13 7 10 7H11V5.73C10.4 5.39 10 4.74 10 4C10 2.9 10.9 2 12 2ZM12 4C11.45 4 11 4.45 11 5C11 5.55 11.45 6 12 6C12.55 6 13 5.55 13 5C13 4.45 12.55 4 12 4ZM5 14V19H19V14C19 11.24 16.76 9 14 9H10C7.24 9 5 11.24 5 14Z"/>
+                    <path d="M12 2C13.1 2 14 2.9 14 4C14 4.74 13.6 5.39 13 5.73V7H14C17.87 7 21 10.13 21 14V20C21 21.1 20.1 22 19 22H5C3.9 22 3 21.1 3 20V14C3 10.13 6.13 7 10 7H11V5.73C10.4 5.39 10 4.74 10 4C10 2.9 10.9 2 12 2ZM12 4C11.45 4 11 4.45 11 5C11 5.55 11.45 6 12 6C12.55 6 13 5.55 13 5C13 4.45 12.55 4 12 4ZM5 14V19H19V14C19 11.24 16.76 9 14 9H10C7.24 9 5 11.24 5 14Z" />
                   </svg>
                 </div>
                 <span className="text-sm sm:text-xl font-serif font-bold text-gray-800 hidden xs:block">
@@ -232,11 +249,11 @@ export default function GuestsPage() {
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
         {/* Page Title */}
         <div className="mb-6 sm:mb-8">
-  <h1 className="text-2xl sm:text-3xl font-serif font-bold text-gray-800">Invitations</h1>
-  <p className="text-gray-600 mt-1">
-    Total: {count} {count === 1 ? 'invitation' : 'invitations'}
-  </p>
-</div>
+          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-gray-800">Invitations</h1>
+          <p className="text-gray-600 mt-1">
+            Total: {count} {count === 1 ? 'invitation' : 'invitations'}
+          </p>
+        </div>
 
         {/* Search Bar */}
         <div className="mb-6">
@@ -259,36 +276,82 @@ export default function GuestsPage() {
           </div>
         </div>
 
-        {/* Category Filter */}
-        <div className="mb-4 overflow-x-auto">
-          <div className="flex gap-2 pb-2">
-            {/* All Button */}
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                selectedCategory === 'all'
-                  ? 'bg-rose-500 text-white'
-                  : 'bg-white text-gray-600 hover:bg-rose-50'
-              }`}
+        {/* Filters */}
+        <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          {/* Category Filter */}
+          <div className="relative">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full appearance-none px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent shadow-sm cursor-pointer"
             >
-              All
-            </button>
+              <option value="all">All Categories</option>
+              {guestCategories.filter(cat => cat !== 'all').map(cat => (
+                <option key={cat!} value={cat!}>{cat}</option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
 
-            {guestCategories.map((cat) => (
-              cat !== 'all' && cat && (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                    selectedCategory === cat
-                      ? 'bg-rose-500 text-white'
-                      : 'bg-white text-gray-600 hover:bg-rose-50'
-                  }`}
-                >
-                  {cat}
-                </button>
-              )
-            ))}
+          {/* Group Filter */}
+          <div className="relative">
+            <select
+              value={selectedGroup}
+              onChange={(e) => setSelectedGroup(e.target.value)}
+              className="w-full appearance-none px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent shadow-sm cursor-pointer"
+            >
+              <option value="all">All Groups</option>
+              {guestGroups.filter(grp => grp !== 'all').map((grp, index) => (
+                <option key={`grp-${index}`} value={grp!}>{grp}</option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Note Filter */}
+          <div className="relative">
+            <select
+              value={selectedNote}
+              onChange={(e) => setSelectedNote(e.target.value)}
+              className="w-full appearance-none px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent shadow-sm cursor-pointer"
+            >
+              <option value="all">All Notes</option>
+              {guestNotes.filter(n => n !== 'all').map((n, index) => (
+                <option key={`note-${index}`} value={n!}>{n}</option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Table Filter */}
+          <div className="relative">
+            <select
+              value={selectedTable}
+              onChange={(e) => setSelectedTable(e.target.value)}
+              className="w-full appearance-none px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent shadow-sm cursor-pointer"
+            >
+              <option value="all">All Tables</option>
+              {guestTables.filter(t => t !== 'all').map((t, index) => (
+                <option key={`table-${index}`} value={t!}>{t}</option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
           </div>
         </div>
 
@@ -325,6 +388,7 @@ export default function GuestsPage() {
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Category</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Guests</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Group</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Table</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Note</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
@@ -343,6 +407,16 @@ export default function GuestsPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {guest.confirmedGuests}/{guest.numberOfGuests}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      {guest.groupName ? (
+                        <div className="flex flex-col">
+                          <span>{guest.groupName}</span>
+                          {guest.groupPriorityLevel && (
+                            <span className="text-xs text-gray-400">Priority {guest.groupPriorityLevel}</span>
+                          )}
+                        </div>
+                      ) : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {guest.tableName || '-'}
@@ -400,6 +474,14 @@ export default function GuestsPage() {
                     </svg>
                     <span>{guest.confirmedGuests}/{guest.numberOfGuests} guests</span>
                   </div>
+                  {guest.groupName && (
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                      <span>{guest.groupName} {guest.groupPriorityLevel ? `(P${guest.groupPriorityLevel})` : ''}</span>
+                    </div>
+                  )}
                   {guest.tableName && (
                     <div className="flex items-center gap-2 text-gray-600">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -498,9 +580,8 @@ export default function GuestsPage() {
                   <button
                     type="button"
                     onClick={() => setOpenDropdown(openDropdown === 'category' ? null : 'category')}
-                    className={`w-full px-3 py-2.5 text-left border rounded-xl bg-white transition-all duration-200 flex items-center justify-between ${
-                      editFormData.categoryId ? 'border-rose-400' : 'border-gray-300 hover:border-rose-400'
-                    }`}
+                    className={`w-full px-3 py-2.5 text-left border rounded-xl bg-white transition-all duration-200 flex items-center justify-between ${editFormData.categoryId ? 'border-rose-400' : 'border-gray-300 hover:border-rose-400'
+                      }`}
                   >
                     <span className={editFormData.categoryId ? 'text-gray-800' : 'text-gray-400'}>
                       {categories.find(c => c._id === editFormData.categoryId)?.name || 'Select a category'}
@@ -522,12 +603,78 @@ export default function GuestsPage() {
                               setEditFormData({ ...editFormData, categoryId: cat._id });
                               setOpenDropdown(null);
                             }}
-                            className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${
-                              cat._id === editFormData.categoryId ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
-                            }`}
+                            className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${cat._id === editFormData.categoryId ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
+                              }`}
                           >
                             <span>{cat.name}</span>
                             {cat._id === editFormData.categoryId && (
+                              <svg className="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Group Dropdown */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Group <span className="text-gray-400 text-xs">(optional)</span>
+                </label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setOpenDropdown(openDropdown === 'group' ? null : 'group')}
+                    className={`w-full px-3 py-2.5 text-left border rounded-xl bg-white transition-all duration-200 flex items-center justify-between ${editFormData.groupId && editFormData.groupId.trim() !== '' ? 'border-rose-400' : 'border-gray-300 hover:border-rose-400'
+                      }`}
+                  >
+                    <span className={editFormData.groupId === '' || !editFormData.groupId ? 'text-gray-400' : 'text-gray-800'}>
+                      {editFormData.groupId && groups.find(g => g._id === editFormData.groupId)
+                        ? `${groups.find(g => g._id === editFormData.groupId)?.name} · P${groups.find(g => g._id === editFormData.groupId)?.priorityLevel}`
+                        : 'Select a group (optional)'}
+                    </span>
+                    <svg className={`w-5 h-5 text-gray-400 transition-transform ${openDropdown === 'group' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {openDropdown === 'group' && (
+                    <div className="absolute z-[100] w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditFormData({ ...editFormData, groupId: '' });
+                          setOpenDropdown(null);
+                        }}
+                        className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${!editFormData.groupId ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
+                          }`}
+                      >
+                        <span>None</span>
+                        {!editFormData.groupId && (
+                          <svg className="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                      </button>
+                      {groups.length === 0 ? (
+                        <div className="px-4 py-3 text-gray-500 text-sm">No groups available</div>
+                      ) : (
+                        groups.map((grp) => (
+                          <button
+                            key={grp._id}
+                            type="button"
+                            onClick={() => {
+                              setEditFormData({ ...editFormData, groupId: grp._id });
+                              setOpenDropdown(null);
+                            }}
+                            className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${grp._id === editFormData.groupId ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
+                              }`}
+                          >
+                            <span>{grp.name} <span className="text-xs text-gray-400 ml-1">· P{grp.priorityLevel}</span></span>
+                            {grp._id === editFormData.groupId && (
                               <svg className="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
@@ -571,9 +718,8 @@ export default function GuestsPage() {
                               setEditFormData(newData);
                               setOpenDropdown(null);
                             }}
-                            className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${
-                              num === editFormData.numberOfGuests ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
-                            }`}
+                            className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${num === editFormData.numberOfGuests ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
+                              }`}
                           >
                             <span>{num} {num === 1 ? 'Guest' : 'Guests'}</span>
                             {num === editFormData.numberOfGuests && (
@@ -599,8 +745,8 @@ export default function GuestsPage() {
                       className="w-full px-3 py-2.5 text-left border border-gray-300 hover:border-rose-400 rounded-xl bg-white transition-all duration-200 flex items-center justify-between"
                     >
                       <span className="text-gray-800 truncate pr-2">
-                        {(editFormData.confirmedGuests || 0) === (editFormData.numberOfGuests || 1) 
-                          ? 'Attend all' 
+                        {(editFormData.confirmedGuests || 0) === (editFormData.numberOfGuests || 1)
+                          ? 'Attend all'
                           : `${editFormData.confirmedGuests || 0} Confirmed`}
                       </span>
                       <svg className={`w-5 h-5 text-gray-400 shrink-0 transition-transform ${openDropdown === 'confirmed' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -615,9 +761,8 @@ export default function GuestsPage() {
                             setEditFormData({ ...editFormData, confirmedGuests: editFormData.numberOfGuests || 1 });
                             setOpenDropdown(null);
                           }}
-                          className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${
-                            (editFormData.confirmedGuests || 0) === (editFormData.numberOfGuests || 1) ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
-                          }`}
+                          className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${(editFormData.confirmedGuests || 0) === (editFormData.numberOfGuests || 1) ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
+                            }`}
                         >
                           <span className="truncate pr-2">Attend all</span>
                           {(editFormData.confirmedGuests || 0) === (editFormData.numberOfGuests || 1) && (
@@ -634,9 +779,8 @@ export default function GuestsPage() {
                               setEditFormData({ ...editFormData, confirmedGuests: opt });
                               setOpenDropdown(null);
                             }}
-                            className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${
-                              opt === editFormData.confirmedGuests ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
-                            }`}
+                            className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${opt === editFormData.confirmedGuests ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
+                              }`}
                           >
                             <span className="truncate pr-2">{opt} Confirmed</span>
                             {opt === editFormData.confirmedGuests && (
@@ -661,9 +805,8 @@ export default function GuestsPage() {
                   <button
                     type="button"
                     onClick={() => setOpenDropdown(openDropdown === 'note' ? null : 'note')}
-                    className={`w-full px-3 py-2.5 text-left border rounded-xl bg-white transition-all duration-200 flex items-center justify-between ${
-                      editFormData.noteId ? 'border-rose-300' : 'border-gray-300 hover:border-rose-400'
-                    }`}
+                    className={`w-full px-3 py-2.5 text-left border rounded-xl bg-white transition-all duration-200 flex items-center justify-between ${editFormData.noteId ? 'border-rose-300' : 'border-gray-300 hover:border-rose-400'
+                      }`}
                   >
                     <span className={editFormData.noteId ? 'text-gray-800' : 'text-gray-400'}>
                       {notes.find(n => n._id === editFormData.noteId)?.name || 'Select a note (optional)'}
@@ -680,9 +823,8 @@ export default function GuestsPage() {
                           setEditFormData({ ...editFormData, noteId: '' });
                           setOpenDropdown(null);
                         }}
-                        className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${
-                          !editFormData.noteId ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
-                        }`}
+                        className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${!editFormData.noteId ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
+                          }`}
                       >
                         <span>None</span>
                         {!editFormData.noteId && (
@@ -699,9 +841,8 @@ export default function GuestsPage() {
                             setEditFormData({ ...editFormData, noteId: note._id });
                             setOpenDropdown(null);
                           }}
-                          className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${
-                            note._id === editFormData.noteId ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
-                          }`}
+                          className={`w-full px-4 py-3 text-left hover:bg-rose-50 transition-colors flex items-center justify-between ${note._id === editFormData.noteId ? 'bg-rose-50 text-rose-600' : 'text-gray-700'
+                            }`}
                         >
                           <span>{note.name}</span>
                           {note._id === editFormData.noteId && (

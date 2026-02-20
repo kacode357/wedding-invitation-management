@@ -12,6 +12,9 @@ export interface Guest {
   categoryId?: number | string;
   categoryName?: string;
   category?: string; // Some APIs return "category" instead of "categoryName"
+  groupId?: string | null;
+  groupName?: string | null;
+  groupPriorityLevel?: number | null;
   tableId?: number | string | null;
   tableName?: string | number | null;
   table?: {

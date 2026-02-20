@@ -9,35 +9,36 @@ import type { Guest } from '../types/guest/guest.response';
 export default function AddTablePage() {
   const navigate = useNavigate();
   const { createTable, isLoading: isCreatingTable } = useCreateTable();
-  
+
   const [availableGuests, setAvailableGuests] = useState<Guest[]>([]);
   const [isLoadingGuests, setIsLoadingGuests] = useState(true);
   const [guestsError, setGuestsError] = useState<string | null>(null);
-  
+
   const [formData, setFormData] = useState<CreateTablePayload>({
     tableName: '',
     capacity: 10,
     guestIds: [],
   });
-  
+
   const [guestSearchTerm, setGuestSearchTerm] = useState('');
-  
+  const [guestGroupFilter, setGuestGroupFilter] = useState<string>('all');
+
   // Calculate total confirmed guests based on selected guest IDs
   const selectedConfirmedGuests = formData.guestIds?.reduce((total, guestId) => {
     const guest = availableGuests.find(g => (g._id || String(g.id)) === guestId);
     return total + (guest?.confirmedGuests || 0);
   }, 0) || 0;
-  
+
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAvailableGuests = async () => {
       setIsLoadingGuests(true);
       setGuestsError(null);
-      
+
       try {
         const response = await tableService.getAvailableGuests();
-        
+
         if (response.success && response.data) {
           setAvailableGuests(response.data.guests);
         } else {
@@ -66,7 +67,7 @@ export default function AddTablePage() {
     setFormData(prev => {
       const currentGuestIds = prev.guestIds || [];
       const isSelected = currentGuestIds.includes(guestId);
-      
+
       if (isSelected) {
         return {
           ...prev,
@@ -80,7 +81,7 @@ export default function AddTablePage() {
           const guest = availableGuests.find(g => (g._id || String(g.id)) === id);
           return total + (guest?.confirmedGuests || 0);
         }, 0);
-        
+
         // Check if capacity would be exceeded
         if (currentConfirmedGuests + additionalGuests > (prev.capacity || 10)) {
           setSubmitError(`Cannot add more guests. Banquet table capacity is ${prev.capacity}`);
@@ -100,7 +101,7 @@ export default function AddTablePage() {
     const totalConfirmedIfAllSelected = availableGuests.reduce((total, guest) => {
       return total + (guest.confirmedGuests || 0);
     }, 0);
-    
+
     if (totalConfirmedIfAllSelected <= (formData.capacity || 10)) {
       setFormData(prev => ({
         ...prev,
@@ -121,7 +122,7 @@ export default function AddTablePage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.tableName.trim()) {
       toast.error('Please enter a banquet table name');
       return;
@@ -131,7 +132,7 @@ export default function AddTablePage() {
 
     try {
       const result = await createTable(formData);
-      
+
       if (result?.success) {
         toast.success('Banquet table created successfully!');
         // Use setTimeout to ensure toast is shown before navigating
@@ -151,13 +152,20 @@ export default function AddTablePage() {
     navigate('/tables');
   };
 
-  // Filter guests by search term
+  // Extract unique groups for the filter dropdown
+  const availableGroups = [...new Set(availableGuests.map(g => g.groupName).filter(Boolean))] as string[];
+
+  // Filter guests by search term AND group filter
   const filteredGuests = availableGuests.filter((guest) => {
     const searchLower = guestSearchTerm.toLowerCase();
-    return (
-      guest.guestName.toLowerCase().includes(searchLower) ||
-      (guest.categoryName || guest.category)?.toLowerCase().includes(searchLower)
-    );
+    const matchesSearch = guest.guestName.toLowerCase().includes(searchLower) ||
+      (guest.categoryName || guest.category)?.toLowerCase().includes(searchLower);
+
+    const matchesGroup = guestGroupFilter === 'all' ||
+      (guestGroupFilter === 'none' && !guest.groupName) ||
+      guest.groupName === guestGroupFilter;
+
+    return matchesSearch && matchesGroup;
   });
 
   // Group filtered guests by category for better display
@@ -186,7 +194,7 @@ export default function AddTablePage() {
               </svg>
               <span className="hidden sm:inline text-sm font-medium">Back</span>
             </button>
-            
+
             {/* Title */}
             <h1 className="text-lg sm:text-xl font-serif font-bold text-gray-800">
               Create Banquet Table
@@ -223,24 +231,43 @@ export default function AddTablePage() {
           {/* Table Details Card */}
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 p-4 sm:p-6 lg:p-8">
             <h2 className="text-lg font-semibold text-gray-800 mb-5">Banquet Table Details</h2>
-            
+
             <div className="space-y-5">
-              {/* Table Name - Required */}
-              <div>
-                <label htmlFor="tableName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Table Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="tableName"
-                  name="tableName"
-                  value={formData.tableName}
-                  onChange={handleChange}
-                  required
-                  placeholder="e.g., VIP Table, Bridal Party, Groom's Family, Table 1"
-                  autoComplete="off"
-                  className="block w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-purple-400 bg-white text-gray-800 placeholder-gray-400 transition-all duration-200"
-                />
+              <div className="flex flex-col sm:flex-row gap-5">
+                {/* Table Name - Required */}
+                <div className="flex-[2]">
+                  <label htmlFor="tableName" className="block text-sm font-medium text-gray-700 mb-2">
+                    Table Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="tableName"
+                    name="tableName"
+                    value={formData.tableName}
+                    onChange={handleChange}
+                    required
+                    placeholder="e.g., VIP Table, Bridal Party"
+                    autoComplete="off"
+                    className="block w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-purple-400 bg-white text-gray-800 placeholder-gray-400 transition-all duration-200"
+                  />
+                </div>
+
+                {/* Capacity - Required */}
+                <div className="flex-[1]">
+                  <label htmlFor="capacity" className="block text-sm font-medium text-gray-700 mb-2">
+                    Capacity <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    id="capacity"
+                    name="capacity"
+                    value={formData.capacity}
+                    onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) || 1 })}
+                    required
+                    min={1}
+                    className="block w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-purple-400 bg-white text-gray-800 transition-all duration-200"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -276,9 +303,9 @@ export default function AddTablePage() {
               Selected: {selectedConfirmedGuests} / {formData.capacity || 10} guests ({formData.guestIds?.length || 0} entries)
             </p>
 
-            {/* Search Guests */}
-            <div className="mb-4">
-              <div className="relative">
+            {/* Search and Filters */}
+            <div className="mb-4 flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
                 <input
                   type="text"
                   placeholder="Search by name or category..."
@@ -294,6 +321,20 @@ export default function AddTablePage() {
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
+              </div>
+
+              <div className="w-full sm:w-48">
+                <select
+                  value={guestGroupFilter}
+                  onChange={(e) => setGuestGroupFilter(e.target.value)}
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer shadow-sm appearance-none"
+                >
+                  <option value="all">All Groups</option>
+                  <option value="none">No Group</option>
+                  {availableGroups.map(group => (
+                    <option key={group} value={group}>{group}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -320,15 +361,14 @@ export default function AddTablePage() {
                       {guests.map((guest) => {
                         const guestId = guest._id || String(guest.id);
                         const isSelected = formData.guestIds?.includes(guestId);
-                        
+
                         return (
                           <label
                             key={guestId}
-                            className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
-                              isSelected
-                                ? 'bg-purple-50 border-purple-300'
-                                : 'bg-white border-gray-200 hover:border-purple-200 hover:bg-purple-50/30'
-                            }`}
+                            className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${isSelected
+                              ? 'bg-purple-50 border-purple-300'
+                              : 'bg-white border-gray-200 hover:border-purple-200 hover:bg-purple-50/30'
+                              }`}
                           >
                             <input
                               type="checkbox"
@@ -343,7 +383,19 @@ export default function AddTablePage() {
                                   ({guest.categoryName || guest.category || 'Uncategorized'})
                                 </span>
                               </p>
-                              <p className="text-xs text-gray-500 truncate">
+                              <p className="text-[11px] text-gray-500 truncate mt-0.5 flex items-center gap-1">
+                                {guest.groupName ? (
+                                  <>
+                                    <span>{guest.groupName}</span>
+                                    {guest.groupPriorityLevel && (
+                                      <span className="px-1 bg-gray-100 rounded text-gray-400 font-medium">(P{guest.groupPriorityLevel})</span>
+                                    )}
+                                  </>
+                                ) : (
+                                  <span className="italic">No Group</span>
+                                )}
+                              </p>
+                              <p className="text-xs text-gray-500 truncate mt-0.5">
                                 Total: {guest.numberOfGuests} guests | Confirmed: {guest.confirmedGuests}
                               </p>
                             </div>

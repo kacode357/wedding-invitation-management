@@ -8,8 +8,10 @@ import { useGetUnassignedGuests } from '../hooks/guest/useGetUnassignedGuests';
 import { useAssignGuestsToTable } from '../hooks/table/useAssignGuestsToTable';
 import { useRemoveGuestsFromTable } from '../hooks/table/useRemoveGuestsFromTable';
 import { useDeleteTable } from '../hooks/table/useDeleteTable';
+import { useUpdateTable } from '../hooks/table/useUpdateTable';
 import { dashboardService } from '../services/dashboard.service';
 import type { Statistics } from '../types/dashboard/dashboard.response';
+import type { Table } from '../types/table/table.response';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -32,11 +34,53 @@ export default function HomePage() {
   const [showAssignGuestModal, setShowAssignGuestModal] = useState(false);
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
   const [selectedGuestIds, setSelectedGuestIds] = useState<string[]>([]);
+  const [unassignedGroupFilter, setUnassignedGroupFilter] = useState<string>('all');
+  const [unassignedCategoryFilter, setUnassignedCategoryFilter] = useState<string>('all');
+  const [unassignedSearchTerm, setUnassignedSearchTerm] = useState('');
 
   // Confirmation modal state
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
   const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
+
+  // Edit table modal state
+  const { updateTable, isLoading: updatingTable } = useUpdateTable();
+  const [showEditTableModal, setShowEditTableModal] = useState(false);
+  const [editingTable, setEditingTable] = useState<{ id: string; name: string; number?: number; capacity: number } | null>(null);
+
+  const handleOpenEditModal = (table: Table) => {
+    setEditingTable({
+      id: table._id,
+      name: table.tableName,
+      number: table.tableNumber,
+      capacity: table.capacity
+    });
+    setShowEditTableModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditTableModal(false);
+    setEditingTable(null);
+  };
+
+  const handleSaveEditTable = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTable) return;
+
+    const success = await updateTable(editingTable.id, {
+      tableName: editingTable.name,
+      tableNumber: editingTable.number,
+      capacity: editingTable.capacity
+    });
+
+    if (success) {
+      handleCloseEditModal();
+      if (selectedTable?._id === editingTable.id) {
+        fetchTableDetails(editingTable.id);
+      }
+      fetchTables();
+    }
+  };
 
   // Helper function to show confirmation
   const handleConfirm = (message: string, action: () => void) => {
@@ -110,11 +154,14 @@ export default function HomePage() {
     setShowAssignGuestModal(false);
     setSelectedTableId(null);
     setSelectedGuestIds([]);
+    setUnassignedGroupFilter('all');
+    setUnassignedCategoryFilter('all');
+    setUnassignedSearchTerm('');
   };
 
   const handleToggleGuestSelection = (guestId: string) => {
-    setSelectedGuestIds(prev => 
-      prev.includes(guestId) 
+    setSelectedGuestIds(prev =>
+      prev.includes(guestId)
         ? prev.filter(id => id !== guestId)
         : [...prev, guestId]
     );
@@ -122,7 +169,7 @@ export default function HomePage() {
 
   const handleAssignGuests = async () => {
     if (!selectedTableId || selectedGuestIds.length === 0) return;
-    
+
     const success = await assignGuests(selectedTableId, selectedGuestIds);
     if (success) {
       toast.success(`Successfully assigned ${selectedGuestIds.length} guest(s) to banquet table`);
@@ -132,6 +179,27 @@ export default function HomePage() {
       toast.error('Failed to assign guests to banquet table');
     }
   };
+
+  const unassignedGroups = [...new Set(unassignedGuests.map(g => g.groupName).filter(Boolean))] as string[];
+  const unassignedCategories = [...new Set(unassignedGuests.map(g => g.categoryName).filter(Boolean))] as string[];
+
+  const filteredUnassignedGuests = unassignedGuests.filter(guest => {
+    // Group filter
+    if (unassignedGroupFilter !== 'all') {
+      if (unassignedGroupFilter === 'none' && guest.groupName) return false;
+      if (unassignedGroupFilter !== 'none' && guest.groupName !== unassignedGroupFilter) return false;
+    }
+    // Category filter
+    if (unassignedCategoryFilter !== 'all') {
+      if (unassignedCategoryFilter === 'none' && guest.categoryName) return false;
+      if (unassignedCategoryFilter !== 'none' && guest.categoryName !== unassignedCategoryFilter) return false;
+    }
+    // Search filter
+    if (unassignedSearchTerm) {
+      if (!guest.guestName.toLowerCase().includes(unassignedSearchTerm.toLowerCase())) return false;
+    }
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-amber-50 to-rose-100">
@@ -144,7 +212,7 @@ export default function HomePage() {
               <div className="flex-shrink-0 flex items-center gap-2 sm:gap-3">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 bg-rose-500 rounded-full flex items-center justify-center">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C13.1 2 14 2.9 14 4C14 4.74 13.6 5.39 13 5.73V7H14C17.87 7 21 10.13 21 14V20C21 21.1 20.1 22 19 22H5C3.9 22 3 21.1 3 20V14C3 10.13 6.13 7 10 7H11V5.73C10.4 5.39 10 4.74 10 4C10 2.9 10.9 2 12 2ZM12 4C11.45 4 11 4.45 11 5C11 5.55 11.45 6 12 6C12.55 6 13 5.55 13 5C13 4.45 12.55 4 12 4ZM5 14V19H19V14C19 11.24 16.76 9 14 9H10C7.24 9 5 11.24 5 14Z"/>
+                    <path d="M12 2C13.1 2 14 2.9 14 4C14 4.74 13.6 5.39 13 5.73V7H14C17.87 7 21 10.13 21 14V20C21 21.1 20.1 22 19 22H5C3.9 22 3 21.1 3 20V14C3 10.13 6.13 7 10 7H11V5.73C10.4 5.39 10 4.74 10 4C10 2.9 10.9 2 12 2ZM12 4C11.45 4 11 4.45 11 5C11 5.55 11.45 6 12 6C12.55 6 13 5.55 13 5C13 4.45 12.55 4 12 4ZM5 14V19H19V14C19 11.24 16.76 9 14 9H10C7.24 9 5 11.24 5 14Z" />
                   </svg>
                 </div>
                 <span className="text-sm sm:text-xl font-serif font-bold text-gray-800 hidden xs:block">
@@ -213,188 +281,197 @@ export default function HomePage() {
             <p className="text-red-600">{error}</p>
           </div>
         ) : (
-        <div className="space-y-6 sm:space-y-8 mb-8 sm:mb-10 lg:mb-12">
-          {/* Main Stats Row */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-            {/* Card 1: Families Invited */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg border border-white/50 flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
+          <div className="space-y-6 sm:space-y-8 mb-8 sm:mb-10 lg:mb-12">
+            {/* Main Stats Row */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+              {/* Card 1: Families Invited */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg border border-white/50 flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{dashboardData?.invitations?.familiesInvited ?? 0}</span>
+                  <h3 className="text-xs sm:text-sm font-semibold text-gray-800">Families</h3>
+                </div>
               </div>
-              <div>
-                <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{dashboardData?.invitations?.familiesInvited ?? 0}</span>
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-800">Families</h3>
-              </div>
-            </div>
 
-            {/* Card 2: Invited */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg border border-white/50 flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
+              {/* Card 2: Invited */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg border border-white/50 flex items-center gap-3">
+                <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{dashboardData?.invitations?.invitationsSent ?? 0}</span>
+                  <h3 className="text-xs sm:text-sm font-semibold text-gray-800">Invited</h3>
+                </div>
               </div>
-              <div>
-                <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{dashboardData?.invitations?.invitationsSent ?? 0}</span>
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-800">Invited</h3>
-              </div>
-            </div>
 
-            {/* Card 3: Total Guests */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg border border-white/50 flex items-center gap-3">
-              <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
+              {/* Card 3: Total Guests */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg border border-white/50 flex items-center gap-3">
+                <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{dashboardData?.guests?.numberOfGuests ?? 0}</span>
+                  <h3 className="text-xs sm:text-sm font-semibold text-gray-800">Total Guests</h3>
+                </div>
               </div>
-              <div>
-                <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{dashboardData?.guests?.numberOfGuests ?? 0}</span>
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-800">Total Guests</h3>
-              </div>
-            </div>
 
-            {/* Card 4: Confirmed Guests */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg border border-white/50 flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+              {/* Card 4: Confirmed Guests */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg border border-white/50 flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{dashboardData?.guests?.confirmedGuests ?? 0}</span>
+                  <h3 className="text-xs sm:text-sm font-semibold text-gray-800">Confirmed</h3>
+                </div>
               </div>
-              <div>
-                <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{dashboardData?.guests?.confirmedGuests ?? 0}</span>
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-800">Confirmed</h3>
-              </div>
-            </div>
 
-            {/* Card 5: Tables */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg border border-white/50 flex items-center gap-3">
-              <div className="w-10 h-10 bg-rose-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-                </svg>
-              </div>
-              <div>
-                <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{tables.length}</span>
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-800">Tables</h3>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Guest Categories */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-white/50">
-            <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-800">View All Guests</h3>
-              <button
-                onClick={() => navigate('/guests')}
-                className="text-sm text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1 transition-colors"
-              >
-                View All
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
-              {dashboardData?.guestsByCategory && dashboardData.guestsByCategory.length > 0 ? (
-                dashboardData.guestsByCategory.map((cat, index) => (
-                  <div key={index} className="flex items-center justify-between bg-gradient-to-r from-rose-50 to-amber-50 px-3 py-2 rounded-lg border border-rose-100">
-                    <span className="text-xs sm:text-sm text-gray-700 truncate" title={cat.category}>{cat.category}</span>
-                    <span className="text-sm sm:text-base font-bold text-rose-600">{cat.count}</span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-gray-500 col-span-full text-center py-4">No guest categories yet</p>
-              )}
-            </div>
-          </div>
-
-          {/* Table Management */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-white/50">
-            <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-800">Banquet Table Management</h3>
-              <button
-                onClick={() => navigate('/tables')}
-                className="text-sm text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1 transition-colors"
-              >
-                View All
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-
-            {tablesLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500"></div>
-              </div>
-            ) : tables.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {/* Card 5: Tables */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg border border-white/50 flex items-center gap-3">
+                <div className="w-10 h-10 bg-rose-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
                   </svg>
                 </div>
-                <p className="text-gray-600 mb-4">No banquet tables created yet</p>
+                <div>
+                  <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{tables.length}</span>
+                  <h3 className="text-xs sm:text-sm font-semibold text-gray-800">Tables</h3>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Guest Categories */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-white/50">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800">View All Guests</h3>
                 <button
-                  onClick={() => navigate('/tables')}
-                  className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium"
+                  onClick={() => navigate('/guests')}
+                  className="text-sm text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1 transition-colors"
                 >
-                  Add Table
+                  View All
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  </svg>
                 </button>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
-                {tables.slice(0, 3).map((table, index) => (
-                  <div
-                    key={table._id}
-                    className={`bg-gradient-to-br from-purple-50 to-rose-50 rounded-xl p-4 border border-purple-100 hover:shadow-md transition-shadow ${index > 0 ? 'hidden md:block' : ''}`}
-                  >
-<div className="flex items-start mb-2">
-                      <div>
-                        <h4 className="font-semibold text-gray-800">Table number {table.tableNumber} - {table.tableName}</h4>
-                      </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
+                {dashboardData?.guestsByCategory && dashboardData.guestsByCategory.length > 0 ? (
+                  dashboardData.guestsByCategory.map((cat, index) => (
+                    <div key={index} className="flex items-center justify-between bg-gradient-to-r from-rose-50 to-amber-50 px-3 py-2 rounded-lg border border-rose-100">
+                      <span className="text-xs sm:text-sm text-gray-700 truncate" title={cat.category}>{cat.category}</span>
+                      <span className="text-sm sm:text-base font-bold text-rose-600">{cat.count}</span>
                     </div>
-                    <div className="text-sm text-gray-600 mb-3">
-                      <div className="flex items-center gap-2">
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        <span>
-                          {table.currentGuests || 0} / {table.capacity} guests
-                        </span>
-                      </div>
-                      {table.availableSeats !== undefined && (
-                        <div className="flex items-center gap-2 mt-1">
-                          <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                          </svg>
-                          <span className="text-green-600">{table.availableSeats} seats available</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleViewTableDetails(table._id)}
-                        className="flex-1 px-3 py-1.5 bg-purple-500 text-white text-sm rounded-lg hover:bg-purple-600 transition-colors"
-                      >
-                        View Details
-                      </button>
-                      <button
-                        onClick={() => handleOpenAssignGuestModal(table._id)}
-                        className="flex-1 px-3 py-1.5 bg-white border border-purple-200 text-purple-600 text-sm rounded-lg hover:bg-purple-50 transition-colors"
-                      >
-                        Add Guest
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500 col-span-full text-center py-4">No guest categories yet</p>
+                )}
               </div>
-            )}
+            </div>
+
+            {/* Table Management */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-white/50">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800">Banquet Table Management</h3>
+                <button
+                  onClick={() => navigate('/tables')}
+                  className="text-sm text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1 transition-colors"
+                >
+                  View All
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+
+              {tablesLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500"></div>
+                </div>
+              ) : tables.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-600 mb-4">No banquet tables created yet</p>
+                  <button
+                    onClick={() => navigate('/tables')}
+                    className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium"
+                  >
+                    Add Table
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
+                  {tables.slice(0, 3).map((table, index) => (
+                    <div
+                      key={table._id}
+                      className={`bg-gradient-to-br from-purple-50 to-rose-50 rounded-xl p-4 border border-purple-100 hover:shadow-md transition-shadow ${index > 0 ? 'hidden md:block' : ''}`}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <h4 className="font-semibold text-gray-800">Table number {table.tableNumber} - {table.tableName}</h4>
+                        </div>
+                        <button
+                          onClick={() => handleOpenEditModal(table)}
+                          className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors ml-2"
+                          title="Edit Table"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
+                        </button>
+                      </div>
+                      <div className="text-sm text-gray-600 mb-3">
+                        <div className="flex items-center gap-2">
+                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                          </svg>
+                          <span>
+                            {table.currentGuests || 0} / {table.capacity} guests
+                          </span>
+                        </div>
+                        {table.availableSeats !== undefined && (
+                          <div className="flex items-center gap-2 mt-1">
+                            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span className="text-green-600">{table.availableSeats} seats available</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleViewTableDetails(table._id)}
+                          className="flex-1 px-3 py-1.5 bg-purple-500 text-white text-sm rounded-lg hover:bg-purple-600 transition-colors"
+                        >
+                          View Details
+                        </button>
+                        <button
+                          onClick={() => handleOpenAssignGuestModal(table._id)}
+                          className="flex-1 px-3 py-1.5 bg-white border border-purple-200 text-purple-600 text-sm rounded-lg hover:bg-purple-50 transition-colors"
+                        >
+                          Add Guest
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
         )}
 
         {/* Quick Actions */}
@@ -406,7 +483,7 @@ export default function HomePage() {
             <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Add</h3>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4">
               {/* Add Guest */}
-              <button 
+              <button
                 onClick={() => navigate('/add-guest')}
                 className="flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 h-24 sm:h-28 bg-gradient-to-br from-rose-50 to-rose-100 rounded-xl hover:from-rose-100 hover:to-rose-200 transition-all border border-rose-200 active:scale-95"
               >
@@ -419,7 +496,7 @@ export default function HomePage() {
               </button>
 
               {/* Add Table */}
-              <button 
+              <button
                 onClick={() => navigate('/tables')}
                 className="flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 h-24 sm:h-28 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl hover:from-purple-100 hover:to-purple-200 transition-all border border-purple-200 active:scale-95"
               >
@@ -438,7 +515,7 @@ export default function HomePage() {
             <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Invitation Check</h3>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4">
               {/* Invited Guests */}
-              <button 
+              <button
                 onClick={() => navigate('/invited-guests')}
                 className="flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 h-24 sm:h-28 bg-gradient-to-br from-green-50 to-green-100 rounded-xl hover:from-green-100 hover:to-green-200 transition-all border border-green-200 active:scale-95"
               >
@@ -451,7 +528,7 @@ export default function HomePage() {
               </button>
 
               {/* Uninvited Guests */}
-              <button 
+              <button
                 onClick={() => navigate('/uninvited-guests')}
                 className="flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 h-24 sm:h-28 bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl hover:from-amber-100 hover:to-amber-200 transition-all border border-amber-200 active:scale-95"
               >
@@ -470,7 +547,7 @@ export default function HomePage() {
             <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Wedding Day</h3>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4">
               {/* User Info */}
-              <button 
+              <button
                 onClick={() => navigate('/user-info')}
                 className="flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 h-24 sm:h-28 bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl hover:from-pink-100 hover:to-pink-200 transition-all border border-pink-200 active:scale-95"
               >
@@ -483,7 +560,7 @@ export default function HomePage() {
               </button>
 
               {/* Attendance */}
-              <button 
+              <button
                 onClick={() => navigate('/attendance')}
                 className="flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 h-24 sm:h-28 bg-gradient-to-br from-rose-50 to-rose-100 rounded-xl hover:from-rose-100 hover:to-rose-200 transition-all border border-rose-200 active:scale-95"
               >
@@ -502,7 +579,7 @@ export default function HomePage() {
             <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Manager</h3>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4">
               {/* Notes */}
-              <button 
+              <button
                 onClick={() => navigate('/notes')}
                 className="flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 h-24 sm:h-28 bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl hover:from-teal-100 hover:to-teal-200 transition-all border border-teal-200 active:scale-95"
               >
@@ -515,7 +592,7 @@ export default function HomePage() {
               </button>
 
               {/* Categories */}
-              <button 
+              <button
                 onClick={() => navigate('/categories')}
                 className="flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 h-24 sm:h-28 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl hover:from-indigo-100 hover:to-indigo-200 transition-all border border-indigo-200 active:scale-95"
               >
@@ -525,6 +602,19 @@ export default function HomePage() {
                   </svg>
                 </div>
                 <span className="text-xs sm:text-sm font-semibold text-gray-800 text-center">Categories</span>
+              </button>
+
+              {/* Groups */}
+              <button
+                onClick={() => navigate('/groups')}
+                className="flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 h-24 sm:h-28 bg-gradient-to-br from-violet-50 to-violet-100 rounded-xl hover:from-violet-100 hover:to-violet-200 transition-all border border-violet-200 active:scale-95"
+              >
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-violet-500 rounded-full flex items-center justify-center shadow-md">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <span className="text-xs sm:text-sm font-semibold text-gray-800 text-center">Groups</span>
               </button>
             </div>
           </div>
@@ -585,19 +675,27 @@ export default function HomePage() {
                               </div>
                               <div>
                                 <p className="font-medium text-gray-800">{guest.guestName}</p>
-                                <div className="flex flex-wrap gap-1 mt-0.5">
+                                <div className="flex flex-wrap gap-1.5 mt-1">
                                   {guest.categoryName && (
-                                    <span className="text-xs bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded">
+                                    <span className="text-[11px] text-gray-600 border border-gray-200 bg-gray-50 px-1.5 py-0.5 rounded">
                                       {guest.categoryName}
                                     </span>
                                   )}
+                                  <span className="text-[11px] text-gray-600 border border-gray-200 bg-gray-50 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                    {guest.groupName || 'No Group'}
+                                    {guest.groupName && guest.groupPriorityLevel && (
+                                      <span className="text-gray-400 font-medium">
+                                        (P{guest.groupPriorityLevel})
+                                      </span>
+                                    )}
+                                  </span>
                                   {guest.noteName && (
-                                    <span className="text-xs bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded">
+                                    <span className="text-[11px] text-gray-600 border border-gray-200 bg-gray-50 px-1.5 py-0.5 rounded">
                                       {guest.noteName}
                                     </span>
                                   )}
-                                  <span className="text-xs text-gray-500">
-                                    {guest.confirmedGuests}/{guest.numberOfGuests} confirmed
+                                  <span className="text-[11px] text-gray-500 flex items-center ml-1">
+                                    • {guest.confirmedGuests}/{guest.numberOfGuests} confirmed
                                   </span>
                                 </div>
                               </div>
@@ -717,7 +815,7 @@ export default function HomePage() {
                 </svg>
               </button>
             </div>
-            
+
             <div className="p-4 sm:p-6 overflow-y-auto max-h-[60vh]">
               {unassignedLoading ? (
                 <div className="flex items-center justify-center py-8">
@@ -734,37 +832,108 @@ export default function HomePage() {
                   <p className="text-sm text-gray-500">All guests are already assigned to banquet tables</p>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {unassignedGuests.map((guest) => {
-                    const guestId = guest._id;
-                    if (!guestId) return null;
-                    return (
-                    <label
-                      key={guestId}
-                      className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                        selectedGuestIds.includes(guestId)
-                          ? 'bg-purple-50 border-purple-200'
-                          : 'bg-white border-gray-200 hover:bg-gray-50'
-                      }`}
-                    >
+                <div className="space-y-4">
+                  {/* Filters */}
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="relative flex-1">
                       <input
-                        type="checkbox"
-                        checked={selectedGuestIds.includes(guestId)}
-                        onChange={() => handleToggleGuestSelection(guestId)}
-                        className="w-4 h-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                        type="text"
+                        placeholder="Search by name..."
+                        value={unassignedSearchTerm}
+                        onChange={(e) => setUnassignedSearchTerm(e.target.value)}
+                        className="w-full px-4 py-2 pl-10 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-800 truncate">{guest.guestName}</p>
-                      </div>
-                      <span className="text-xs text-gray-500">
-                        {guest.numberOfGuests} guest{guest.numberOfGuests > 1 ? 's' : ''}
-                      </span>
-                    </label>
-                  )})}
+                      <svg
+                        className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={unassignedCategoryFilter}
+                        onChange={(e) => setUnassignedCategoryFilter(e.target.value)}
+                        className="w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer"
+                      >
+                        <option value="all">All Categories</option>
+                        <option value="none">No Category</option>
+                        {unassignedCategories.map(cat => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                      </select>
+                      <select
+                        value={unassignedGroupFilter}
+                        onChange={(e) => setUnassignedGroupFilter(e.target.value)}
+                        className="w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer"
+                      >
+                        <option value="all">All Groups</option>
+                        <option value="none">No Group</option>
+                        {unassignedGroups.map(group => (
+                          <option key={group} value={group}>{group}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {filteredUnassignedGuests.length === 0 ? (
+                    <p className="text-sm text-gray-500 text-center py-4">No guests match the selected group.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {filteredUnassignedGuests.map((guest) => {
+                        const guestId = guest._id;
+                        if (!guestId) return null;
+                        return (
+                          <label
+                            key={guestId}
+                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${selectedGuestIds.includes(guestId)
+                              ? 'bg-purple-50 border-purple-200'
+                              : 'bg-white border-gray-200 hover:bg-gray-50'
+                              }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedGuestIds.includes(guestId)}
+                              onChange={() => handleToggleGuestSelection(guestId)}
+                              className="w-4 h-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium text-gray-800 truncate">{guest.guestName}</p>
+                                {guest.categoryName && (
+                                  <span className="text-[10px] px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded border border-indigo-100 whitespace-nowrap">
+                                    {guest.categoryName}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-gray-500 truncate mt-0.5 flex items-center gap-1">
+                                {guest.groupName ? (
+                                  <>
+                                    <span>{guest.groupName}</span>
+                                    {guest.groupPriorityLevel && (
+                                      <span className="px-1 bg-gray-100 rounded text-gray-400 font-medium">(P{guest.groupPriorityLevel})</span>
+                                    )}
+                                  </>
+                                ) : (
+                                  <span className="italic">No Group</span>
+                                )}
+                              </p>
+                            </div>
+                            <span className="text-xs text-gray-500">
+                              {guest.numberOfGuests} guest{guest.numberOfGuests > 1 ? 's' : ''}
+                            </span>
+                          </label>
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-            
+
             <div className="p-4 sm:p-6 border-t border-gray-100 flex gap-3">
               <button
                 onClick={handleCloseAssignGuestModal}
@@ -828,6 +997,97 @@ export default function HomePage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Table Modal */}
+      {showEditTableModal && editingTable && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+                Edit Banquet Table
+              </h3>
+              <button
+                onClick={handleCloseEditModal}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditTable} className="p-4 sm:p-6 space-y-4">
+              <div>
+                <label htmlFor="editTableName" className="block text-sm font-medium text-gray-700 mb-1">
+                  Table Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="editTableName"
+                  value={editingTable.name}
+                  onChange={(e) => setEditingTable({ ...editingTable, name: e.target.value })}
+                  required
+                  placeholder="e.g., VIP Table"
+                  className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label htmlFor="editTableNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                    Table Number
+                  </label>
+                  <input
+                    type="number"
+                    id="editTableNumber"
+                    value={editingTable.number || ''}
+                    onChange={(e) => setEditingTable({ ...editingTable, number: e.target.value ? parseInt(e.target.value) : undefined })}
+                    min={1}
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label htmlFor="editTableCapacity" className="block text-sm font-medium text-gray-700 mb-1">
+                    Capacity <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    id="editTableCapacity"
+                    value={editingTable.capacity}
+                    onChange={(e) => setEditingTable({ ...editingTable, capacity: parseInt(e.target.value) || 1 })}
+                    required
+                    min={1}
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={handleCloseEditModal}
+                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium border border-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={updatingTable}
+                  className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {updatingTable ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Changes'
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
