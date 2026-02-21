@@ -144,9 +144,14 @@ class GroupService {
         }
 
         // Check if group is assigned to any guest
-        const assignedGuest = await Guest.findOne({ groupId: new Group.ObjectId(id) });
+        const assignedGuest = await Guest.findOne({
+            $or: [
+                { groupId: new Group.ObjectId(id) },
+                { groupId: id }
+            ]
+        });
         if (assignedGuest) {
-            throw new AppError("Cannot delete group because it is assigned to one or more guests", 400);
+            throw new AppError(messages.COMMON.GROUP_IN_USE || "Cannot delete group because it is assigned to one or more guests", 400);
         }
 
         return await Group.deleteById(id);

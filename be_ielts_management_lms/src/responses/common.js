@@ -11,6 +11,7 @@ module.exports = {
     SERVER_ERROR: "Internal server error",
     UNAUTHORIZED: "Unauthorized access",
     FORBIDDEN: "Forbidden - Insufficient permissions",
+    GROUP_IN_USE: "Cannot delete group because it is assigned to one or more guests",
   },
   vi: {
     SUCCESS: "Thao tác thành công",
@@ -23,5 +24,6 @@ module.exports = {
     SERVER_ERROR: "Lỗi máy chủ nội bộ",
     UNAUTHORIZED: "Không có quyền truy cập",
     FORBIDDEN: "Bị cấm - Không đủ quyền",
+    GROUP_IN_USE: "Không thể xóa nhóm vì nhóm đang được áp dụng cho một hoặc nhiều khách mời",
   },
 };
