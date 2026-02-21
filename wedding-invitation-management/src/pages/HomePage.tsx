@@ -637,6 +637,24 @@ export default function HomePage() {
                 </div>
                 <span className="text-xs sm:text-sm font-semibold text-white text-center">Location</span>
               </button>
+
+              {/* Thư Mời 3D - Public Page */}
+              <button
+                onClick={() => navigate('/invitation')}
+                className="flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 h-24 sm:h-28 rounded-xl transition-all border active:scale-95"
+                style={{
+                  background: 'linear-gradient(135deg, #1a0008 0%, #3d0015 100%)',
+                  borderColor: '#c9a44a',
+                }}
+              >
+                <div
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-md"
+                  style={{ background: 'rgba(201,164,74,0.2)', border: '1px solid rgba(201,164,74,0.4)' }}
+                >
+                  <span className="text-lg sm:text-xl">💌</span>
+                </div>
+                <span className="text-xs sm:text-sm font-semibold text-center" style={{ color: '#f0d080' }}>Thư Mời 3D</span>
+              </button>
             </div>
           </div>
         </div>
