@@ -58,11 +58,6 @@ class GroupService {
 
         if (isNaN(priorityLevel) || !Number.isInteger(priorityLevel) || priorityLevel < 0 || priorityLevel > 100) {
             errors.push("Priority level must be an integer between 0 and 100");
-        } else {
-            const isPriorityUnique = await this.validateUniquePriorityLevel(priorityLevel);
-            if (!isPriorityUnique) {
-                errors.push(`Priority level ${priorityLevel} is already used by another group`);
-            }
         }
 
         if (errors.length > 0) {
@@ -126,10 +121,6 @@ class GroupService {
             const level = Number(updateData.priorityLevel);
             if (isNaN(level) || !Number.isInteger(level) || level < 0 || level > 100) {
                 throw new AppError("Priority level must be an integer between 0 and 100", 400);
-            }
-            const isPriorityUnique = await this.validateUniquePriorityLevel(level, id);
-            if (!isPriorityUnique) {
-                throw new AppError(`Priority level ${level} is already used by another group`, 400);
             }
             updateData.priorityLevel = level;
         }
