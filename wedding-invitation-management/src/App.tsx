@@ -1,8 +1,17 @@
 import { useState, useEffect, type FormEvent } from 'react';
+import { Navigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 import { useAuth } from './hooks/auth/useAuth';
 import type { LoginPayload } from './types/auth/auth.payload';
 
+const TOKEN_COOKIE_NAME = 'auth_token';
+
 function App() {
+  // Nếu đã có token thì redirect về home, không cần vào login nữa
+  if (Cookies.get(TOKEN_COOKIE_NAME)) {
+    return <Navigate to="/home" replace />;
+  }
+
   const [email, setEmail] = useState('admin@lms.com');
   const [password, setPassword] = useState('test123');
   const [isLoaded, setIsLoaded] = useState(false);
@@ -15,10 +24,10 @@ function App() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    
+
     const payload: LoginPayload = { email, password };
     const success = await login(payload);
-    
+
     if (!success) {
       // Error is already handled in useAuth
     }
@@ -37,7 +46,7 @@ function App() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-rose-500 rounded-full mb-4 shadow-lg">
             <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C13.1 2 14 2.9 14 4C14 4.74 13.6 5.39 13 5.73V7H14C17.87 7 21 10.13 21 14V20C21 21.1 20.1 22 19 22H5C3.9 22 3 21.1 3 20V14C3 10.13 6.13 7 10 7H11V5.73C10.4 5.39 10 4.74 10 4C10 2.9 10.9 2 12 2ZM12 4C11.45 4 11 4.45 11 5C11 5.55 11.45 6 12 6C12.55 6 13 5.55 13 5C13 4.45 12.55 4 12 4ZM5 14V19H19V14C19 11.24 16.76 9 14 9H10C7.24 9 5 11.24 5 14Z"/>
+              <path d="M12 2C13.1 2 14 2.9 14 4C14 4.74 13.6 5.39 13 5.73V7H14C17.87 7 21 10.13 21 14V20C21 21.1 20.1 22 19 22H5C3.9 22 3 21.1 3 20V14C3 10.13 6.13 7 10 7H11V5.73C10.4 5.39 10 4.74 10 4C10 2.9 10.9 2 12 2ZM12 4C11.45 4 11 4.45 11 5C11 5.55 11.45 6 12 6C12.55 6 13 5.55 13 5C13 4.45 12.55 4 12 4ZM5 14V19H19V14C19 11.24 16.76 9 14 9H10C7.24 9 5 11.24 5 14Z" />
             </svg>
           </div>
           <h1 className="text-2xl sm:text-3xl font-serif font-bold text-gray-800 mb-2">

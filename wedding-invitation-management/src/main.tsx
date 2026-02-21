@@ -18,6 +18,7 @@ import CategoriesPage from './pages/CategoriesPage.tsx'
 import AddCategoryPage from './pages/AddCategoryPage.tsx'
 import UserInfoPage from './pages/UserInfoPage.tsx'
 import GroupsPage from './pages/GroupsPage.tsx'
+import LocationPage from './pages/LocationPage.tsx'
 import { ProtectedRoute } from './components/ProtectedRoute.tsx'
 
 // ScrollToTop component - scrolls window to top on route changes
@@ -166,6 +167,8 @@ createRoot(document.getElementById('root')!).render(
             </ProtectedRoute>
           }
         />
+        {/* Public route - no auth required */}
+        <Route path="/location" element={<LocationPage />} />
       </Routes>
     </BrowserRouter>
   )
