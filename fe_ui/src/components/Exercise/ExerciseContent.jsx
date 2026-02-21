@@ -1,8 +1,6 @@
 import React from 'react'
-import { Card, Tag, Typography } from 'antd'
+import { Card, Tag } from 'antd'
 import SmartInput from './SmartInput'
-
-const { Text } = Typography
 
 // Dialogue Item Component - Renders a single dialogue item
 function DialogueItem({ item, userAnswers, checkResults, answers, blankRefs, isMobile }) {
@@ -18,12 +16,13 @@ function DialogueItem({ item, userAnswers, checkResults, answers, blankRefs, isM
       <div style={{
         display: 'flex',
         flexWrap: 'wrap',
-        gap: 4,
+        gap: '4px 6px',
         marginTop: 8,
-        alignItems: 'center'
+        alignItems: 'baseline',
+        lineHeight: '2.2'
       }}>
         {parts.map((part, i) => {
-          if (part.type === 'text') return <Text key={i} style={{ fontSize: isMobile ? 14 : undefined }}>{part.value}</Text>
+          if (part.type === 'text') return <span key={i} className="dialogue-text">{part.value}</span>
           if (part.type === 'blank') {
             const val = userAnswers[part.id] || ''
             const isCorrect = checkResults[part.id] === 'correct'

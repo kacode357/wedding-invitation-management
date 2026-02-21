@@ -13,16 +13,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Mobile-first base styles */
-@media (768px) {
- max-width:  html {
-    font-size: 14px;
-  }
-  
-  body {
-    font-size: 14px;
-  }
-}
+
 
 /* Audio Exercise Container */
 .audio-exercise {
@@ -130,6 +121,13 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+/* Dialogue text - force font size */
+.dialogue-text {
+  font-size: 18px !important;
+  line-height: inherit;
+  color: #000000e0;
 }
 
 /* Input Row - flex-start to avoid gaps */

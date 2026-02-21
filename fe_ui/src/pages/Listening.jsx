@@ -7,10 +7,11 @@ const { Content } = Layout
 const { Title, Text } = Typography
 
 const audioList = [
-  { id: 'audio1', title: 'Audio 1', questions: 433 },
-  { id: 'audio2', title: 'Audio 2', questions: 120 },
-  { id: 'audio3', title: 'Audio 3', questions: 302 },
-  { id: 'audio4', title: 'Audio 4', questions: 147 }
+  { id: 'audio1', title: 'Audio 1', questions: 43 },
+  { id: 'audio2', title: 'Audio 2', questions: 47 },
+  { id: 'audio3', title: 'Audio 3', questions: 38 },
+  { id: 'audio4', title: 'Audio 4', questions: 46 },
+  { id: 'audio5', title: 'Audio 5', questions: 41 }
 ]
 
 function Listening() {
@@ -22,18 +23,18 @@ function Listening() {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768)
     }
-    
+
     checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
   return (
-    <Content 
+    <Content
       className="listening-page"
-      style={{ 
-        padding: isMobile ? '16px' : '24px', 
-        minHeight: 'calc(100vh - 64px)' 
+      style={{
+        padding: isMobile ? '16px' : '24px',
+        minHeight: 'calc(100vh - 64px)'
       }}
     >
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
@@ -50,9 +51,9 @@ function Listening() {
         </button>
 
         <div style={{ marginBottom: isMobile ? 16 : 24 }}>
-          <Title 
-            level={3} 
-            style={{ 
+          <Title
+            level={3}
+            style={{
               marginBottom: 8,
               fontSize: isMobile ? 20 : 24
             }}
@@ -78,7 +79,7 @@ function Listening() {
                     border: 'none',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
                   }}
-                  bodyStyle={{ 
+                  bodyStyle={{
                     padding: isMobile ? 12 : 20,
                     display: 'flex',
                     flexDirection: 'column',
@@ -99,10 +100,10 @@ function Listening() {
                     <SoundOutlined style={{ fontSize: isMobile ? 20 : 28, color: '#fff' }} />
                   </div>
 
-                  <Title 
-                    level={5} 
-                    style={{ 
-                      textAlign: 'center', 
+                  <Title
+                    level={5}
+                    style={{
+                      textAlign: 'center',
                       marginBottom: isMobile ? 4 : 8,
                       fontSize: isMobile ? 14 : 16
                     }}
@@ -111,9 +112,9 @@ function Listening() {
                   </Title>
 
                   <div style={{ textAlign: 'center' }}>
-                    <Text 
-                      type="secondary" 
-                      style={{ 
+                    <Text
+                      type="secondary"
+                      style={{
                         fontSize: isMobile ? 11 : 12
                       }}
                     >

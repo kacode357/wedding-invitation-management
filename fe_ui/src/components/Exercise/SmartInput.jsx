@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 
 // Helper function to check if user word is a "prefix match" of answer word
 // Returns { isMatch: boolean, missingPart: string, matchedPart: string }
@@ -13,21 +13,22 @@ function isPrefixMatch(userWord, answerWord) {
 
   // Direct match
   if (userLower === answerLower) {
-    return { isMatch: true, missingPart: '', matchedPart: userWord, exact: true }
+    return { isMatch: true, missingPart: '', matchedPart: userWord, extraPart: '', exact: true }
   }
 
   // Check if user word is a prefix of answer word (case-insensitive)
   if (answerLower.startsWith(userLower)) {
     const missingPart = answerWord.slice(userWord.length)
-    return { isMatch: true, missingPart, matchedPart: userWord, exact: false }
+    return { isMatch: true, missingPart, matchedPart: userWord, extraPart: '', exact: false }
   }
 
   // Check if answer word is a prefix of user word (user typed extra characters)
   if (userLower.startsWith(answerLower)) {
-    return { isMatch: true, missingPart: '', matchedPart: answerWord, exact: false }
+    const extraPart = userWord.slice(answerWord.length)
+    return { isMatch: true, missingPart: '', matchedPart: answerWord, extraPart, exact: false }
   }
 
-  return { isMatch: false, missingPart: '', matchedPart: '', exact: false }
+  return { isMatch: false, missingPart: '', matchedPart: '', extraPart: '', exact: false }
 }
 
 // SmartInput component with mobile support
@@ -42,28 +43,22 @@ export default function SmartInput({ value, answer, onChange, onCheck, disabled,
     }
   }, [blankRef, value, hasChecked, isCorrect, isWrong])
 
-  useEffect(() => {
-    if (inputRef.current && value && !hasChecked) {
-      const input = inputRef.current
+  useLayoutEffect(() => {
+    const input = inputRef.current
+    if (!input || hasChecked) return
+
+    if (value) {
       const tempSpan = document.createElement('span')
-      tempSpan.style.visibility = 'hidden'
-      tempSpan.style.position = 'absolute'
-      tempSpan.style.whiteSpace = 'pre'
-      tempSpan.style.font = window.getComputedStyle(input).font
-      tempSpan.style.letterSpacing = window.getComputedStyle(input).letterSpacing
-      tempSpan.style.fontSize = window.getComputedStyle(input).fontSize
-      tempSpan.style.fontFamily = window.getComputedStyle(input).fontFamily
-      tempSpan.style.fontWeight = window.getComputedStyle(input).fontWeight
-      tempSpan.textContent = value || ' '
+      tempSpan.style.cssText = 'visibility:hidden;position:absolute;white-space:pre;font-size:18px;font-family:inherit;letter-spacing:normal;'
+      tempSpan.textContent = value
       document.body.appendChild(tempSpan)
-
-      const newWidth = tempSpan.offsetWidth + 30
-      const maxWidth = isMobile ? window.innerWidth - 80 : 400
-      input.style.width = Math.min(Math.max(newWidth, isMobile ? 120 : 300), maxWidth) + 'px'
-
+      const measured = tempSpan.offsetWidth + 32
       document.body.removeChild(tempSpan)
-    } else if (!value && inputRef.current && !hasChecked) {
-      inputRef.current.style.width = isMobile ? '120px' : '300px'
+      const minW = isMobile ? 120 : 300
+      const maxW = isMobile ? window.innerWidth - 80 : 500
+      input.style.width = Math.min(Math.max(measured, minW), maxW) + 'px'
+    } else {
+      input.style.width = (isMobile ? 120 : 300) + 'px'
     }
   }, [value, hasChecked, isMobile])
 
@@ -79,11 +74,10 @@ export default function SmartInput({ value, answer, onChange, onCheck, disabled,
         <span ref={wrapperRef} style={{
           color: '#52c41a',
           fontWeight: 500,
-          padding: '4px 8px',
-          background: '#f6ffed',
+          padding: '2px 8px',
           borderRadius: 4,
           display: 'inline-block',
-          fontSize: isMobile ? 13 : 14,
+          fontSize: 18,
           border: '2px solid #52c41a'
         }}>
           {answer}
@@ -98,6 +92,42 @@ export default function SmartInput({ value, answer, onChange, onCheck, disabled,
       // Track which user words have been used
       const usedUserIndices = new Set()
       const elements = []
+      let lastMatchedUserIdx = -1
+
+      // Helper to render extra user words between matched indices
+      const renderExtraWordsUpTo = (endIdx) => {
+        for (let k = lastMatchedUserIdx + 1; k < endIdx; k++) {
+          if (usedUserIndices.has(k)) continue
+
+          const userWord = wordsUser[k]
+          // Check if it's just a slight typo of some answer word
+          let isSimilarToAnswer = false
+          for (const ansWord of wordsAnswer) {
+            const match = isPrefixMatch(userWord, ansWord)
+            if (match.isMatch && match.matchedPart.length >= 3) {
+              isSimilarToAnswer = true
+              break
+            }
+          }
+
+          if (!isSimilarToAnswer) {
+            elements.push(
+              <span key={`extra-${k}`} style={{
+                color: '#ff4d4f',
+                fontWeight: 400,
+                textDecoration: 'line-through',
+                textDecorationColor: '#ff4d4f'
+              }}>
+                {userWord}{' '}
+              </span>
+            )
+          }
+          usedUserIndices.add(k)
+        }
+        if (endIdx > lastMatchedUserIdx) {
+          lastMatchedUserIdx = endIdx
+        }
+      }
 
       // For each answer word, find the best matching user word
       for (let i = 0; i < wordsAnswer.length; i++) {
@@ -115,8 +145,10 @@ export default function SmartInput({ value, answer, onChange, onCheck, disabled,
         }
 
         if (bestMatchIdx !== -1) {
-          // Found exact match - show correct word in green
+          // Found exact match
+          renderExtraWordsUpTo(bestMatchIdx) // Render any extra words before this match
           usedUserIndices.add(bestMatchIdx)
+
           elements.push(
             <span key={`user-${bestMatchIdx}`} style={{
               color: '#52c41a',
@@ -143,9 +175,9 @@ export default function SmartInput({ value, answer, onChange, onCheck, disabled,
           }
 
           if (prefixMatchIdx !== -1 && prefixMatch) {
-            // Show user's matched part in green + missing suffix attached in red underline
+            // Found prefix match
+            renderExtraWordsUpTo(prefixMatchIdx) // Render any extra words before this match
             usedUserIndices.add(prefixMatchIdx)
-            const userWord = wordsUser[prefixMatchIdx]
 
             elements.push(
               <span key={`prefix-${prefixMatchIdx}`}>
@@ -162,11 +194,21 @@ export default function SmartInput({ value, answer, onChange, onCheck, disabled,
                     {prefixMatch.missingPart}
                   </span>
                 )}
+                {prefixMatch.extraPart && (
+                  <span style={{
+                    color: '#ff4d4f',
+                    fontWeight: 400,
+                    textDecoration: 'line-through',
+                    textDecorationColor: '#ff4d4f'
+                  }}>
+                    {prefixMatch.extraPart}
+                  </span>
+                )}
               </span>
             )
             elements.push(<span key={`space-${i}`}>&nbsp;</span>)
           } else {
-            // No match at all - show the missing word in red underline (user forgot this word)
+            // No match at all - user forgot this word
             elements.push(
               <span key={`missing-${i}`} style={{
                 color: '#ff4d4f',
@@ -181,59 +223,28 @@ export default function SmartInput({ value, answer, onChange, onCheck, disabled,
         }
       }
 
-      // Show extra user words (not matched to any answer word) in red strikethrough
-      const extraWords = []
-      for (let i = 0; i < wordsUser.length; i++) {
-        if (usedUserIndices.has(i)) continue
-        const userWord = wordsUser[i]
-        const userWordLower = userWord.toLowerCase()
-
-        // Check if this word should be considered "extra" or part of a compound
-        // Skip showing extra words that are very similar to answer words (just missing/extra chars)
-        let isSimilarToAnswer = false
-        for (const ansWord of wordsAnswer) {
-          const match = isPrefixMatch(userWord, ansWord)
-          if (match.isMatch && match.matchedPart.length >= 3) {
-            isSimilarToAnswer = true
-            break
-          }
-        }
-
-        if (!isSimilarToAnswer) {
-          extraWords.push(
-            <span key={`extra-${i}`} style={{
-              color: '#ff4d4f',
-              fontWeight: 400,
-              textDecoration: 'line-through',
-              textDecorationColor: '#ff4d4f'
-            }}>
-              {userWord}{' '}
-            </span>
-          )
-        }
-      }
+      // Render any remaining extra user words at the very end
+      renderExtraWordsUpTo(wordsUser.length)
 
       return (
         <span ref={wrapperRef} style={{
-          padding: '4px 8px',
-          background: '#fff2f0',
+          padding: '2px 8px',
           borderRadius: 4,
-          fontSize: isMobile ? 13 : 14,
+          fontSize: 18,
           display: 'inline-flex',
           flexWrap: 'wrap',
-          alignItems: 'center',
+          alignItems: 'baseline',
           gap: 2,
           border: '2px solid #ff4d4f'
         }}>
           {elements}
-          {extraWords.length > 0 && extraWords}
         </span>
       )
     }
   }
 
   return (
-    <span ref={wrapperRef} style={{ display: 'inline-flex', alignItems: 'center', width: '100%' }}>
+    <span ref={wrapperRef} style={{ display: 'inline-flex', alignItems: 'center' }}>
       <input
         ref={inputRef}
         type="text"
@@ -251,16 +262,18 @@ export default function SmartInput({ value, answer, onChange, onCheck, disabled,
         disabled={disabled}
         placeholder="..."
         style={{
-          padding: isMobile ? '8px 12px' : '4px 12px',
-          borderRadius: 4,
-          fontSize: isMobile ? 15 : 14,
+          padding: '4px 12px',
+          borderRadius: 6,
+          fontSize: 18,
+          lineHeight: '1.5',
           outline: 'none',
-          border: '1px solid #d9d9d9',
+          border: '1.5px solid #d9d9d9',
           width: isMobile ? 120 : 300,
           minWidth: isMobile ? 120 : 300,
-          maxWidth: isMobile ? 'calc(100vw - 80px)' : 400,
+          maxWidth: isMobile ? 'calc(100vw - 80px)' : 500,
           textAlign: 'left',
-          background: 'white'
+          background: 'white',
+          verticalAlign: 'middle'
         }}
       />
       {value && !hasChecked && (
@@ -270,15 +283,18 @@ export default function SmartInput({ value, answer, onChange, onCheck, disabled,
             onCheck()
           }}
           style={{
-            marginLeft: 4,
-            padding: isMobile ? '8px 16px' : '4px 12px',
+            marginLeft: 6,
+            padding: '4px 14px',
             background: '#1677ff',
             color: 'white',
             border: 'none',
-            borderRadius: 4,
+            borderRadius: 6,
             cursor: 'pointer',
-            fontSize: isMobile ? 13 : 12,
-            whiteSpace: 'nowrap'
+            fontSize: 14,
+            fontWeight: 500,
+            whiteSpace: 'nowrap',
+            verticalAlign: 'middle',
+            lineHeight: '1.5'
           }}
         >
           Check

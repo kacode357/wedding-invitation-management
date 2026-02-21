@@ -1,0 +1,828 @@
+{
+    "title": "Audio 5 Part 1",
+    "type": "gap_fill_exercise",
+    "dialogue": [
+        {
+            "id": 1,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Good morning. Tauber Insurance Company. How can I help you?"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Good morning. I want to alter my "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q1"
+                },
+                {
+                    "type": "text",
+                    "value": "."
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Is that for your house, contents, or "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q2"
+                },
+                {
+                    "type": "text",
+                    "value": "?"
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "My vehicle."
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Can you give me the number of the policy please?"
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Certainly, I have it here in front of me. "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q3"
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "And what "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q4"
+                },
+                {
+                    "type": "text",
+                    "value": "?"
+                }
+            ]
+        },
+        {
+            "id": 8,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "It's a Masda...a Masda Marvel."
+                }
+            ]
+        },
+        {
+            "id": 9,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "And what's the cc "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q5"
+                },
+                {
+                    "type": "text",
+                    "value": "?"
+                }
+            ]
+        },
+        {
+            "id": 10,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Sorry? What do you mean?"
+                }
+            ]
+        },
+        {
+            "id": 11,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "How big is "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q6"
+                },
+                {
+                    "type": "text",
+                    "value": "? Is it 1500 or 1800 cc, for example?"
+                }
+            ]
+        },
+        {
+            "id": 12,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Oh that...it's actually much bigger than that: it's "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q7"
+                }
+            ]
+        },
+        {
+            "id": 13,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Thank you. Now I just have to ask you a few questions to "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q8"
+                },
+                {
+                    "type": "text",
+                    "value": ". What name is the policy under?"
+                }
+            ]
+        },
+        {
+            "id": 14,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Heathcote."
+                }
+            ]
+        },
+        {
+            "id": 15,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Let me just bring that up on the computer. Yes, can I just confirm your first name, please?"
+                }
+            ]
+        },
+        {
+            "id": 16,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Well, my first name is Lisa but I'm known "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q9"
+                },
+                {
+                    "type": "text",
+                    "value": "—Marie."
+                }
+            ]
+        },
+        {
+            "id": 17,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Right. I see both here but Lisa is the one I want "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q10"
+                },
+                {
+                    "type": "text",
+                    "value": " And your date of birth, Lisa?...I mean, Marie."
+                }
+            ]
+        },
+        {
+            "id": 18,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "blank",
+                    "id": "audio5_q11"
+                },
+                {
+                    "type": "text",
+                    "value": " August, 1955."
+                }
+            ]
+        },
+        {
+            "id": 19,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Correct. Just one more question "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q12"
+                },
+                {
+                    "type": "text",
+                    "value": "—can you remember "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q13"
+                },
+                {
+                    "type": "text",
+                    "value": " on this policy?"
+                }
+            ]
+        },
+        {
+            "id": 20,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Oh, dear. I didn't know I had a password on it."
+                }
+            ]
+        },
+        {
+            "id": 21,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Everyone has a password. Would you like to "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q14"
+                },
+                {
+                    "type": "text",
+                    "value": "?"
+                }
+            ]
+        },
+        {
+            "id": 22,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Possibly it's my mother's name..."
+                }
+            ]
+        },
+        {
+            "id": 23,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "And what would that be?"
+                }
+            ]
+        },
+        {
+            "id": 24,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Sophia."
+                }
+            ]
+        },
+        {
+            "id": 25,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Sorry, "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q15"
+                }
+            ]
+        },
+        {
+            "id": 26,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Alright...Oh, I remember now, it's "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q16"
+                },
+                {
+                    "type": "text",
+                    "value": ", Jack."
+                }
+            ]
+        },
+        {
+            "id": 27,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Yes, followed by "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q17"
+                }
+            ]
+        },
+        {
+            "id": 28,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "1897—right?"
+                }
+            ]
+        },
+        {
+            "id": 29,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Correct. Now we can "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q18"
+                },
+                {
+                    "type": "text",
+                    "value": " What exactly do you want to change?"
+                }
+            ]
+        },
+        {
+            "id": 30,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Well, a couple of things. Firstly, I think "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q19"
+                },
+                {
+                    "type": "text",
+                    "value": " Can we reduce the value by $5,000."
+                }
+            ]
+        },
+        {
+            "id": 31,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "You mean, "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q20"
+                },
+                {
+                    "type": "text",
+                    "value": " $15,000?"
+                }
+            ]
+        },
+        {
+            "id": 32,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Yes, I'm sure it's lost quite a bit of value "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q21"
+                }
+            ]
+        },
+        {
+            "id": 33,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Done. Now, what's the other thing?"
+                }
+            ]
+        },
+        {
+            "id": 34,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Well, I want to add the name of "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q22"
+                },
+                {
+                    "type": "text",
+                    "value": " to my insurance policy."
+                }
+            ]
+        },
+        {
+            "id": 35,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Who is it?"
+                }
+            ]
+        },
+        {
+            "id": 36,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "His name is Samuel Michaels."
+                }
+            ]
+        },
+        {
+            "id": 37,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "He doesn't have "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q23"
+                },
+                {
+                    "type": "text",
+                    "value": " as you?"
+                }
+            ]
+        },
+        {
+            "id": 38,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "No, he doesn't. Is that a problem?"
+                }
+            ]
+        },
+        {
+            "id": 39,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "No, it shouldn't be, as long as he's "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q24"
+                },
+                {
+                    "type": "text",
+                    "value": ", but we find it easier to "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q25"
+                },
+                {
+                    "type": "text",
+                    "value": " for family members."
+                }
+            ]
+        },
+        {
+            "id": 40,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Oh, he is family...he's "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q26"
+                },
+                {
+                    "type": "text",
+                    "value": " He's my son-in-law. And he's 28 in fact."
+                }
+            ]
+        },
+        {
+            "id": 41,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Good—and what would he be using the car for? Would it be "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q27"
+                },
+                {
+                    "type": "text",
+                    "value": "?"
+                }
+            ]
+        },
+        {
+            "id": 42,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Not really...you see, "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q28"
+                },
+                {
+                    "type": "text",
+                    "value": " and I'm having difficulty driving (it's "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q29"
+                },
+                {
+                    "type": "text",
+                    "value": " I have to use the gear stick) and Sam, that is Samuel, offered to "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q30"
+                },
+                {
+                    "type": "text",
+                    "value": " and so on. He's a good driver and I feel safe with him but I'd like to know that the car is still insured "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q31"
+                }
+            ]
+        },
+        {
+            "id": 43,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "So that would be... family reasons, then?"
+                }
+            ]
+        },
+        {
+            "id": 44,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Yes, I think so. Will "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q32"
+                },
+                {
+                    "type": "text",
+                    "value": "?"
+                }
+            ]
+        },
+        {
+            "id": 45,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "No—as long as you can provide us with a photocopy of "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q33"
+                },
+                {
+                    "type": "text",
+                    "value": "—a true copy—you know what I mean—you'll have to get someone from the Department of Transport to sign it saying that he's seen "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q34"
+                }
+            ]
+        },
+        {
+            "id": 46,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "I think we can manage that without any difficulty."
+                }
+            ]
+        },
+        {
+            "id": 47,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Oh, and while he's at the Department, he should ask them for a record of "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q35"
+                },
+                {
+                    "type": "text",
+                    "value": ", demerit points, that kind of thing, only for the last five years though. "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q36"
+                },
+                {
+                    "type": "text",
+                    "value": " anything beyond that but it's important that he has a clean record for the five previous years."
+                }
+            ]
+        },
+        {
+            "id": 48,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Oh, I'm sure "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q37"
+                },
+                {
+                    "type": "text",
+                    "value": " Is there anything else you need?"
+                }
+            ]
+        },
+        {
+            "id": 49,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Just the date for when you'd like this "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q38"
+                }
+            ]
+        },
+        {
+            "id": 50,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Today, if that's possible."
+                }
+            ]
+        },
+        {
+            "id": 51,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Yes, we can issue "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q39"
+                },
+                {
+                    "type": "text",
+                    "value": " from today's date but full cover won't apply until "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q40"
+                },
+                {
+                    "type": "text",
+                    "value": " and it's been approved."
+                }
+            ]
+        },
+        {
+            "id": 52,
+            "speaker": "WOMAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "What exactly is 'temporary'?"
+                }
+            ]
+        },
+        {
+            "id": 53,
+            "speaker": "MAN",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "He'll be covered "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio5_q41"
+                },
+                {
+                    "type": "text",
+                    "value": " but it will lapse after that time if there's any problem with his credentials."
+                }
+            ]
+        }
+    ]
+}

@@ -12,6 +12,8 @@ import audio3Questions from '../../data/audio3/audio_3_questions.json'
 import audio3Answers from '../../data/audio3/audio_3_answers.json'
 import audio4Questions from '../../data/audio4/audio_4_questions.json'
 import audio4Answers from '../../data/audio4/audio_4_answers.json'
+import audio5Questions from '../../data/audio5/audio_5_questions.json'
+import audio5Answers from '../../data/audio5/audio_5_answers.json'
 
 import ExerciseHeaderDesktop from './ExerciseHeaderDesktop'
 import ExerciseHeaderMobile from './ExerciseHeaderMobile'
@@ -26,7 +28,8 @@ const audioData = {
   audio1: { questions: audio1Questions, answers: audio1Answers, file: '/Audio 1.mp3', title: 'Audio 1' },
   audio2: { questions: audio2Questions, answers: audio2Answers, file: '/Audio 2.mp3', title: 'Audio 2' },
   audio3: { questions: audio3Questions, answers: audio3Answers, file: '/Audio 3.mp3', title: 'Audio 3' },
-  audio4: { questions: audio4Questions, answers: audio4Answers, file: '/Audio 4.mp3', title: 'Audio 4' }
+  audio4: { questions: audio4Questions, answers: audio4Answers, file: '/Audio 4.mp3', title: 'Audio 4' },
+  audio5: { questions: audio5Questions, answers: audio5Answers, file: '/Audio 5.mp3', title: 'Audio 5' }
 }
 
 // Submit Button Component
@@ -137,6 +140,24 @@ function Exercise() {
 
   const data = audioInfo.questions
   const answers = audioInfo.answers
+
+  // Expose answers to console via kaka_check
+  useEffect(() => {
+    window.kaka_check = () => {
+      console.log(`%c 🎯 Filling answers for ${audioId}...`, 'color: #1677ff; font-weight: bold; font-size: 14px;')
+      setUserAnswers(answers)
+      const results = {}
+      Object.keys(answers).forEach(id => {
+        results[id] = 'correct'
+      })
+      setCheckResults(results)
+      console.table(answers)
+      return answers
+    }
+    return () => {
+      delete window.kaka_check
+    }
+  }, [audioId, answers])
 
   // Get all blanks
   const allBlanks = data.dialogue.flatMap(item =>
@@ -409,9 +430,9 @@ function Exercise() {
                       {item.speaker}
                     </Tag>
                   )}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 8, alignItems: 'center' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 6px', marginTop: 8, alignItems: 'baseline', lineHeight: '2.2' }}>
                     {(item.text || item.content || []).map((part, i) => {
-                      if (part.type === 'text') return <Text key={i}>{part.value}</Text>
+                      if (part.type === 'text') return <span key={i} className="dialogue-text">{part.value}</span>
                       if (part.type === 'blank') {
                         const val = userAnswers[part.id] || ''
                         const isCorrect = checkResults[part.id] === 'correct'
@@ -489,12 +510,13 @@ function Exercise() {
               <div style={{
                 display: 'flex',
                 flexWrap: 'wrap',
-                gap: 4,
+                gap: '4px 6px',
                 marginTop: 8,
-                alignItems: 'center'
+                alignItems: 'baseline',
+                lineHeight: '2.2'
               }}>
                 {(item.text || item.content || []).map((part, i) => {
-                  if (part.type === 'text') return <Text key={i} style={{ fontSize: 14 }}>{part.value}</Text>
+                  if (part.type === 'text') return <span key={i} className="dialogue-text">{part.value}</span>
                   if (part.type === 'blank') {
                     const val = userAnswers[part.id] || ''
                     const isCorrect = checkResults[part.id] === 'correct'
