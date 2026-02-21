@@ -1,5 +1,5 @@
-// Group Service - Business Logic Layer
 const Group = require("../models/group.model");
+const Guest = require("../models/guest.model");
 const { AppError } = require("../utils/appError");
 const { getMessages } = require("../responses");
 
@@ -141,6 +141,12 @@ class GroupService {
         const group = await Group.findById(id);
         if (!group) {
             throw new AppError(messages.COMMON.NOT_FOUND, 404);
+        }
+
+        // Check if group is assigned to any guest
+        const assignedGuest = await Guest.findOne({ groupId: new Group.ObjectId(id) });
+        if (assignedGuest) {
+            throw new AppError("Cannot delete group because it is assigned to one or more guests", 400);
         }
 
         return await Group.deleteById(id);
