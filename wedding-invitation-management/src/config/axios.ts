@@ -15,7 +15,7 @@ function getTokenFromCookies(): string | null {
 }
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'https://ieltsmanagementlms-production.up.railway.app/api',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
