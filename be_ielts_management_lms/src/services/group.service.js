@@ -51,15 +51,17 @@ class GroupService {
             }
         }
 
+        let priorityLevel = 0;
         if (groupData.priorityLevel !== undefined && groupData.priorityLevel !== null) {
-            const level = Number(groupData.priorityLevel);
-            if (isNaN(level) || !Number.isInteger(level) || level < 0) {
-                errors.push("Priority level must be a non-negative integer");
-            } else {
-                const isPriorityUnique = await this.validateUniquePriorityLevel(level);
-                if (!isPriorityUnique) {
-                    errors.push(`Priority level ${level} is already used by another group`);
-                }
+            priorityLevel = Number(groupData.priorityLevel);
+        }
+
+        if (isNaN(priorityLevel) || !Number.isInteger(priorityLevel) || priorityLevel < 0 || priorityLevel > 100) {
+            errors.push("Priority level must be an integer between 0 and 100");
+        } else {
+            const isPriorityUnique = await this.validateUniquePriorityLevel(priorityLevel);
+            if (!isPriorityUnique) {
+                errors.push(`Priority level ${priorityLevel} is already used by another group`);
             }
         }
 
@@ -69,7 +71,7 @@ class GroupService {
 
         const data = {
             name: groupData.name.trim(),
-            priorityLevel: groupData.priorityLevel !== undefined ? Number(groupData.priorityLevel) : 0,
+            priorityLevel: priorityLevel,
         };
 
         return await Group.create(data);
@@ -122,8 +124,8 @@ class GroupService {
 
         if (updateData.priorityLevel !== undefined && updateData.priorityLevel !== null) {
             const level = Number(updateData.priorityLevel);
-            if (isNaN(level) || !Number.isInteger(level) || level < 0) {
-                throw new AppError("Priority level must be a non-negative integer", 400);
+            if (isNaN(level) || !Number.isInteger(level) || level < 0 || level > 100) {
+                throw new AppError("Priority level must be an integer between 0 and 100", 400);
             }
             const isPriorityUnique = await this.validateUniquePriorityLevel(level, id);
             if (!isPriorityUnique) {
