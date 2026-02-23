@@ -53,6 +53,9 @@ export interface GuestResponse {
   message?: string;
   timestamp?: string;
   guest?: Guest;
+  data?: {
+    guest: Guest;
+  };
 }
 
 // Guests list response

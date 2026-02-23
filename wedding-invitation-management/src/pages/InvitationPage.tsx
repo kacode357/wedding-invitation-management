@@ -1,12 +1,56 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation, useParams } from 'react-router-dom';
 
 const PRIMARY = '#800020';
 const GOLD = '#c9a44a';
 
 export default function InvitationPage() {
+    const { hash } = useParams<{ hash?: string }>();
+    const location = useLocation();
     const [sheet, setSheet] = useState(0); // 0=closed 1=letter
     const [flipped, setFlipped] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
+    const [guestName, setGuestName] = useState<string>('');
+    const [hasError, setHasError] = useState(false);
+
+    useEffect(() => {
+        if (hash) {
+            try {
+                // Giải mã Base64 hash
+                const decodedStr = decodeURIComponent(atob(hash));
+                const parts = decodedStr.split('|');
+                if (parts.length >= 2) {
+                    // Phần đầu là ID, phần sau là Tên (Trường hợp tên có dấu | thì join lại)
+                    const name = parts.slice(1).join('|');
+                    setGuestName(name);
+                } else {
+                    setHasError(true);
+                }
+            } catch (error) {
+                console.error("Invalid invitation hash");
+                setHasError(true);
+            }
+        } else {
+            // Hỗ trợ backwards compatibility (nếu cần)
+            const searchParams = new URLSearchParams(location.search);
+            const nameEncoded = searchParams.get('k');
+
+            if (nameEncoded) {
+                try {
+                    const decodedName = decodeURIComponent(atob(nameEncoded));
+                    setGuestName(decodedName);
+                } catch (error) {
+                    console.error("Invalid encoded name URL");
+                    setHasError(true);
+                }
+            } else {
+                const nameParam = searchParams.get('name');
+                if (nameParam) {
+                    setGuestName(nameParam);
+                }
+            }
+        }
+    }, [hash, location.search]);
 
     const close = () => {
         setIsClosing(true);
@@ -15,6 +59,22 @@ export default function InvitationPage() {
             setIsClosing(false);
         }, 300);
     };
+
+    if (hasError) {
+        return (
+            <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg,#1a0008 0%,#3d0015 50%,#1a0008 100%)', padding: '24px 16px', fontFamily: "'Be Vietnam Pro',sans-serif" }}>
+                <div style={{ background: 'rgba(255,255,255,0.95)', padding: '40px', borderRadius: '16px', textAlign: 'center', maxWidth: '400px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}>
+                    <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#fee2e2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <h2 style={{ color: PRIMARY, fontSize: '24px', fontWeight: 'bold', marginBottom: '12px', fontFamily: "'Be Vietnam Pro',sans-serif" }}>Thiệp Không Hợp Lệ</h2>
+                    <p style={{ color: '#4b5563', fontSize: '15px', lineHeight: '1.6' }}>Rất tiếc, đường dẫn thiệp mời này không đúng hoặc đã bị chỉnh sửa sai lệch. Vui lòng kiểm tra lại link bạn nhận được.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg,#1a0008 0%,#3d0015 50%,#1a0008 100%)', padding: '24px 16px', fontFamily: "'Be Vietnam Pro',sans-serif" }}>
@@ -33,7 +93,12 @@ export default function InvitationPage() {
                         <p style={{ fontFamily: "'Great Vibes',cursive", fontSize: 'clamp(24px,6.5vw,38px)', color: 'rgba(255,255,255,0.95)', lineHeight: 1.1, textAlign: 'center', marginBottom: 12, textShadow: '0 2px 12px rgba(0,0,0,0.3)' }}>Hồng Ngọc &amp; Hoàng Sơn</p>
                         <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 10, letterSpacing: '0.2em', fontWeight: 600, marginBottom: 40 }}>24.05.2026</p>
                         <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 8.5, letterSpacing: '0.3em', textTransform: 'uppercase', fontWeight: 600, marginBottom: 8 }}>Kính Mời</p>
-                        <div style={{ width: 140, borderBottom: '1px dashed rgba(255,255,255,0.35)' }} />
+                        {guestName && (
+                            <p style={{ fontFamily: "'Be Vietnam Pro',sans-serif", fontSize: 13, fontWeight: 700, color: '#f0d090', marginBottom: 12, letterSpacing: '0.05em', textAlign: 'center' }}>
+                                {guestName}
+                            </p>
+                        )}
+                        <div style={{ width: 140, borderBottom: '1px dashed rgba(255,255,255,0.35)', marginTop: guestName ? 0 : 4 }} />
                     </div>
 
                     {/* Back */}

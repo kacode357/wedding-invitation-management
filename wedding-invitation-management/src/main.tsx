@@ -19,6 +19,7 @@ import AddCategoryPage from './pages/AddCategoryPage.tsx'
 import UserInfoPage from './pages/UserInfoPage.tsx'
 import GroupsPage from './pages/GroupsPage.tsx'
 import LocationPage from './pages/LocationPage.tsx'
+import CreateInvitationPage from './pages/CreateInvitationPage.tsx'
 import InvitationPage from './pages/InvitationPage.tsx'
 import { ProtectedRoute } from './components/ProtectedRoute.tsx'
 
@@ -168,10 +169,18 @@ createRoot(document.getElementById('root')!).render(
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/create-invitation"
+          element={
+            <ProtectedRoute>
+              <CreateInvitationPage />
+            </ProtectedRoute>
+          }
+        />
         {/* Public routes - no auth required */}
         <Route path="/location" element={<LocationPage />} />
         <Route path="/invitation" element={<InvitationPage />} />
-        <Route path="/invite/:invitationId" element={<InvitationPage />} />
+        <Route path="/invite/:hash" element={<InvitationPage />} />
       </Routes>
     </BrowserRouter>
   )

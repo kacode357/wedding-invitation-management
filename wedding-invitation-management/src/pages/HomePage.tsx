@@ -512,7 +512,7 @@ export default function HomePage() {
 
           {/* Invitation Check Section */}
           <div className="mb-6">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Invitation Check</h3>
+            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Invitations Check</h3>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4">
               {/* Invited Guests */}
               <button
@@ -538,6 +538,19 @@ export default function HomePage() {
                   </svg>
                 </div>
                 <span className="text-xs sm:text-sm font-semibold text-gray-800 text-center">Uninvited</span>
+              </button>
+
+              {/* Create Invitation */}
+              <button
+                onClick={() => navigate('/create-invitation')}
+                className="flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 h-24 sm:h-28 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl hover:from-blue-100 hover:to-blue-200 transition-all border border-blue-200 active:scale-95"
+              >
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-full flex items-center justify-center shadow-md">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <span className="text-xs sm:text-sm font-semibold text-gray-800 text-center">E-Invitation</span>
               </button>
             </div>
           </div>
@@ -620,517 +633,511 @@ export default function HomePage() {
               {/* Location - Public Page */}
               <button
                 onClick={() => navigate('/location')}
-                className="flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 h-24 sm:h-28 rounded-xl transition-all border active:scale-95"
-                style={{
-                  background: 'linear-gradient(135deg, #800020 0%, #a0002a 100%)',
-                  borderColor: '#800020',
-                }}
+                className="flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 h-24 sm:h-28 bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-xl hover:from-cyan-100 hover:to-cyan-200 transition-all border border-cyan-200 active:scale-95"
               >
-                <div
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-md"
-                  style={{ background: 'rgba(255,255,255,0.2)' }}
-                >
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-cyan-500 rounded-full flex items-center justify-center shadow-md">
                   <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </div>
-                <span className="text-xs sm:text-sm font-semibold text-white text-center">Location</span>
+                <span className="text-xs sm:text-sm font-semibold text-gray-800 text-center">Location</span>
               </button>
 
-              {/* Thư Mời 3D - Public Page */}
+              {/* 3D Invitation - Public Page */}
               <button
                 onClick={() => navigate('/invitation')}
-                className="flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 h-24 sm:h-28 rounded-xl transition-all border active:scale-95"
-                style={{
-                  background: 'linear-gradient(135deg, #1a0008 0%, #3d0015 100%)',
-                  borderColor: '#c9a44a',
-                }}
+                className="flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 h-24 sm:h-28 bg-gradient-to-br from-fuchsia-50 to-fuchsia-100 rounded-xl hover:from-fuchsia-100 hover:to-fuchsia-200 transition-all border border-fuchsia-200 active:scale-95"
               >
-                <div
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-md"
-                  style={{ background: 'rgba(201,164,74,0.2)', border: '1px solid rgba(201,164,74,0.4)' }}
-                >
-                  <span className="text-lg sm:text-xl">💌</span>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-fuchsia-500 rounded-full flex items-center justify-center shadow-md">
+                  <span className="text-lg sm:text-xl text-white">💌</span>
                 </div>
-                <span className="text-xs sm:text-sm font-semibold text-center" style={{ color: '#f0d080' }}>Thư Mời 3D</span>
+                <span className="text-xs sm:text-sm font-semibold text-gray-800 text-center">3D Invitation</span>
               </button>
             </div>
           </div>
         </div>
-      </main>
+      </main >
 
       {/* Table Detail Modal */}
-      {showTableModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden">
-            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100">
-              <div>
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
-                  {selectedTable?.tableName}
-                </h3>
-                {selectedTable?.tableNumber && (
-                  <span className="text-sm text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full">
-                    Banquet Table {selectedTable.tableNumber}
-                  </span>
-                )}
-              </div>
-              <button
-                onClick={handleCloseTableModal}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div className="p-4 sm:p-6 overflow-y-auto max-h-[60vh]">
-              {tableDetailLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+      {
+        showTableModal && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden">
+              <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100">
+                <div>
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+                    {selectedTable?.tableName}
+                  </h3>
+                  {selectedTable?.tableNumber && (
+                    <span className="text-sm text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full">
+                      Banquet Table {selectedTable.tableNumber}
+                    </span>
+                  )}
                 </div>
-              ) : (
-                <>
-                  <div className="mb-4">
-                    <p className="text-sm text-gray-500">Capacity</p>
-                    <p className="font-semibold text-gray-800">
-                      {selectedTable?.currentGuests || 0} / {selectedTable?.capacity} guests
-                    </p>
+                <button
+                  onClick={handleCloseTableModal}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="p-4 sm:p-6 overflow-y-auto max-h-[60vh]">
+                {tableDetailLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-500 mb-2">Guests at this banquet table</p>
-                    {selectedTable?.guests && selectedTable.guests.length > 0 ? (
-                      <div className="space-y-2">
-                        {selectedTable.guests.map((guest) => (
-                          <div
-                            key={guest._id}
-                            className="flex items-center justify-between gap-3 p-3 bg-gray-50 rounded-lg"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${guest.isArrived ? 'bg-green-100' : 'bg-purple-100'}`}>
-                                <svg className={`w-4 h-4 ${guest.isArrived ? 'text-green-600' : 'text-purple-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                              </div>
-                              <div>
-                                <p className="font-medium text-gray-800">{guest.guestName}</p>
-                                <div className="flex flex-wrap gap-1.5 mt-1">
-                                  {guest.categoryName && (
-                                    <span className="text-[11px] text-gray-600 border border-gray-200 bg-gray-50 px-1.5 py-0.5 rounded">
-                                      {guest.categoryName}
-                                    </span>
-                                  )}
-                                  <span className="text-[11px] text-gray-600 border border-gray-200 bg-gray-50 px-1.5 py-0.5 rounded flex items-center gap-1">
-                                    {guest.groupName || 'No Group'}
-                                    {guest.groupName && guest.groupPriorityLevel && (
-                                      <span className="text-gray-400 font-medium">
-                                        (P{guest.groupPriorityLevel})
+                ) : (
+                  <>
+                    <div className="mb-4">
+                      <p className="text-sm text-gray-500">Capacity</p>
+                      <p className="font-semibold text-gray-800">
+                        {selectedTable?.currentGuests || 0} / {selectedTable?.capacity} guests
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500 mb-2">Guests at this banquet table</p>
+                      {selectedTable?.guests && selectedTable.guests.length > 0 ? (
+                        <div className="space-y-2">
+                          {selectedTable.guests.map((guest) => (
+                            <div
+                              key={guest._id}
+                              className="flex items-center justify-between gap-3 p-3 bg-gray-50 rounded-lg"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${guest.isArrived ? 'bg-green-100' : 'bg-purple-100'}`}>
+                                  <svg className={`w-4 h-4 ${guest.isArrived ? 'text-green-600' : 'text-purple-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                  </svg>
+                                </div>
+                                <div>
+                                  <p className="font-medium text-gray-800">{guest.guestName}</p>
+                                  <div className="flex flex-wrap gap-1.5 mt-1">
+                                    {guest.categoryName && (
+                                      <span className="text-[11px] text-gray-600 border border-gray-200 bg-gray-50 px-1.5 py-0.5 rounded">
+                                        {guest.categoryName}
                                       </span>
                                     )}
-                                  </span>
-                                  {guest.noteName && (
-                                    <span className="text-[11px] text-gray-600 border border-gray-200 bg-gray-50 px-1.5 py-0.5 rounded">
-                                      {guest.noteName}
+                                    <span className="text-[11px] text-gray-600 border border-gray-200 bg-gray-50 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                      {guest.groupName || 'No Group'}
+                                      {guest.groupName && guest.groupPriorityLevel && (
+                                        <span className="text-gray-400 font-medium">
+                                          (P{guest.groupPriorityLevel})
+                                        </span>
+                                      )}
                                     </span>
-                                  )}
-                                  <span className="text-[11px] text-gray-500 flex items-center ml-1">
-                                    • {guest.confirmedGuests}/{guest.numberOfGuests} confirmed
-                                  </span>
+                                    {guest.noteName && (
+                                      <span className="text-[11px] text-gray-600 border border-gray-200 bg-gray-50 px-1.5 py-0.5 rounded">
+                                        {guest.noteName}
+                                      </span>
+                                    )}
+                                    <span className="text-[11px] text-gray-500 flex items-center ml-1">
+                                      • {guest.confirmedGuests}/{guest.numberOfGuests} confirmed
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {guest.isArrived ? (
-                                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                                  Arrived
-                                </span>
-                              ) : (
+                              <div className="flex items-center gap-2">
+                                {guest.isArrived ? (
+                                  <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                                    Arrived
+                                  </span>
+                                ) : (
+                                  <button
+                                    onClick={async () => {
+                                      const guestId = guest._id;
+                                      if (!guestId) return;
+                                      // TODO: Implement check-in
+                                      toast.info('Check-in feature coming soon');
+                                    }}
+                                    className="p-1.5 text-green-500 hover:bg-green-50 rounded-lg transition-colors"
+                                    title="Check in guest"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  </button>
+                                )}
                                 <button
                                   onClick={async () => {
                                     const guestId = guest._id;
-                                    if (!guestId) return;
-                                    // TODO: Implement check-in
-                                    toast.info('Check-in feature coming soon');
+                                    const tableId = selectedTable?._id;
+                                    if (!guestId || !tableId) return;
+                                    handleConfirm('Are you sure you want to remove this guest from the table?', async () => {
+                                      const success = await removeGuests(tableId, [guestId]);
+                                      if (success) {
+                                        toast.success('Guest removed from table');
+                                        fetchTables();
+                                        fetchTableDetails(tableId);
+                                      } else {
+                                        toast.error('Failed to remove guest from table');
+                                      }
+                                    });
                                   }}
-                                  className="p-1.5 text-green-500 hover:bg-green-50 rounded-lg transition-colors"
-                                  title="Check in guest"
+                                  disabled={removingGuests}
+                                  className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                                  title="Remove from table"
                                 >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                   </svg>
                                 </button>
-                              )}
-                              <button
-                                onClick={async () => {
-                                  const guestId = guest._id;
-                                  const tableId = selectedTable?._id;
-                                  if (!guestId || !tableId) return;
-                                  handleConfirm('Are you sure you want to remove this guest from the table?', async () => {
-                                    const success = await removeGuests(tableId, [guestId]);
-                                    if (success) {
-                                      toast.success('Guest removed from table');
-                                      fetchTables();
-                                      fetchTableDetails(tableId);
-                                    } else {
-                                      toast.error('Failed to remove guest from table');
-                                    }
-                                  });
-                                }}
-                                disabled={removingGuests}
-                                className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                                title="Remove from table"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                              </button>
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-500 text-center py-4">No guests assigned to this banquet table yet</p>
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-            <div className="p-4 sm:p-6 border-t border-gray-100 flex gap-3">
-              <button
-                onClick={async () => {
-                  if (!selectedTable?._id) return;
-                  handleConfirm('Are you sure you want to delete this table?', async () => {
-                    const success = await deleteTable(selectedTable._id);
-                    if (success) {
-                      toast.success('Table deleted successfully');
-                      handleCloseTableModal();
-                      fetchTables();
-                    } else {
-                      toast.error('Failed to delete table');
-                    }
-                  });
-                }}
-                disabled={deletingTable}
-                className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors font-medium disabled:opacity-50 flex items-center gap-2"
-              >
-                {deletingTable ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-700"></div>
-                    Deleting...
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Delete
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-500 text-center py-4">No guests assigned to this banquet table yet</p>
+                      )}
+                    </div>
                   </>
                 )}
-              </button>
+              </div>
+              <div className="p-4 sm:p-6 border-t border-gray-100 flex gap-3">
+                <button
+                  onClick={async () => {
+                    if (!selectedTable?._id) return;
+                    handleConfirm('Are you sure you want to delete this table?', async () => {
+                      const success = await deleteTable(selectedTable._id);
+                      if (success) {
+                        toast.success('Table deleted successfully');
+                        handleCloseTableModal();
+                        fetchTables();
+                      } else {
+                        toast.error('Failed to delete table');
+                      }
+                    });
+                  }}
+                  disabled={deletingTable}
+                  className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors font-medium disabled:opacity-50 flex items-center gap-2"
+                >
+                  {deletingTable ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-700"></div>
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Delete
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* Assign Guest to Table Modal */}
-      {showAssignGuestModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden">
-            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100">
-              <div>
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
-                  Add Guests to Banquet Table
-                </h3>
-                <p className="text-sm text-gray-500">
-                  Select guests to assign
-                </p>
+      {
+        showAssignGuestModal && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden">
+              <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100">
+                <div>
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+                    Add Guests to Banquet Table
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    Select guests to assign
+                  </p>
+                </div>
+                <button
+                  onClick={handleCloseAssignGuestModal}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
-              <button
-                onClick={handleCloseAssignGuestModal}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
 
-            <div className="p-4 sm:p-6 overflow-y-auto max-h-[60vh]">
-              {unassignedLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
-                </div>
-              ) : unassignedGuests.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
+              <div className="p-4 sm:p-6 overflow-y-auto max-h-[60vh]">
+                {unassignedLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
                   </div>
-                  <p className="text-gray-600">No unassigned guests</p>
-                  <p className="text-sm text-gray-500">All guests are already assigned to banquet tables</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {/* Filters */}
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="relative flex-1">
-                      <input
-                        type="text"
-                        placeholder="Search by name..."
-                        value={unassignedSearchTerm}
-                        onChange={(e) => setUnassignedSearchTerm(e.target.value)}
-                        className="w-full px-4 py-2 pl-10 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      />
-                      <svg
-                        className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                ) : unassignedGuests.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
                     </div>
-
-                    <div className="flex items-center gap-2">
-                      <select
-                        value={unassignedCategoryFilter}
-                        onChange={(e) => setUnassignedCategoryFilter(e.target.value)}
-                        className="w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer"
-                      >
-                        <option value="all">All Categories</option>
-                        <option value="none">No Category</option>
-                        {unassignedCategories.map(cat => (
-                          <option key={cat} value={cat}>{cat}</option>
-                        ))}
-                      </select>
-                      <select
-                        value={unassignedGroupFilter}
-                        onChange={(e) => setUnassignedGroupFilter(e.target.value)}
-                        className="w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer"
-                      >
-                        <option value="all">All Groups</option>
-                        <option value="none">No Group</option>
-                        {unassignedGroups.map(group => (
-                          <option key={group} value={group}>{group}</option>
-                        ))}
-                      </select>
-                    </div>
+                    <p className="text-gray-600">No unassigned guests</p>
+                    <p className="text-sm text-gray-500">All guests are already assigned to banquet tables</p>
                   </div>
-
-                  {filteredUnassignedGuests.length === 0 ? (
-                    <p className="text-sm text-gray-500 text-center py-4">No guests match the selected group.</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {filteredUnassignedGuests.map((guest) => {
-                        const guestId = guest._id;
-                        if (!guestId) return null;
-                        return (
-                          <label
-                            key={guestId}
-                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${selectedGuestIds.includes(guestId)
-                              ? 'bg-purple-50 border-purple-200'
-                              : 'bg-white border-gray-200 hover:bg-gray-50'
-                              }`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedGuestIds.includes(guestId)}
-                              onChange={() => handleToggleGuestSelection(guestId)}
-                              className="w-4 h-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <p className="font-medium text-gray-800 truncate">{guest.guestName}</p>
-                                {guest.categoryName && (
-                                  <span className="text-[10px] px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded border border-indigo-100 whitespace-nowrap">
-                                    {guest.categoryName}
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-[11px] text-gray-500 truncate mt-0.5 flex items-center gap-1">
-                                {guest.groupName ? (
-                                  <>
-                                    <span>{guest.groupName}</span>
-                                    {guest.groupPriorityLevel && (
-                                      <span className="px-1 bg-gray-100 rounded text-gray-400 font-medium">(P{guest.groupPriorityLevel})</span>
-                                    )}
-                                  </>
-                                ) : (
-                                  <span className="italic">No Group</span>
-                                )}
-                              </p>
-                            </div>
-                            <span className="text-xs text-gray-500">
-                              {guest.numberOfGuests} guest{guest.numberOfGuests > 1 ? 's' : ''}
-                            </span>
-                          </label>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="p-4 sm:p-6 border-t border-gray-100 flex gap-3">
-              <button
-                onClick={handleCloseAssignGuestModal}
-                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAssignGuests}
-                disabled={selectedGuestIds.length === 0 || assigningGuests}
-                className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {assigningGuests ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Assigning...
-                  </>
                 ) : (
-                  `Assign ${selectedGuestIds.length} Guest${selectedGuestIds.length !== 1 ? 's' : ''}`
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                  <div className="space-y-4">
+                    {/* Filters */}
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <div className="relative flex-1">
+                        <input
+                          type="text"
+                          placeholder="Search by name..."
+                          value={unassignedSearchTerm}
+                          onChange={(e) => setUnassignedSearchTerm(e.target.value)}
+                          className="w-full px-4 py-2 pl-10 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        />
+                        <svg
+                          className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
 
-      {/* Confirmation Modal */}
-      {showConfirmModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div className="p-6">
-              <div className="flex items-center justify-center mb-4">
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                </div>
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={unassignedCategoryFilter}
+                          onChange={(e) => setUnassignedCategoryFilter(e.target.value)}
+                          className="w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer"
+                        >
+                          <option value="all">All Categories</option>
+                          <option value="none">No Category</option>
+                          {unassignedCategories.map(cat => (
+                            <option key={cat} value={cat}>{cat}</option>
+                          ))}
+                        </select>
+                        <select
+                          value={unassignedGroupFilter}
+                          onChange={(e) => setUnassignedGroupFilter(e.target.value)}
+                          className="w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer"
+                        >
+                          <option value="all">All Groups</option>
+                          <option value="none">No Group</option>
+                          {unassignedGroups.map(group => (
+                            <option key={group} value={group}>{group}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {filteredUnassignedGuests.length === 0 ? (
+                      <p className="text-sm text-gray-500 text-center py-4">No guests match the selected group.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {filteredUnassignedGuests.map((guest) => {
+                          const guestId = guest._id;
+                          if (!guestId) return null;
+                          return (
+                            <label
+                              key={guestId}
+                              className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${selectedGuestIds.includes(guestId)
+                                ? 'bg-purple-50 border-purple-200'
+                                : 'bg-white border-gray-200 hover:bg-gray-50'
+                                }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedGuestIds.includes(guestId)}
+                                onChange={() => handleToggleGuestSelection(guestId)}
+                                className="w-4 h-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <p className="font-medium text-gray-800 truncate">{guest.guestName}</p>
+                                  {guest.categoryName && (
+                                    <span className="text-[10px] px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded border border-indigo-100 whitespace-nowrap">
+                                      {guest.categoryName}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[11px] text-gray-500 truncate mt-0.5 flex items-center gap-1">
+                                  {guest.groupName ? (
+                                    <>
+                                      <span>{guest.groupName}</span>
+                                      {guest.groupPriorityLevel && (
+                                        <span className="px-1 bg-gray-100 rounded text-gray-400 font-medium">(P{guest.groupPriorityLevel})</span>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <span className="italic">No Group</span>
+                                  )}
+                                </p>
+                              </div>
+                              <span className="text-xs text-gray-500">
+                                {guest.numberOfGuests} guest{guest.numberOfGuests > 1 ? 's' : ''}
+                              </span>
+                            </label>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-              <p className="text-center text-gray-700 font-medium mb-6">{confirmMessage}</p>
-              <div className="flex gap-3">
+
+              <div className="p-4 sm:p-6 border-t border-gray-100 flex gap-3">
                 <button
-                  onClick={() => {
-                    setShowConfirmModal(false);
-                    setConfirmAction(null);
-                  }}
+                  onClick={handleCloseAssignGuestModal}
                   className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={() => {
-                    if (confirmAction) {
-                      confirmAction();
-                    }
-                    setShowConfirmModal(false);
-                    setConfirmAction(null);
-                  }}
-                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
+                  onClick={handleAssignGuests}
+                  disabled={selectedGuestIds.length === 0 || assigningGuests}
+                  className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Confirm
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Table Modal */}
-      {showEditTableModal && editingTable && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100">
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
-                Edit Banquet Table
-              </h3>
-              <button
-                onClick={handleCloseEditModal}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveEditTable} className="p-4 sm:p-6 space-y-4">
-              <div>
-                <label htmlFor="editTableName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Table Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="editTableName"
-                  value={editingTable.name}
-                  onChange={(e) => setEditingTable({ ...editingTable, name: e.target.value })}
-                  required
-                  placeholder="e.g., VIP Table"
-                  className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-              </div>
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <label htmlFor="editTableNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                    Table Number
-                  </label>
-                  <input
-                    type="number"
-                    id="editTableNumber"
-                    value={editingTable.number || ''}
-                    onChange={(e) => setEditingTable({ ...editingTable, number: e.target.value ? parseInt(e.target.value) : undefined })}
-                    min={1}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
-                <div className="flex-1">
-                  <label htmlFor="editTableCapacity" className="block text-sm font-medium text-gray-700 mb-1">
-                    Capacity <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    id="editTableCapacity"
-                    value={editingTable.capacity}
-                    onChange={(e) => setEditingTable({ ...editingTable, capacity: parseInt(e.target.value) || 1 })}
-                    required
-                    min={1}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-4 flex gap-3">
-                <button
-                  type="button"
-                  onClick={handleCloseEditModal}
-                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium border border-gray-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={updatingTable}
-                  className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {updatingTable ? (
+                  {assigningGuests ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Saving...
+                      Assigning...
                     </>
                   ) : (
-                    'Save Changes'
+                    `Assign ${selectedGuestIds.length} Guest${selectedGuestIds.length !== 1 ? 's' : ''}`
                   )}
                 </button>
               </div>
-            </form>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-    </div>
+      {/* Confirmation Modal */}
+      {
+        showConfirmModal && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+              <div className="p-6">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                </div>
+                <p className="text-center text-gray-700 font-medium mb-6">{confirmMessage}</p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setShowConfirmModal(false);
+                      setConfirmAction(null);
+                    }}
+                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (confirmAction) {
+                        confirmAction();
+                      }
+                      setShowConfirmModal(false);
+                      setConfirmAction(null);
+                    }}
+                    className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+
+      {/* Edit Table Modal */}
+      {
+        showEditTableModal && editingTable && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+              <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+                  Edit Banquet Table
+                </h3>
+                <button
+                  onClick={handleCloseEditModal}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveEditTable} className="p-4 sm:p-6 space-y-4">
+                <div>
+                  <label htmlFor="editTableName" className="block text-sm font-medium text-gray-700 mb-1">
+                    Table Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="editTableName"
+                    value={editingTable.name}
+                    onChange={(e) => setEditingTable({ ...editingTable, name: e.target.value })}
+                    required
+                    placeholder="e.g., VIP Table"
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label htmlFor="editTableNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                      Table Number
+                    </label>
+                    <input
+                      type="number"
+                      id="editTableNumber"
+                      value={editingTable.number || ''}
+                      onChange={(e) => setEditingTable({ ...editingTable, number: e.target.value ? parseInt(e.target.value) : undefined })}
+                      min={1}
+                      className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label htmlFor="editTableCapacity" className="block text-sm font-medium text-gray-700 mb-1">
+                      Capacity <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      id="editTableCapacity"
+                      value={editingTable.capacity}
+                      onChange={(e) => setEditingTable({ ...editingTable, capacity: parseInt(e.target.value) || 1 })}
+                      required
+                      min={1}
+                      className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-4 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={handleCloseEditModal}
+                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium border border-gray-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={updatingTable}
+                    className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {updatingTable ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      'Save Changes'
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )
+      }
+
+    </div >
   );
 }

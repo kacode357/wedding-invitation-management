@@ -626,3 +626,27 @@ exports.findByIdAndGetTable = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Get public guest info by invitationId (no auth required)
+ */
+exports.getPublicGuestByInvitationId = async (req, res, next) => {
+  try {
+    const { invitationId } = req.params;
+    const lang = req.headers["accept-language"] || "en";
+
+    const guest = await guestService.findByInvitationId(invitationId, lang);
+
+    // Return only safely exposed info
+    const publicData = {
+      _id: guest._id,
+      guestName: guest.guestName,
+      numberOfGuests: guest.numberOfGuests,
+      invitationId: guest.invitationId
+    };
+
+    sendSuccess(res, publicData, 200, "Guest found successfully");
+  } catch (error) {
+    next(error);
+  }
+};

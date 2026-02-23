@@ -67,4 +67,9 @@ export const guestService = {
     const response = await api.put<GuestResponse>(`/guests/${id}/invitation/create`);
     return response.data;
   },
+
+  async getPublicGuestByInvitationId(invitationId: string): Promise<GuestResponse> {
+    const response = await api.get<GuestResponse>(`/guests/public/invitation/${invitationId}`);
+    return response.data;
+  },
 };

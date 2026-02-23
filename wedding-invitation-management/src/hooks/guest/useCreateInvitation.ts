@@ -20,7 +20,8 @@ export function useCreateInvitation(): UseCreateInvitationReturn {
             const response = await guestService.createInvitation(id);
 
             if (response.success) {
-                return { success: true, guest: response.guest };
+                const guest = response.data?.guest || response.guest;
+                return { success: true, guest };
             } else {
                 setError(response.message || 'Failed to create e-invitation');
                 return { success: false };

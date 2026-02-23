@@ -117,6 +117,25 @@ class GuestService {
   }
 
   /**
+   * Find guest by invitation ID
+   */
+  async findByInvitationId(invitationId, lang = "en") {
+    const messages = getMessages(lang);
+
+    if (!invitationId) {
+      throw new AppError("Invitation ID is required", 400);
+    }
+
+    const guest = await Guest.findOne({ invitationId });
+
+    if (!guest) {
+      throw new AppError(messages.COMMON.NOT_FOUND || "Guest not found", 404);
+    }
+
+    return guest;
+  }
+
+  /**
    * Get guests by category
    */
   async findByCategory(categoryId, lang = "en") {

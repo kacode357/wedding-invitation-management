@@ -6,6 +6,9 @@ const auth = require("../middleware/auth");
 const authorizeRoles = require("../middleware/authorizeRoles");
 const { USER_ROLES } = require("../constants/enums/user.enum");
 
+// Public routes (no auth required)
+router.get("/public/invitation/:invitationId", guestController.getPublicGuestByInvitationId);
+
 // All routes require authentication and admin role
 router.use(auth);
 router.use(authorizeRoles(USER_ROLES.ADMIN));
