@@ -171,6 +171,7 @@ createRoot(document.getElementById('root')!).render(
         {/* Public routes - no auth required */}
         <Route path="/location" element={<LocationPage />} />
         <Route path="/invitation" element={<InvitationPage />} />
+        <Route path="/invite/:invitationId" element={<InvitationPage />} />
       </Routes>
     </BrowserRouter>
   )

@@ -1,6 +1,7 @@
 // Guest Service - Business Logic Layer
 const Guest = require("../models/guest.model");
 const Table = require("../models/table.model");
+const crypto = require("crypto");
 const { AppError } = require("../utils/appError");
 const { getMessages } = require("../responses");
 const {
@@ -57,7 +58,9 @@ class GuestService {
       categoryId: guestData.categoryId || null,
       numberOfGuests: guestData.numberOfGuests || 1,
       confirmedGuests: guestData.confirmedGuests ?? guestData.numberOfGuests ?? 1,
-      invitationSent: guestData.invitationSent || false
+      invitationSent: guestData.invitationSent || false,
+      isInvitationCreated: guestData.isInvitationCreated || false,
+      invitationId: guestData.invitationId || crypto.randomBytes(4).toString('hex')
     };
 
     // If tableId is provided and is a valid ObjectId, validate table and capacity
@@ -442,6 +445,30 @@ class GuestService {
     }
 
     const updatedGuest = await Guest.updateById(id, { invitationSent: false });
+    return updatedGuest;
+  }
+
+  /**
+   * Create an e-invitation for a guest
+   */
+  async createInvitation(id, lang = "en") {
+    const messages = getMessages(lang);
+
+    const guest = await Guest.findById(id);
+    if (!guest) {
+      throw new AppError(messages.COMMON.NOT_FOUND, 404);
+    }
+
+    const updateData = {
+      isInvitationCreated: true
+    };
+
+    // Fallback if invitationId wasn't created initially
+    if (!guest.invitationId) {
+      updateData.invitationId = crypto.randomBytes(4).toString('hex');
+    }
+
+    const updatedGuest = await Guest.updateById(id, updateData);
     return updatedGuest;
   }
 

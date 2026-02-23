@@ -26,6 +26,8 @@ export interface Guest {
   noteId?: string | null;
   noteName?: string | null;
   invitationSent?: boolean;
+  isInvitationCreated?: boolean;
+  invitationId?: string;
   isArrived?: boolean;
   arrivedAt?: string | null;
   createdAt?: string;

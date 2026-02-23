@@ -21,6 +21,8 @@ const COLLECTION_NAME = "guests";
  *         numberOfGuests: { type: number, minimum: 1, maximum: 10, description: "Total number of guests invited" }
  *         confirmedGuests: { type: number, minimum: 0, description: "Number of guests confirmed to attend (can be less than numberOfGuests)" }
  *         invitationSent: { type: boolean }
+ *         isInvitationCreated: { type: boolean, description: "Whether the e-invitation link has been generated" }
+ *         invitationId: { type: string, description: "Unique short ID for the e-invitation link" }
  *         tableId: { type: string }
  *         noteId: { type: string, description: "Note _id reference" }
  *         groupId: { type: string, description: "Group _id reference (optional)" }
@@ -47,6 +49,9 @@ async function create(data) {
   }
   if (data.invitationSent === undefined || data.invitationSent === null) {
     data.invitationSent = false;
+  }
+  if (data.isInvitationCreated === undefined || data.isInvitationCreated === null) {
+    data.isInvitationCreated = false;
   }
   if (!data.tableId) {
     data.tableId = null;

@@ -1,0 +1,844 @@
+{
+    "title": "Audio 9 Part 1",
+    "type": "gap_fill_exercise",
+    "dialogue": [
+        {
+            "id": 1,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Where have you been, Nadia?"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "blank",
+                    "id": "audio9_q1"
+                },
+                {
+                    "type": "text",
+                    "value": "."
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "What took you so long? You said you were only going "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q2"
+                },
+                {
+                    "type": "text",
+                    "value": "."
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "I was only gone "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q3"
+                },
+                {
+                    "type": "text",
+                    "value": "."
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Well, it seemed much longer than that. Did you buy anything?"
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "blank",
+                    "id": "audio9_q4"
+                },
+                {
+                    "type": "text",
+                    "value": " get the latest novel by Dan Brown but it's quite heavy and I'd have to "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q5"
+                },
+                {
+                    "type": "text",
+                    "value": ". If I could have found a crossword puzzle book, "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q6"
+                },
+                {
+                    "type": "text",
+                    "value": "; but in the end "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q7"
+                },
+                {
+                    "type": "text",
+                    "value": " a front-page article in today's issue of the New York Times."
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Is that "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q8"
+                },
+                {
+                    "type": "text",
+                    "value": "?"
+                }
+            ]
+        },
+        {
+            "id": 8,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Yes. Look, "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q9"
+                },
+                {
+                    "type": "text",
+                    "value": " while I catch up on the news and then we can swap."
+                }
+            ]
+        },
+        {
+            "id": 9,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "I'd rather "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q10"
+                },
+                {
+                    "type": "text",
+                    "value": "."
+                }
+            ]
+        },
+        {
+            "id": 10,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Are you looking for anything in particular?"
+                }
+            ]
+        },
+        {
+            "id": 11,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "I just thought "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q11"
+                },
+                {
+                    "type": "text",
+                    "value": " in there of that new play that opened on Broadway yesterday."
+                }
+            ]
+        },
+        {
+            "id": 12,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "The drama "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q12"
+                },
+                {
+                    "type": "text",
+                    "value": "?"
+                }
+            ]
+        },
+        {
+            "id": 13,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Oh, I'd forgotten about that, mmm, "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q13"
+                },
+                {
+                    "type": "text",
+                    "value": " actually I was thinking of the new comedy... the one about... "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q14"
+                },
+                {
+                    "type": "text",
+                    "value": "."
+                }
+            ]
+        },
+        {
+            "id": 14,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Doctor Hunter."
+                }
+            ]
+        },
+        {
+            "id": 15,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "That's the one."
+                }
+            ]
+        },
+        {
+            "id": 16,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Well, when I was in the bookshop "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q15"
+                },
+                {
+                    "type": "text",
+                    "value": " and they said it was fantastic "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q16"
+                },
+                {
+                    "type": "text",
+                    "value": " They especially liked the actor who played the main part- "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q17"
+                },
+                {
+                    "type": "text",
+                    "value": ", apparently."
+                }
+            ]
+        },
+        {
+            "id": 17,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Lots of fun, then?"
+                }
+            ]
+        },
+        {
+            "id": 18,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Well, according to those two they thought "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q18"
+                },
+                {
+                    "type": "text",
+                    "value": "."
+                }
+            ]
+        },
+        {
+            "id": 19,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Ooh, we'll have to "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q19"
+                },
+                {
+                    "type": "text",
+                    "value": " seeing it when we get back."
+                }
+            ]
+        },
+        {
+            "id": 20,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Definitely."
+                }
+            ]
+        },
+        {
+            "id": 21,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "blank",
+                    "id": "audio9_q20"
+                },
+                {
+                    "type": "text",
+                    "value": " and I'm hungry. Do you fancy a coffee and a muffin?"
+                }
+            ]
+        },
+        {
+            "id": 22,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "blank",
+                    "id": "audio9_q21"
+                },
+                {
+                    "type": "text",
+                    "value": "."
+                }
+            ]
+        },
+        {
+            "id": 23,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "And how will you have your coffee today? "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q22"
+                },
+                {
+                    "type": "text",
+                    "value": "?"
+                }
+            ]
+        },
+        {
+            "id": 24,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "I think I might have "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q23"
+                },
+                {
+                    "type": "text",
+                    "value": "."
+                }
+            ]
+        },
+        {
+            "id": 25,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "What? You don't mean a flat white or "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q24"
+                },
+                {
+                    "type": "text",
+                    "value": "?"
+                }
+            ]
+        },
+        {
+            "id": 26,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Oh, I don't know, I want something to perk me up. An espresso? Short and black with sugar?"
+                }
+            ]
+        },
+        {
+            "id": 27,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Perfect!"
+                }
+            ]
+        },
+        {
+            "id": 28,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Will that be with a chocolate muffin or a berry muffin?"
+                }
+            ]
+        },
+        {
+            "id": 29,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "blank",
+                    "id": "audio9_q25"
+                },
+                {
+                    "type": "text",
+                    "value": "-the berry sounds healthier."
+                }
+            ]
+        },
+        {
+            "id": 30,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "And I'll have a plain one with butter. "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q26"
+                }
+            ]
+        },
+        {
+            "id": 31,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Here you are. "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q27"
+                },
+                {
+                    "type": "text",
+                    "value": ", it's really hot."
+                }
+            ]
+        },
+        {
+            "id": 32,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Thank you. I'm really ready for this."
+                }
+            ]
+        },
+        {
+            "id": 33,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Have you thought about what "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q28"
+                },
+                {
+                    "type": "text",
+                    "value": " when we get to London?"
+                }
+            ]
+        },
+        {
+            "id": 34,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "The Tower, of course. I've always "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q29"
+                },
+                {
+                    "type": "text",
+                    "value": " the Crown Jewels. That is where they keep the jewels, isn't it?"
+                }
+            ]
+        },
+        {
+            "id": 35,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "I think so. And, what about the Wheel? I hear "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q30"
+                }
+            ]
+        },
+        {
+            "id": 36,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "I'm not that keen on the wheel. "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q31"
+                }
+            ]
+        },
+        {
+            "id": 37,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "No way."
+                }
+            ]
+        },
+        {
+            "id": 38,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Well, let's leave it out of the itinerary then."
+                }
+            ]
+        },
+        {
+            "id": 39,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Okay. So, do we do the Tower first?"
+                }
+            ]
+        },
+        {
+            "id": 40,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Yes, that's the idea. And then we absolutely have to go to Westminster."
+                }
+            ]
+        },
+        {
+            "id": 41,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Really?"
+                }
+            ]
+        },
+        {
+            "id": 42,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Yes. Look, it's not going to "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q32"
+                },
+                {
+                    "type": "text",
+                    "value": " and I promised my sister I'd take photos there."
+                }
+            ]
+        },
+        {
+            "id": 43,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Well, "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q33"
+                }
+            ]
+        },
+        {
+            "id": 44,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "I do. Oh, "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q34"
+                },
+                {
+                    "type": "text",
+                    "value": " the British Museum is free to the public? "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q35"
+                },
+                {
+                    "type": "text",
+                    "value": "?"
+                }
+            ]
+        },
+        {
+            "id": 45,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Well, I did know that but I was hoping we wouldn't have to "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q36"
+                },
+                {
+                    "type": "text",
+                    "value": "-we've only got three days in all and "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q37"
+                },
+                {
+                    "type": "text",
+                    "value": " to go through the museum."
+                }
+            ]
+        },
+        {
+            "id": 46,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Well, let's say "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q38"
+                },
+                {
+                    "type": "text",
+                    "value": " and see how you feel then?"
+                }
+            ]
+        },
+        {
+            "id": 47,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Okay, I can't argue with that."
+                }
+            ]
+        },
+        {
+            "id": 48,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "And Buckingham Palace?"
+                }
+            ]
+        },
+        {
+            "id": 49,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "I suppose "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q39"
+                },
+                {
+                    "type": "text",
+                    "value": " that as well, have you?"
+                }
+            ]
+        },
+        {
+            "id": 50,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Well, no, not really, but we can't say "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q40"
+                },
+                {
+                    "type": "text",
+                    "value": " and haven't seen the Queen's palace!"
+                }
+            ]
+        },
+        {
+            "id": 51,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "I guess not and "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q41"
+                },
+                {
+                    "type": "text",
+                    "value": " that it won't cost anything as well."
+                }
+            ]
+        },
+        {
+            "id": 52,
+            "speaker": "NADIA",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Oh, Thomas. "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q42"
+                },
+                {
+                    "type": "text",
+                    "value": " I'm afraid of spending money; "
+                },
+                {
+                    "type": "blank",
+                    "id": "audio9_q43"
+                },
+                {
+                    "type": "text",
+                    "value": " I want to see all the traditional sights first."
+                }
+            ]
+        },
+        {
+            "id": 53,
+            "speaker": "THOMAS",
+            "text": [
+                {
+                    "type": "text",
+                    "value": "Good. I'm glad that's sorted. Listen, I think they just called our flight."
+                }
+            ]
+        }
+    ]
+}

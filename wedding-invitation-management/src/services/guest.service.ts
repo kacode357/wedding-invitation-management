@@ -62,4 +62,9 @@ export const guestService = {
     const response = await api.get<GuestSearchTableResponse>(`/guests/search/table?guestId=${guestId}`);
     return response.data;
   },
+
+  async createInvitation(id: string | number): Promise<GuestResponse> {
+    const response = await api.put<GuestResponse>(`/guests/${id}/invitation/create`);
+    return response.data;
+  },
 };

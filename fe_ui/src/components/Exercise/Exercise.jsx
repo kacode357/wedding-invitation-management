@@ -14,6 +14,10 @@ import audio4Questions from '../../data/audio4/audio_4_questions.json'
 import audio4Answers from '../../data/audio4/audio_4_answers.json'
 import audio5Questions from '../../data/audio5/audio_5_questions.json'
 import audio5Answers from '../../data/audio5/audio_5_answers.json'
+import audio9Questions from '../../data/audio9/audio_9_questions.json'
+import audio9Answers from '../../data/audio9/audio_9_answers.json'
+import audio13Questions from '../../data/audio13/audio_13_questions.json'
+import audio13Answers from '../../data/audio13/audio_13_answers.json'
 
 import ExerciseHeaderDesktop from './ExerciseHeaderDesktop'
 import ExerciseHeaderMobile from './ExerciseHeaderMobile'
@@ -29,7 +33,9 @@ const audioData = {
   audio2: { questions: audio2Questions, answers: audio2Answers, file: '/Audio 2.mp3', title: 'Audio 2' },
   audio3: { questions: audio3Questions, answers: audio3Answers, file: '/Audio 3.mp3', title: 'Audio 3' },
   audio4: { questions: audio4Questions, answers: audio4Answers, file: '/Audio 4.mp3', title: 'Audio 4' },
-  audio5: { questions: audio5Questions, answers: audio5Answers, file: '/Audio 5.mp3', title: 'Audio 5' }
+  audio5: { questions: audio5Questions, answers: audio5Answers, file: '/Audio 5.mp3', title: 'Audio 5' },
+  audio9: { questions: audio9Questions, answers: audio9Answers, file: '/Audio 9.mp3', title: 'Audio 9' },
+  audio13: { questions: audio13Questions, answers: audio13Answers, file: '/Audio 13.mp3', title: 'Audio 13' }
 }
 
 // Submit Button Component
@@ -223,9 +229,19 @@ function Exercise() {
     }
   }
 
+  // Helper to normalize text by ignoring punctuation
+  const normalizeText = (text) => {
+    if (!text) return '';
+    return text.toString().toLowerCase()
+      .replace(/[-/]/g, ' ')
+      .replace(/[.,!?;:()[\]{}"]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
   const handleCheck = (id) => {
-    const val = userAnswers[id]?.trim().toLowerCase()
-    const ans = answers[id]?.toLowerCase()
+    const val = normalizeText(userAnswers[id])
+    const ans = normalizeText(answers[id])
     const newResult = val === ans ? 'correct' : 'wrong'
 
     setCheckResults(prev => {
@@ -259,8 +275,8 @@ function Exercise() {
     setIsSubmitted(true)
     setConfirmModalOpen(false)
     allBlanks.forEach(q => {
-      const val = userAnswers[q.id]?.trim().toLowerCase()
-      const ans = answers[q.id]?.toLowerCase()
+      const val = normalizeText(userAnswers[q.id])
+      const ans = normalizeText(answers[q.id])
       if (val === ans) {
         setCheckResults(prev => ({ ...prev, [q.id]: 'correct' }))
       } else {

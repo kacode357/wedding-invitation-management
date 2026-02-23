@@ -93,16 +93,18 @@ export default function InvitationPage() {
                                 </div>
 
 
-                                {/* Nhà Gái / Nhà Trai — chỉ tên */}
+                                {/* Nhà Gái / Nhà Trai */}
                                 <div style={{ display: 'flex', gap: 6, paddingBottom: 10, borderBottom: `1px dashed ${PRIMARY}20`, marginBottom: 12, fontSize: 8.5, textAlign: 'center' }}>
                                     <div style={{ flex: 1 }}>
                                         <p style={{ fontSize: 7.5, color: '#bbb', letterSpacing: '0.1em', marginBottom: 3 }}>NHÀ GÁI</p>
-                                        <p style={{ fontWeight: 700, color: '#444', fontSize: 9, lineHeight: 1.6 }}>NGUYỄN VĂN A<br />NGUYỄN THỊ B</p>
+                                        <p style={{ fontWeight: 700, color: '#444', fontSize: 9, lineHeight: 1.6 }}>Ông Lưu Hoài Phương<br />Bà Lê Ngọc Điệp</p>
+                                        <p style={{ fontSize: 7.5, color: '#888', marginTop: 2 }}>Quận 11, TP.HCM</p>
                                     </div>
                                     <div style={{ width: 1, background: `${PRIMARY}15`, margin: '0 4px' }} />
                                     <div style={{ flex: 1 }}>
                                         <p style={{ fontSize: 7.5, color: '#bbb', letterSpacing: '0.1em', marginBottom: 3 }}>NHÀ TRAI</p>
-                                        <p style={{ fontWeight: 700, color: '#444', fontSize: 9, lineHeight: 1.6 }}>TRẦN VĂN C<br />TRẦN THỊ D</p>
+                                        <p style={{ fontWeight: 700, color: '#444', fontSize: 9, lineHeight: 1.6 }}>Ông Vũ Mạnh Hùng<br />Bà Nguyễn Thị Tám</p>
+                                        <p style={{ fontSize: 7.5, color: '#888', marginTop: 2 }}>Hoàng Mai, Hà Nội</p>
                                     </div>
                                 </div>
 
@@ -114,9 +116,11 @@ export default function InvitationPage() {
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 10 }}>
                                         <div style={{ flex: 1, height: '0.5px', background: `${PRIMARY}20` }} /><span style={{ color: GOLD, fontSize: 9 }}>✦</span><div style={{ flex: 1, height: '0.5px', background: `${PRIMARY}20` }} />
                                     </div>
-                                    <p style={{ fontFamily: "'Great Vibes',cursive", fontSize: 'clamp(18px,4vw,25px)', color: PRIMARY, lineHeight: 1.2, marginBottom: 4 }}>Lưu Hoài Hồng Ngọc</p>
+                                    <p style={{ fontFamily: "'Great Vibes',cursive", fontSize: 'clamp(18px,4vw,25px)', color: PRIMARY, lineHeight: 1.2, marginBottom: 0 }}>Hồng Ngọc</p>
+                                    <p style={{ fontSize: 9, color: '#888', marginBottom: 4, fontStyle: 'italic' }}>(Trưởng nữ)</p>
                                     <p style={{ fontFamily: "'Great Vibes',cursive", fontSize: 32, color: GOLD, lineHeight: 1, marginBottom: 4 }}>&amp;</p>
-                                    <p style={{ fontFamily: "'Great Vibes',cursive", fontSize: 'clamp(18px,4vw,25px)', color: PRIMARY, lineHeight: 1.2, marginBottom: 12 }}>Vũ Hoàng Sơn</p>
+                                    <p style={{ fontFamily: "'Great Vibes',cursive", fontSize: 'clamp(18px,4vw,25px)', color: PRIMARY, lineHeight: 1.2, marginBottom: 0 }}>Hoàng Sơn</p>
+                                    <p style={{ fontSize: 9, color: '#888', marginBottom: 12, fontStyle: 'italic' }}>(Trưởng nam)</p>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                                         <div style={{ flex: 1, height: '0.5px', background: `${PRIMARY}20` }} /><span style={{ color: GOLD, fontSize: 9 }}>❧</span><div style={{ flex: 1, height: '0.5px', background: `${PRIMARY}20` }} />
                                     </div>
@@ -129,11 +133,10 @@ export default function InvitationPage() {
                                     ĐẾN DỰ BUỔI TIỆC RƯỢU CHUNG VUI<br />CÙNG GIA ĐÌNH CHÚNG TÔI TẠI:
                                 </p>
 
-                                <p style={{ fontFamily: "'Great Vibes',cursive", fontSize: 26, color: PRIMARY, lineHeight: 1.1, marginBottom: 8 }}>Tư Gia</p>
+                                <p style={{ fontFamily: "'Great Vibes',cursive", fontSize: 26, color: PRIMARY, lineHeight: 1.1, marginBottom: 8 }}>Tư Gia Nhà Gái</p>
 
-                                <p style={{ fontSize: 9, fontWeight: 800, color: '#333', letterSpacing: '0.04em', marginBottom: 3 }}>HHW5+29J CẦN ĐƯỚC, LONG AN</p>
-                                <p style={{ fontSize: 8, color: '#aaa', marginBottom: 3 }}>H. Cần Đước — T. Long An</p>
-                                <p style={{ fontSize: 8, color: '#aaa', marginBottom: 14 }}>Đối diện VLXD Năm Hạnh — ĐT 835D</p>
+                                <p style={{ fontSize: 9, fontWeight: 800, color: '#333', letterSpacing: '0.04em', marginBottom: 3 }}>Xã Phước Vân, huyện Cần Đước, tỉnh Long An</p>
+                                <p style={{ fontSize: 8, color: '#aaa', marginBottom: 14 }}>(nay là xã Long Cang, tỉnh Tây Ninh)</p>
 
                                 {/* Time slots — elegant */}
                                 <div style={{ marginBottom: 14 }}>

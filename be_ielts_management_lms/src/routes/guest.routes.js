@@ -26,6 +26,7 @@ router.delete("/:id", guestController.delete);
 
 // Invitation status
 router.put("/:id/invitation/sent", guestController.markInvitationSent);
+router.put("/:id/invitation/create", guestController.createInvitation);
 
 // Arrival/Check-in status
 router.put("/:id/arrived", guestController.checkIn);

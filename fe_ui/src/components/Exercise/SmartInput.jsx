@@ -19,13 +19,17 @@ function isPrefixMatch(userWord, answerWord) {
   // Check if user word is a prefix of answer word (case-insensitive)
   if (answerLower.startsWith(userLower)) {
     const missingPart = answerWord.slice(userWord.length)
-    return { isMatch: true, missingPart, matchedPart: userWord, extraPart: '', exact: false }
+    if (missingPart.length <= 2 || userLower.length >= 3) {
+      return { isMatch: true, missingPart, matchedPart: userWord, extraPart: '', exact: false }
+    }
   }
 
   // Check if answer word is a prefix of user word (user typed extra characters)
   if (userLower.startsWith(answerLower)) {
     const extraPart = userWord.slice(answerWord.length)
-    return { isMatch: true, missingPart: '', matchedPart: answerWord, extraPart, exact: false }
+    if (extraPart.length <= 2 || answerLower.length >= 4) {
+      return { isMatch: true, missingPart: '', matchedPart: answerWord, extraPart, exact: false }
+    }
   }
 
   return { isMatch: false, missingPart: '', matchedPart: '', extraPart: '', exact: false }

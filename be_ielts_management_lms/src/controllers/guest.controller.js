@@ -463,6 +463,53 @@ exports.markInvitationSent = async (req, res, next) => {
 
 /**
  * @swagger
+ * /api/guests/{id}/invitation/create:
+ *   put:
+ *     tags: [Guests]
+ *     summary: Create an e-invitation for a guest
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: E-invitation created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 message: { type: string }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     guest:
+ *                       type: object
+ *                       properties:
+ *                         _id: { type: string }
+ *                         isInvitationCreated: { type: boolean }
+ *                         invitationId: { type: string }
+ */
+exports.createInvitation = async (req, res, next) => {
+  try {
+    const lang = req.headers["accept-language"] || "en";
+    const messages = getMessages(lang);
+
+    const { id } = req.params;
+    const guest = await guestService.createInvitation(id, lang);
+
+    sendSuccess(res, { guest }, 200, messages.COMMON.UPDATE_SUCCESS);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @swagger
  * /api/guests/arrived:
  *   get:
  *     tags: [Guests]

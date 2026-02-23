@@ -8,6 +8,7 @@ import { useDeleteGuest } from '../hooks/guest/useDeleteGuest';
 import { useCategories } from '../hooks/category/useCategories';
 import { useNotes } from '../hooks/note/useNotes';
 import { useGroups } from '../hooks/group/useGroups';
+import { useCreateInvitation } from '../hooks/guest/useCreateInvitation';
 import type { Guest } from '../types/guest/guest.response';
 import type { UpdateGuestPayload } from '../types/guest/guest.payload';
 
@@ -20,6 +21,7 @@ export default function GuestsPage() {
   const { categories, fetchCategories } = useCategories();
   const { notes, fetchNotes } = useNotes();
   const { groups, fetchGroups } = useGroups();
+  const { createInvitation, isLoading: isCreatingInvitation } = useCreateInvitation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -40,6 +42,10 @@ export default function GuestsPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingGuestId, setDeletingGuestId] = useState<string | number | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Invitation Link state
+  const [isInviteLinkModalOpen, setIsInviteLinkModalOpen] = useState(false);
+  const [generatedInviteLink, setGeneratedInviteLink] = useState('');
 
   // Extract unique options from guests
   const guestCategories = ['all', ...new Set(guests.map(guest => guest.categoryName).filter(Boolean))];
@@ -166,6 +172,26 @@ export default function GuestsPage() {
     setIsDeleteModalOpen(false);
     setDeletingGuestId(null);
     setDeleteError(null);
+  };
+
+  const handleCreateInvitation = async (guest: Guest) => {
+    const guestId = guest._id || guest.id;
+    if (!guestId) return;
+
+    const result = await createInvitation(guestId);
+    if (result.success && result.guest?.invitationId) {
+      const inviteLink = `${window.location.origin}/invite/${result.guest.invitationId}`;
+      setGeneratedInviteLink(inviteLink);
+      setIsInviteLinkModalOpen(true);
+      fetchGuests(); // Refresh list to update status
+    } else {
+      toast.error('Failed to create invitation');
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Invitation link copied to clipboard!');
   };
 
   return (
@@ -427,6 +453,16 @@ export default function GuestsPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <div className="flex items-center gap-2">
                         <button
+                          onClick={() => handleCreateInvitation(guest)}
+                          className={`p-1.5 rounded-lg transition-colors ${guest.isInvitationCreated ? 'text-green-600 hover:bg-green-50' : 'text-rose-600 hover:bg-rose-50'}`}
+                          title={guest.isInvitationCreated ? "Regenerate/View Link" : "Create Invitation"}
+                          disabled={isCreatingInvitation}
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                        </button>
+                        <button
                           onClick={() => handleEditClick(guest)}
                           className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                           title="Edit guest"
@@ -501,6 +537,16 @@ export default function GuestsPage() {
                 </div>
                 {/* Mobile Action Buttons */}
                 <div className="mt-3 pt-3 border-t border-gray-100 flex gap-2">
+                  <button
+                    onClick={() => handleCreateInvitation(guest)}
+                    className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1.5 ${guest.isInvitationCreated ? 'bg-green-50 text-green-600 hover:bg-green-100' : 'bg-rose-50 text-rose-600 hover:bg-rose-100'}`}
+                    disabled={isCreatingInvitation}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    {guest.isInvitationCreated ? 'Link' : 'Invite'}
+                  </button>
                   <button
                     onClick={() => handleEditClick(guest)}
                     className="flex-1 py-2 px-3 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors flex items-center justify-center gap-1.5"
@@ -935,6 +981,63 @@ export default function GuestsPage() {
                 ) : (
                   'Delete'
                 )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Invitation Link Modal */}
+      {isInviteLinkModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsInviteLinkModalOpen(false)}></div>
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">E-Invitation Link</h3>
+              <button
+                onClick={() => setIsInviteLinkModalOpen(false)}
+                className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-600 mb-4">
+              The invitation link has been generated. You can share this link with your guest.
+            </p>
+
+            <div className="flex gap-2 p-3 bg-gray-50 border border-gray-200 rounded-xl mb-6">
+              <input
+                type="text"
+                readOnly
+                value={generatedInviteLink}
+                className="flex-1 bg-transparent border-none text-sm text-gray-800 focus:ring-0"
+              />
+              <button
+                onClick={() => copyToClipboard(generatedInviteLink)}
+                className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                title="Copy to clipboard"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => window.open(generatedInviteLink, '_blank')}
+                className="flex-1 py-2.5 px-4 bg-rose-500 text-white font-semibold rounded-xl hover:bg-rose-600 transition-colors flex items-center justify-center gap-2"
+              >
+                Preview Invitation
+              </button>
+              <button
+                onClick={() => setIsInviteLinkModalOpen(false)}
+                className="flex-1 py-2.5 px-4 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                Close
               </button>
             </div>
           </div>
