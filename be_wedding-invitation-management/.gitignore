@@ -1,18 +1,45 @@
+# Dependencies
 node_modules/
-.env
-.DS_Store
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-dist/
-build/
-coverage/
+
+# Environment files - NEVER commit secrets
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-.cache/
+
+# Logs & temp
+*.log
+logs/
 temp/
 tmp/
+.cache/
+
+# Build output
+dist/
+build/
+coverage/
+
+# Test files
+*.test.js
+*.spec.js
+__tests__/
+tests/
