@@ -1,0 +1,74 @@
+# ============================================
+# Docker Compose - VPS Hostinger Deployment
+# ============================================
+# Hướng dẫn:
+# 1. Clone repo: git clone https://github.com/kacode357/wedding-invitation-management
+# 2. Tạo .env.production từ .env.example
+# 3. Chạy: docker compose up -d
+#
+# Lưu ý:
+# - MongoDB chạy trong container, dữ liệu persist trong volume mongo_data
+# - Source code được mount trực tiếp vào /app (không cần copy vào image)
+# - node_modules được giữ riêng trong container (tránh conflict OS)
+# ============================================
+
+services:
+  # -------------------------------
+  # MongoDB Database
+  # -------------------------------
+  mongodb:
+    image: mongo:7
+    container_name: wedding_mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-wedding_user}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-wedding_password}
+      MONGO_INITDB_DATABASE: wedding_invitation_management
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - wedding_network
+    expose:
+      - "27017"
+
+  # -------------------------------
+  # Wedding Invitation API
+  # -------------------------------
+  app:
+    image: node:20-alpine
+    container_name: wedding_api
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: sh -c "npm ci --omit=dev && node src/server.js"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      MONGODB_URI: mongodb://${MONGO_USER:-wedding_user}:${MONGO_PASSWORD:-wedding_password}@mongodb:27017/wedding_invitation_management?authSource=admin
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      API_URL: ${API_URL}
+      SWAGGER_UI_ENABLED: ${SWAGGER_UI_ENABLED:-true}
+    ports:
+      - "3000:3000"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - wedding_network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+networks:
+  wedding_network:
+    driver: bridge
+
+volumes:
+  mongo_data:
+    driver: local
