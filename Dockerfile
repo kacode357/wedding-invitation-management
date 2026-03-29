@@ -20,10 +20,6 @@ COPY . .
 # ============================================
 FROM node:20-alpine AS production
 
-# Create non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1000
-
 WORKDIR /app
 
 # Copy package files
@@ -33,18 +29,15 @@ COPY package*.json ./
 RUN npm ci --omit=dev --ignore-scripts && \
     npm cache clean --force
 
-# Copy built/bundled source (from builder stage)
+# Copy source code (from builder stage)
 COPY --from=builder /build/src ./src
 COPY --from=builder /build/config ./config
 
-# Copy env file template (actual values come from docker-compose environment)
-# DO NOT copy .env files - use docker-compose environment variables
-
-# Set ownership to non-root user
-RUN chown -R nodejs:nodejs /app
+# Set ownership to node user (default non-root user in node:20-alpine, uid=1000)
+RUN chown -R node:node /app
 
 # Switch to non-root user
-USER nodejs
+USER node
 
 # Expose application port
 EXPOSE 3000
