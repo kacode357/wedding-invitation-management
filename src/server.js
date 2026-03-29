@@ -8,6 +8,13 @@ const { seedCategories } = require("./seeds/category.seed");
 const { seedNotes } = require("./seeds/note.seed");
 const { exec } = require("child_process");
 
+// ============================================
+// Trust Proxy - CRITICAL for Traefik/Reverse Proxy
+// ============================================
+// Allow Express to trust X-Forwarded-* headers from Traefik
+// This is required for correct IP detection and protocol detection behind a reverse proxy
+app.set("trust proxy", 1);
+
 /**
  * Normalize API_URL - add https:// if protocol is missing
  * @returns {string|null} - Normalized URL or null
@@ -37,8 +44,8 @@ function getPort() {
     if (process.env.PORT) {
       return parseInt(process.env.PORT, 10);
     }
-    // Fallback for production without PORT (shouldn't happen on major platforms)
-    return 8080;
+    // Fallback for production - default to 3000 (Docker/Traefik)
+    return 3000;
   }
 
   // Development: use .env PORT if set, otherwise default 5000
@@ -150,7 +157,7 @@ async function start() {
     ? getNormalizedApiUrl()
     : `http://localhost:${PORT}`;
 
-  app.listen(PORT, () => {
+  app.listen(PORT, "0.0.0.0", () => {
     console.log(`\n🚀 Wedding Invitation Management API`);
     console.log(`   Port: ${PORT}`);
     console.log(`   Environment: ${process.env.NODE_ENV}`);

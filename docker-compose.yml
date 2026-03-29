@@ -1,20 +1,18 @@
 # ============================================
-# Docker Compose - VPS Hostinger Deployment
+# Docker Compose - VPS Hostinger with Traefik
 # ============================================
 # Hướng dẫn:
-# 1. Clone repo: git clone https://github.com/kacode357/wedding-invitation-management
-# 2. Tạo .env.production từ .env.example
-# 3. Chạy: docker compose up -d
+# 1. Đảm bảo Traefik đã chạy trên VPS (cổng 80, 443)
+# 2. Clone repo vào VPS
+# 3. Copy .env.production thành .env: cp .env.production .env
+# 4. Chạy: docker compose -f docker-compose.yml up -d --build
 #
-# Lưu ý:
-# - MongoDB chạy trong container, dữ liệu persist trong volume mongo_data
-# - Source code được mount trực tiếp vào /app (không cần copy vào image)
-# - node_modules được giữ riêng trong container (tránh conflict OS)
+# Traefik sẽ tự động detect labels và route traffic
 # ============================================
 
 services:
   # -------------------------------
-  # MongoDB Database
+  # MongoDB Database (Internal only)
   # -------------------------------
   mongodb:
     image: mongo:7
@@ -28,46 +26,85 @@ services:
       - mongo_data:/data/db
     networks:
       - wedding_network
-    expose:
-      - "27017"
+    # Không expose port ra ngoài - chỉ truy cập nội bộ
+    # Traefik KHÔNG route đến MongoDB
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # -------------------------------
   # Wedding Invitation API
   # -------------------------------
   app:
-    image: node:20-alpine
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: wedding-invitation-api:latest
     container_name: wedding_api
     restart: unless-stopped
-    working_dir: /app
-    volumes:
-      - .:/app
-      - /app/node_modules
-    command: sh -c "npm ci --omit=dev && node src/server.js"
     environment:
       NODE_ENV: production
       PORT: 3000
       MONGODB_URI: mongodb://${MONGO_USER:-wedding_user}:${MONGO_PASSWORD:-wedding_password}@mongodb:27017/wedding_invitation_management?authSource=admin
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
-      API_URL: ${API_URL}
+      API_URL: ${API_URL:-http://wedding-ngoc.quangde.cloud}
       SWAGGER_UI_ENABLED: ${SWAGGER_UI_ENABLED:-true}
-    ports:
-      - "3000:3000"
     depends_on:
       mongodb:
         condition: service_healthy
     networks:
       - wedding_network
+    # KHÔNG expose port 3000 ra ngoài!
+    # Traefik truy cập app qua network nội bộ qua container name
+    # Chỉ expose port 3000 trong network (cho healthcheck)
+    expose:
+      - "3000"
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
+    # Security: chạy non-root
+    user: "1000:1000"
+
+    # ============================================
+    # TRAEFIK LABELS - CRITICAL
+    # ============================================
+    # Traefik sẽ đọc labels này và tự động route traffic
+    labels:
+      # Enable Traefik cho container này
+      - "traefik.enable=true"
+
+      # HTTP Router - Domain: wedding-ngoc.quangde.cloud
+      - "traefik.http.routers.wedding-api.rule=Host(`wedding-ngoc.quangde.cloud`)"
+      - "traefik.http.routers.wedding-api.entrypoints=web"
+      - "traefik.http.routers.wedding-api.service=wedding-api-service"
+
+      # HTTPS Router (nếu có certificate)
+      - "traefik.http.routers.wedding-api-ssl.rule=Host(`wedding-ngoc.quangde.cloud`)"
+      - "traefik.http.routers.wedding-api-ssl.entrypoints=websecure"
+      - "traefik.http.routers.wedding-api-ssl.tls=true"
+      - "traefik.http.routers.wedding-api-ssl.service=wedding-api-service"
+
+      # Service - chỉ định container và port nội bộ
+      - "traefik.http.services.wedding-api-service.loadbalancer.server.port=3000"
+      - "traefik.http.services.wedding-api-service.loadbalancer.server.scheme=http"
+
+      # Middleware: redirect HTTP -> HTTPS (tùy chọn)
+      - "traefik.http.middlewares.wedding-redirect-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.wedding-api.middlewares=wedding-redirect-https"
 
 networks:
   wedding_network:
     driver: bridge
+    # Kết nối với Traefik network
+    # Đảm bảo Traefik container cùng network với app
+    external: false
 
 volumes:
   mongo_data:
