@@ -51,7 +51,7 @@ services:
       MONGODB_URI: mongodb://${MONGO_USER:-wedding_user}:${MONGO_PASSWORD:-wedding_password}@mongodb:27017/wedding_invitation_management?authSource=admin
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
-      API_URL: ${API_URL:-http://wedding-ngoc.quangde.cloud}
+      API_URL: ${API_URL:-https://wedding-ngoc.quangde.cloud}
       SWAGGER_UI_ENABLED: ${SWAGGER_UI_ENABLED:-true}
     depends_on:
       mongodb:
