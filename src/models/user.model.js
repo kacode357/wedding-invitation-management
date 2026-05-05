@@ -1,5 +1,5 @@
 // User Model - MongoDB Driver
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const { getCollection, ObjectId } = require("../db/mongoose");
 
 const COLLECTION_NAME = "users";
