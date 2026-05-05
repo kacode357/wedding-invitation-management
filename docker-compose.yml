@@ -11,29 +11,6 @@
 # ============================================
 
 services:
-  # -------------------------------
-  # MongoDB Database (Internal only)
-  # -------------------------------
-  mongodb:
-    image: mongo:7
-    container_name: wedding_mongodb
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-wedding_user}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-wedding_password}
-      MONGO_INITDB_DATABASE: wedding_invitation_management
-    volumes:
-      - mongo_data:/data/db
-    networks:
-      - wedding_network
-    # Không expose port ra ngoài - chỉ truy cập nội bộ
-    # Traefik KHÔNG route đến MongoDB
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
 
   # -------------------------------
   # Wedding Invitation API
@@ -48,14 +25,12 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      MONGODB_URI: mongodb://${MONGO_USER:-wedding_user}:${MONGO_PASSWORD:-wedding_password}@mongodb:27017/wedding_invitation_management?authSource=admin
+      MONGODB_URI: ${MONGODB_URI}
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       API_URL: ${API_URL:-https://wedding-ngoc.quangde.cloud}
       SWAGGER_UI_ENABLED: ${SWAGGER_UI_ENABLED:-true}
-    depends_on:
-      mongodb:
-        condition: service_healthy
+
     networks:
       - wedding_network
     # KHÔNG expose port 3000 ra ngoài!
@@ -106,6 +81,3 @@ networks:
     # Đảm bảo Traefik container cùng network với app
     external: false
 
-volumes:
-  mongo_data:
-    driver: local
