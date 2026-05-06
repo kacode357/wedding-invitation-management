@@ -23,13 +23,13 @@ services:
     container_name: wedding_api
     restart: unless-stopped
     environment:
+      API_URL: https://wedding-ngoc.quangde.cloud
+      JWT_EXPIRES_IN: 7d
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      MONGODB_URI: mongodb+srv://luukaka2211_db_user:LYlrg5HreIa2TJTC@cluster0.uw530ty.mongodb.net/?appName=Cluster0
+      SWAGGER_UI_ENABLED: "true"
       NODE_ENV: production
       PORT: 3000
-      MONGODB_URI: ${MONGODB_URI}
-      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
-      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
-      API_URL: ${API_URL:-https://wedding-ngoc.quangde.cloud}
-      SWAGGER_UI_ENABLED: ${SWAGGER_UI_ENABLED:-true}
 
     networks:
       - wedding_network

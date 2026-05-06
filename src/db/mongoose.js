@@ -2,6 +2,10 @@
 const { MongoClient, ObjectId } = require("mongodb");
 require("dotenv").config();
 
+// Fix for Node.js querySrv ECONNREFUSED error (DNS resolution failure)
+const dns = require('node:dns');
+dns.setServers(['8.8.8.8', '1.1.1.1']); // Force Node.js to use Google/Cloudflare DNS
+
 const MONGODB_URI = process.env.MONGODB_URI;
 
 let client;
@@ -16,7 +20,7 @@ async function connectDB() {
     if (!MONGODB_URI) {
       throw new Error("❌ MONGODB_URI chưa được cấu hình trong .env!");
     }
-
+    console.log(">>", MONGODB_URI)
     console.log("⏳ Đang kết nối MongoDB...");
 
     client = new MongoClient(MONGODB_URI, {
@@ -32,7 +36,7 @@ async function connectDB() {
     return clientPromise;
   } catch (error) {
     console.error("✗ MongoDB Connection Error:", error.message);
-    console.error("→ Kiểm tra IP whitelist trong MongoDB Atlas!");
+    console.error("→ Kiểm tra IP whitelist trong MongoDB Atlas hoặc trạng thái Cluster (có bị Paused không)!");
     throw error;
   }
 }
