@@ -33,7 +33,6 @@ services:
 
     networks:
       - wedding_network
-      - traefik-proxy
     # KHÔNG expose port 3000 ra ngoài!
     # Traefik truy cập app qua network nội bộ qua container name
     # Chỉ expose port 3000 trong network (cho healthcheck)
@@ -78,6 +77,3 @@ services:
 networks:
   wedding_network:
     driver: bridge
-  traefik-proxy:
-    external: true
-
