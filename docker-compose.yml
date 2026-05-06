@@ -64,6 +64,7 @@ services:
       - "traefik.http.routers.wedding-api-ssl.rule=Host(`wedding-ngoc.quangde.cloud`)"
       - "traefik.http.routers.wedding-api-ssl.entrypoints=websecure"
       - "traefik.http.routers.wedding-api-ssl.tls=true"
+      - "traefik.http.routers.wedding-api-ssl.tls.certresolver=letsencrypt"
       - "traefik.http.routers.wedding-api-ssl.service=wedding-api-service"
 
       # Service - chỉ định container và port nội bộ
